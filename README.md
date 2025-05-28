@@ -65,7 +65,7 @@ help
 ls
 date
 echo "Hello OopisOS!"
-'''
+```
 
 The help command will provide a list of all available commands and their basic usage. Type help <command_name> for more details on a specific command.
 
@@ -112,9 +112,9 @@ OopisOS comes with a comprehensive diagnostic script, diag.sh (available in the 
 -Provide a detailed log of its operations.
 -To run it (assuming you have created diag.sh within OopisOS, e.g., at /etc/diag.sh):
 
-'''Bash
+```Bash
 run /etc/diag.sh
-'''
+```
 
 This script is an excellent example of advanced scripting within OopisOS and serves as a benchmark for system stability.
 
