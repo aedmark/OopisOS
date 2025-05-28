@@ -1,7 +1,6 @@
 # OopisOS - A Browser-Based OS Simulation
 
 ![OopisOS Screenshot](https://i.imgur.com/Seol95t.png)
-*(Note: This is an example screenshot. It's recommended to replace this with a high-quality capture of the application.)*
 
 OopisOS is a unique, single-file HTML application that simulates a desktop operating system environment entirely within a web browser. It features a retro-style terminal, a persistent hierarchical file system, user management, session handling, a built-in text editor, and a suite of command-line utilities, all powered by client-side JavaScript.
 
