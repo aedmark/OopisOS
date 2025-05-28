@@ -64,7 +64,8 @@ The entire system is self-contained within a single HTML file (`OopisOS 0.8.2.ht
 help
 ls
 date
-echo "Hello OopisOS!"'''
+echo "Hello OopisOS!"
+'''
 
 The help command will provide a list of all available commands and their basic usage. Type help <command_name> for more details on a specific command.
 
@@ -112,7 +113,8 @@ OopisOS comes with a comprehensive diagnostic script, diag.sh (available in the 
 -To run it (assuming you have created diag.sh within OopisOS, e.g., at /etc/diag.sh):
 
 '''Bash
-run /etc/diag.sh'''
+run /etc/diag.sh
+'''
 
 This script is an excellent example of advanced scripting within OopisOS and serves as a benchmark for system stability.
 
