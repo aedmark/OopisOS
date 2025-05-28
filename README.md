@@ -90,7 +90,7 @@ Interested in understanding or modifying OopisOS?
 - Define a handler: async (args, cmdOptions) => { ... } function for its logic.
 - Provide summary, usage, details, and examples metadata for the help system.
 
-##Scripting Guide
+## Scripting Guide
 Automate tasks in OopisOS by writing scripts.
 
 **Creating Scripts:** Use edit your_script_name.sh.
@@ -105,11 +105,11 @@ Automate tasks in OopisOS by writing scripts.
 
 ## Diagnostic Script (diag.sh)
 OopisOS comes with a comprehensive diagnostic script, diag.sh (available in the original source files). This script is designed to:
--Rigorously test core filesystem operations.
--Verify command parsing and execution, including redirection.
--Test error handling using the check_fail command.
--Provide a detailed log of its operations.
--To run it (assuming you have created diag.sh within OopisOS, e.g., at /etc/diag.sh):
+- Rigorously test core filesystem operations.
+- Verify command parsing and execution, including redirection.
+- Test error handling using the check_fail command.
+- Provide a detailed log of its operations.
+- To run it (assuming you have created diag.sh within OopisOS, e.g., at /etc/diag.sh):
 
 ```Bash
 run /etc/diag.sh
@@ -127,25 +127,25 @@ This script is an excellent example of advanced scripting within OopisOS and ser
 
 ## Contributing
 Contributions to OopisOS are welcome! If you'd like to contribute, please consider the following:
--Fork the repository.
--Create a new branch for your feature or bug fix (git checkout -b feature/your-new-feature).
--Make your changes. Ensure you test them thoroughly, perhaps by writing new test cases for diag.sh or a similar script.
--Update documentation if you're adding new commands or significantly changing behavior.
--Submit a pull request with a clear description of your changes.
+- Fork the repository.
+- Create a new branch for your feature or bug fix (git checkout -b feature/your-new-feature).
+- Make your changes. Ensure you test them thoroughly, perhaps by writing new test cases for diag.sh or a similar script.
+- Update documentation if you're adding new commands or significantly changing behavior.
+- Submit a pull request with a clear description of your changes.
 
 ### Areas for potential contribution:
--Adding new commands or utilities.
--Enhancing existing command functionalities.
--Improving the UI/UX of the terminal or editor.
--Expanding scripting capabilities (e.g., variables, basic control flow).
--Bug fixes and performance optimizations.
+- Adding new commands or utilities.
+- Enhancing existing command functionalities.
+- Improving the UI/UX of the terminal or editor.
+- Expanding scripting capabilities (e.g., variables, basic control flow).
+- Bug fixes and performance optimizations.
 
 ## Future Ideas
--Basic networking simulation (e.g., ping, fetch-like commands).
--More advanced scripting features (variables, simple loops, if/else).
--A very simple graphical element or windowing system (ambitious!).
--Support for more file types in the editor or for execution.
--Enhanced tab-completion intelligence.
+- Basic networking simulation (e.g., ping, fetch-like commands).
+- More advanced scripting features (variables, simple loops, if/else).
+- A very simple graphical element or windowing system (ambitious!).
+- Support for more file types in the editor or for execution.
+- Enhanced tab-completion intelligence.
 
 ## License
 This project is distributed under the MIT License. See LICENSE for more information.
