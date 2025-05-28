@@ -141,7 +141,7 @@ Contributions to OopisOS are welcome! If you'd like to contribute, please consid
 -Expanding scripting capabilities (e.g., variables, basic control flow).
 -Bug fixes and performance optimizations.
 
-##Future Ideas
+## Future Ideas
 -Basic networking simulation (e.g., ping, fetch-like commands).
 -More advanced scripting features (variables, simple loops, if/else).
 -A very simple graphical element or windowing system (ambitious!).
