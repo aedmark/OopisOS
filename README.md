@@ -85,10 +85,10 @@ Interested in understanding or modifying OopisOS?
 **FileSystemManager:** Handles all file operations and persistence to IndexedDB.
 
 ## Adding a New Command:
--Locate the commands object within CommandExecutor.
--Add a new entry with your command name as the key.
--Define a handler: async (args, cmdOptions) => { ... } function for its logic.
--Provide summary, usage, details, and examples metadata for the help system.
+- Locate the commands object within CommandExecutor.
+- Add a new entry with your command name as the key.
+- Define a handler: async (args, cmdOptions) => { ... } function for its logic.
+- Provide summary, usage, details, and examples metadata for the help system.
 
 ##Scripting Guide
 Automate tasks in OopisOS by writing scripts.
