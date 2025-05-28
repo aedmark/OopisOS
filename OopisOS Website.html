@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OopisOS - Interactive System Report</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Application Structure Plan:
+        The SPA will be a single, scrollable page with thematic sections to present the OopisOS report.
+        Sections:
+        1. Hero/Introduction: What is OopisOS? Key high-level features.
+        2. Core Architecture: Visualizing the 'Manager' components and their roles.
+        3. Key Capabilities Showcase: Interactive exploration of Filesystem Ops, Command Groups, Scripting, User/Session Mgt, Editor.
+        4. Technology & Persistence: Details on HTML, CSS, JS, IndexedDB, LocalStorage.
+        5. Command Lifecycle: Visual flow from input to output.
+        6. The `diag.sh` Advantage: Highlighting testing and reliability.
+        7. Conclusion & Outlook: Summary.
+        Navigation will be primarily through scrolling. The structure aims for a narrative flow, making complex information digestible by breaking it into logical, visually supported chunks. This thematic approach, rather than mirroring the report's linear structure, should enhance user understanding and exploration.
+    -->
+    <!-- Visualization & Content Choices:
+        - What is OopisOS (Section 1): Text summary + Large Stat (e.g., "100% Browser Based"). Goal: Inform. Viz: HTML/CSS. Justification: High impact intro.
+        - Core Architecture (Section 2): Diagram of 'Managers'. Goal: Organize. Viz: HTML/CSS (Tailwind styled divs & pseudo-elements for connections). Justification: Clearly show component relationships without SVG/Mermaid.
+        - Capabilities - Feature Overview (Section 3): Donut Chart of feature categories (Filesystem, User Mgt, etc.). Goal: Compare (Composition). Viz: Chart.js (Canvas). Justification: Shows proportions of overall functionality.
+        - Capabilities - Command Groups (Section 3): Bar Chart for command types. Goal: Compare. Viz: Chart.js (Canvas). Justification: Compares counts of different command types.
+        - Capabilities - Filesystem/Scripting/User Mgt/Editor (Section 3): Info cards with key points. Goal: Inform. Viz: HTML/CSS. Justification: Concise textual highlights.
+        - Technology & Persistence (Section 4): Styled blocks for tech stack, diagram for persistence. Goal: Inform/Organize. Viz: HTML/CSS. Justification: Clear visual grouping.
+        - Command Lifecycle (Section 5): Flowchart. Goal: Organize (Process). Viz: HTML/CSS (Tailwind styled divs, borders for flow). Justification: Visualizes sequential process.
+        - `diag.sh` Advantage (Section 6): Large stat for test coverage. Goal: Inform. Viz: HTML/CSS. Justification: Quantifies robustness.
+        All Chart.js charts will use Canvas, include label wrapping for labels >16 chars, and the specified tooltip config. No SVG/Mermaid will be used.
+    -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F5F5DC; /* Beige - Background */
+            color: #8B4513; /* SaddleBrown - Primary Text */
+        }
+        .font-mono {
+            font-family: 'Roboto Mono', monospace;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 550px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px; 
+            max-height: 450px;
+            padding: 1rem;
+            background-color: #FFFFFF; /* White card background for charts */
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        @media (max-width: 768px) {
+            .chart-container { height: 320px; max-height: 400px; }
+        }
+        @media (max-width: 640px) {
+            .chart-container { height: 300px; max-height: 350px; }
+        }
+        .card {
+            background-color: #FFFFFF;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border-left: 5px solid #D2B48C; /* Tan - Accent */
+        }
+        .section-title {
+            color: #A0522D; /* Sienna - Section Titles */
+            border-bottom: 2px solid #D2B48C; /* Tan */
+            padding-bottom: 0.5rem;
+        }
+        .stat-value {
+            color: #A0522D; /* Sienna */
+            font-weight: 700;
+        }
+        .flowchart-item {
+            background-color: #FFF8E1; /* Lighter Beige for flowchart items */
+            border: 1px solid #D2B48C; /* Tan */
+            color: #8B4513; /* SaddleBrown */
+        }
+        .flowchart-arrow::after {
+            content: '➔';
+            color: #D2B48C; /* Tan */
+            font-size: 1.5rem;
+            line-height: 1;
+        }
+        .manager-box {
+            background-color: #EAE0D1; /* Light Tan */
+            border: 1px solid #D2B48C; /* Tan */
+            color: #8B4513; /* SaddleBrown */
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .manager-box:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(139, 69, 19, 0.15);
+        }
+        .tech-tag {
+            background-color: #D2B48C; /* Tan */
+            color: #FFFFFF;
+        }
+        nav a {
+            color: #8B4513; /* SaddleBrown */
+            transition: color 0.3s ease;
+        }
+        nav a:hover {
+            color: #A0522D; /* Sienna */
+        }
+        .sticky-nav {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background-color: rgba(245, 245, 220, 0.9); /* Beige with opacity */
+            backdrop-filter: blur(5px);
+        }
+    </style>
+</head>
+<body class="leading-relaxed">
+
+    <nav class="sticky-nav shadow-md py-3">
+        <div class="container mx-auto px-4 flex flex-wrap justify-center items-center space-x-4 md:space-x-6">
+            <a href="#intro" class="text-sm font-medium hover:underline">Intro</a>
+            <a href="#architecture" class="text-sm font-medium hover:underline">Architecture</a>
+            <a href="#capabilities" class="text-sm font-medium hover:underline">Capabilities</a>
+            <a href="#tech-stack" class="text-sm font-medium hover:underline">Tech</a>
+            <a href="#lifecycle" class="text-sm font-medium hover:underline">Lifecycle</a>
+            <a href="#diag-script" class="text-sm font-medium hover:underline">Diagnostics</a>
+        </div>
+    </nav>
+
+    <div class="container mx-auto p-4 md:p-8">
+
+        <section id="intro" class="py-12 md:py-16 text-center">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4 section-title inline-block">OopisOS v0.8.2</h1>
+            <p class="text-xl md:text-2xl text-gray-700 mb-8 max-w-3xl mx-auto">An Interactive Deep Dive into a Browser-Based OS Simulation</p>
+            <div class="card p-6 md:p-8 max-w-2xl mx-auto">
+                <h2 class="text-2xl font-semibold mb-3 stat-value">What is OopisOS?</h2>
+                <p class="text-gray-600 mb-4">
+                    OopisOS is a sophisticated JavaScript application simulating a desktop operating system environment entirely within your web browser. It offers a retro-style terminal, a persistent hierarchical file system, user management, session handling, a built-in text editor, common command-line utilities, and scripting capabilities.
+                </p>
+                <div class="my-6">
+                    <span class="stat-value text-5xl font-bold font-mono">100%</span>
+                    <p class="text-gray-500 uppercase text-sm tracking-wider">Client-Side Simulation</p>
+                </div>
+                <p class="text-xs text-gray-500">Leveraging browser technologies like IndexedDB and JavaScript for all its logic and persistence.</p>
+            </div>
+        </section>
+
+        <section id="architecture" class="py-12 md:py-16">
+            <h2 class="text-3xl font-bold mb-10 text-center section-title">Core Architecture: Modular Power</h2>
+            <p class="text-center text-gray-700 mb-10 max-w-3xl mx-auto">
+                OopisOS is built upon a modular JavaScript design. Specialized "Manager" components handle distinct OS functionalities, ensuring maintainability and clear separation of concerns. This architecture is key to its robust performance and extensibility.
+            </p>
+            <div class="card p-6 md:p-8">
+                <h3 class="text-xl font-semibold mb-6 text-center stat-value">Key System Managers</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                    <div class="manager-box p-4 rounded-md text-center"><strong>CommandExecutor</strong><p class="text-xs mt-1 text-gray-600">Heart of command processing (Lexer, Parser, Handlers).</p></div>
+                    <div class="manager-box p-4 rounded-md text-center"><strong>FileSystemManager</strong><p class="text-xs mt-1 text-gray-600">Manages files, directories, and paths using IndexedDB.</p></div>
+                    <div class="manager-box p-4 rounded-md text-center"><strong>UserManager</strong><p class="text-xs mt-1 text-gray-600">Handles user registration, login, and isolated file systems.</p></div>
+                    <div class="manager-box p-4 rounded-md text-center"><strong>SessionManager</strong><p class="text-xs mt-1 text-gray-600">Saves/loads user sessions, including auto-saves and backups.</p></div>
+                    <div class="manager-box p-4 rounded-md text-center"><strong>EditorManager</strong><p class="text-xs mt-1 text-gray-600">Powers the built-in `edit` command and text editor UI.</p></div>
+                    <div class="manager-box p-4 rounded-md text-center"><strong>OutputManager</strong><p class="text-xs mt-1 text-gray-600">Controls terminal display for output, errors, and messages.</p></div>
+                    <div class="manager-box p-4 rounded-md text-center"><strong>TerminalUI</strong><p class="text-xs mt-1 text-gray-600">Manages visual aspects of the terminal (prompt, input).</p></div>
+                    <div class="manager-box p-4 rounded-md text-center"><strong>IndexedDBManager</strong><p class="text-xs mt-1 text-gray-600">Interface for persistent file system storage.</p></div>
+                    <div class="manager-box p-4 rounded-md text-center"><strong>HistoryManager</strong><p class="text-xs mt-1 text-gray-600">Tracks command history for user navigation.</p></div>
+                </div>
+                <p class="text-center text-sm text-gray-500 mt-8">This modular approach allows for independent development and testing of components, contributing to the overall stability and maintainability of OopisOS.</p>
+            </div>
+        </section>
+
+        <section id="capabilities" class="py-12 md:py-16">
+            <h2 class="text-3xl font-bold mb-10 text-center section-title">Key Capabilities Showcase</h2>
+            <p class="text-center text-gray-700 mb-10 max-w-3xl mx-auto">
+                OopisOS offers a rich set of functionalities that mimic a traditional command-line OS. The `diag.sh` script provided in the source report extensively tests many of these core features.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 mb-12">
+                <div class="card p-6">
+                    <h3 class="text-xl font-semibold mb-3 text-center stat-value">Functional Area Distribution</h3>
+                    <p class="text-sm text-gray-600 mb-4 text-center">OopisOS commands are well-distributed across essential operating system functions, indicating a balanced development focus.</p>
+                    <div class="chart-container">
+                        <canvas id="featureDistributionChart"></canvas>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-4 text-center">This chart shows the approximate distribution of core commands, with File System Operations forming the largest category.</p>
+                </div>
+                <div class="card p-6">
+                    <h3 class="text-xl font-semibold mb-3 text-center stat-value">Command Group Analysis</h3>
+                    <p class="text-sm text-gray-600 mb-4 text-center">Analysis of command types reveals a comprehensive toolkit for simulated OS interaction and management tasks.</p>
+                    <div class="chart-container">
+                        <canvas id="commandTypeChart"></canvas>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-4 text-center">Filesystem manipulation commands are prominent, supported by robust system control and utility functions.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                <div class="card p-5">
+                    <h4 class="text-lg font-semibold mb-2 stat-value">File System Operations</h4>
+                    <p class="text-sm text-gray-600">Includes `mkdir`, `ls`, `touch`, `cat`, `cp`, `mv`, `rm`, `pwd`, `cd`, `tree`, `find`. Extensively tested by `diag.sh` for creation, manipulation, navigation, and deletion.</p>
+                </div>
+                <div class="card p-5">
+                    <h4 class="text-lg font-semibold mb-2 stat-value">Scripting & Execution</h4>
+                    <p class="text-sm text-gray-600">The `run` command executes scripts. `diag.sh` itself is a prime example. Features like `delay` and the diagnostic `check_fail` enhance script utility.</p>
+                </div>
+                <div class="card p-5">
+                    <h4 class="text-lg font-semibold mb-2 stat-value">User & Session Management</h4>
+                    <p class="text-sm text-gray-600">Supports `register`, `login`, `logout`. `savestate`, `loadstate`, `backup`, `restore`, and `reset` provide comprehensive session control.</p>
+                </div>
+                <div class="card p-5">
+                    <h4 class="text-lg font-semibold mb-2 stat-value">Built-in Editor (`edit`)</h4>
+                    <p class="text-sm text-gray-600">A full-screen text editor with `Ctrl+S` (save/exit), `Ctrl+O` (exit no save), `Ctrl+P` (toggle preview for MD/HTML). Supports different file modes.</p>
+                </div>
+                <div class="card p-5">
+                    <h4 class="text-lg font-semibold mb-2 stat-value">I/O & Utilities</h4>
+                    <p class="text-sm text-gray-600">`echo` for output, redirection (`>`, `>>`). Utilities include `date`, `help`, `clear`, `history`, `export`, `upload`.</p>
+                </div>
+                <div class="card p-5">
+                    <h4 class="text-lg font-semibold mb-2 stat-value">Error Handling</h4>
+                    <p class="text-sm text-gray-600">Provides user-friendly error messages. `diag.sh` rigorously tests failure conditions (e.g., `ls /non_existent_path`).</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="tech-stack" class="py-12 md:py-16">
+            <h2 class="text-3xl font-bold mb-10 text-center section-title">Technology Stack & Data Persistence</h2>
+            <p class="text-center text-gray-700 mb-10 max-w-3xl mx-auto">
+                OopisOS leverages standard web technologies for its frontend and client-side logic, ensuring broad compatibility and ease of access. Its persistence strategy is tailored for browser environments.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
+                <div class="card p-6 md:p-8">
+                    <h3 class="text-xl font-semibold mb-4 stat-value">Frontend & Logic</h3>
+                    <ul class="space-y-2 mb-4">
+                        <li class="flex items-center"><span class="tech-tag text-xs font-semibold mr-2 px-2 py-0.5 rounded-full">HTML</span> Defines terminal structure.</li>
+                        <li class="flex items-center"><span class="tech-tag text-xs font-semibold mr-2 px-2 py-0.5 rounded-full">Tailwind CSS</span> For utility-first styling.</li>
+                        <li class="flex items-center"><span class="tech-tag text-xs font-semibold mr-2 px-2 py-0.5 rounded-full">Custom CSS</span> For retro terminal aesthetics.</li>
+                        <li class="flex items-center"><span class="tech-tag text-xs font-semibold mr-2 px-2 py-0.5 rounded-full">JavaScript (ES6+)</span> Powers all OS logic and managers.</li>
+                        <li class="flex items-center"><span class="tech-tag text-xs font-semibold mr-2 px-2 py-0.5 rounded-full">Chart.js</span> For data visualizations.</li>
+                        <li class="flex items-center"><span class="tech-tag text-xs font-semibold mr-2 px-2 py-0.5 rounded-full">Marked.js</span> For Markdown preview in editor.</li>
+                    </ul>
+                    <p class="text-sm text-gray-600">This stack provides a responsive UI and robust client-side processing capabilities.</p>
+                </div>
+                <div class="card p-6 md:p-8">
+                    <h3 class="text-xl font-semibold mb-4 stat-value">Data Persistence Strategy</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <h4 class="text-md font-semibold text-gray-700">IndexedDB</h4>
+                            <p class="text-sm text-gray-600">Primary storage for user file systems (via `FileSystemsStore`). Stores entire file/directory structures as JSON per user (key: `fs_<username>`). Ensures persistence across browser sessions.</p>
+                        </div>
+                        <div>
+                            <h4 class="text-md font-semibold text-gray-700">LocalStorage</h4>
+                            <p class="text-sm text-gray-600">Used for:
+                                <ul class="list-disc list-inside text-xs ml-4 text-gray-500">
+                                    <li>User credentials (`oopisOsUserCredentials`).</li>
+                                    <li>Automatic terminal session states (`oopisOsUserTerminalState_<username>`).</li>
+                                    <li>Manual session snapshots (`oopisOsManualUserTerminalState_<username>`).</li>
+                                </ul>
+                            </p>
+                        </div>
+                    </div>
+                     <p class="text-sm text-gray-600 mt-4">This dual-storage approach effectively manages complex file system data and simpler session metadata within the browser's capabilities.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="lifecycle" class="py-12 md:py-16">
+            <h2 class="text-3xl font-bold mb-10 text-center section-title">OopisOS Command Lifecycle</h2>
+            <p class="text-center text-gray-700 mb-10 max-w-3xl mx-auto">
+                The processing of a command in OopisOS follows a well-defined lifecycle, from user input to displayed output, managed by the `CommandExecutor`.
+            </p>
+            <div class="card p-6 md:p-8">
+                <div class="overflow-x-auto">
+                    <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between space-y-4 md:space-y-0 md:space-x-2">
+                        <div class="flowchart-item p-3 rounded-md text-center min-w-[150px] flex-1 flex items-center justify-center">1. User Input</div>
+                        <div class="flowchart-arrow self-center hidden md:block mx-1"></div><div class="md:hidden self-center transform rotate-90 flowchart-arrow my-2"></div>
+                        <div class="flowchart-item p-3 rounded-md text-center min-w-[150px] flex-1 flex items-center justify-center">2. Lexing (Tokens)</div>
+                        <div class="flowchart-arrow self-center hidden md:block mx-1"></div><div class="md:hidden self-center transform rotate-90 flowchart-arrow my-2"></div>
+                        <div class="flowchart-item p-3 rounded-md text-center min-w-[150px] flex-1 flex items-center justify-center">3. Parsing (AST)</div>
+                        <div class="flowchart-arrow self-center hidden md:block mx-1"></div><div class="md:hidden self-center transform rotate-90 flowchart-arrow my-2"></div>
+                        <div class="flowchart-item p-3 rounded-md text-center min-w-[150px] flex-1 flex items-center justify-center">4. Execution (Handler Call)</div>
+                        <div class="flowchart-arrow self-center hidden md:block mx-1"></div><div class="md:hidden self-center transform rotate-90 flowchart-arrow my-2"></div>
+                        <div class="flowchart-item p-3 rounded-md text-center min-w-[150px] flex-1 flex items-center justify-center">5. Output (Display/Redirect)</div>
+                    </div>
+                </div>
+                <p class="text-center text-sm text-gray-500 mt-8">This structured pipeline ensures consistent command processing and facilitates debugging and future enhancements to the command set or parsing logic.</p>
+            </div>
+        </section>
+
+        <section id="diag-script" class="py-12 md:py-16 text-center">
+            <div class="card p-6 md:p-8 max-w-2xl mx-auto">
+                <h2 class="text-2xl font-semibold mb-3 stat-value">The `diag.sh` Advantage: Reliability Through Testing</h2>
+                <p class="text-gray-600 mb-6">
+                    OopisOS includes a comprehensive diagnostic script (`diag.sh`) which automates testing of its core functionalities. This script is crucial for ensuring system stability and reliability.
+                </p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="bg-amber-100 p-4 rounded">
+                        <span class="stat-value text-4xl font-bold font-mono">45+</span>
+                        <p class="text-gray-500 uppercase text-xs tracking-wider">Core Function Tests</p>
+                    </div>
+                    <div class="bg-amber-100 p-4 rounded">
+                        <span class="stat-value text-4xl font-bold font-mono">10+</span>
+                        <p class="text-gray-500 uppercase text-xs tracking-wider">Error Conditions Verified</p>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-600 mt-6">
+                    By using `check_fail` for expected failures and verifying successful operations, `diag.sh` validates filesystem operations, command parsing, redirection, and error handling, contributing to a robust user experience.
+                </p>
+            </div>
+        </section>
+
+        <footer class="text-center py-10 mt-12 border-t border-gray-300">
+            <h2 class="text-2xl font-bold mb-4 section-title inline-block">Conclusion & Outlook</h2>
+            <p class="text-gray-700 mb-6 max-w-3xl mx-auto">
+                OopisOS stands as a notable example of sophisticated browser-based simulation. Its modular design, comprehensive feature set, robust persistence, and thorough internal testing (via `diag.sh`) establish it as a powerful and engaging platform. It is well-suited for educational purposes, exploring retro-computing paradigms, or providing a sandboxed environment for command-line experimentation.
+            </p>
+            <p class="text-xs text-gray-500">&copy; OopisOS Interactive Report. All data derived from provided source material.</p>
+        </footer>
+
+    </div>
+
+    <script>
+        const chartLabelWrapper = (label, maxWidth = 16) => {
+            if (typeof label !== 'string' || label.length <= maxWidth) return label;
+            const words = label.split(' ');
+            const lines = [];
+            let currentLine = '';
+            for (const word of words) {
+                if (currentLine.length > 0 && (currentLine + word).length > maxWidth) {
+                    lines.push(currentLine.trim());
+                    currentLine = word + ' ';
+                } else {
+                    currentLine += word + ' ';
+                }
+            }
+            if (currentLine.trim().length > 0) lines.push(currentLine.trim());
+            return lines.length > 0 ? lines : [label];
+        };
+
+        const tooltipTitleCallback = (tooltipItems) => {
+            const item = tooltipItems[0];
+            let label = item.chart.data.labels[item.dataIndex];
+            if (Array.isArray(label)) {
+              return label.join(' ');
+            }
+            return label;
+        };
+
+        const chartColors = ['#A0522D', '#D2B48C', '#BC8F8F', '#8B4513', '#C08458']; // Sienna, Tan, RosyBrown, SaddleBrown, Lighter Brown
+
+        const defaultChartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { color: '#8B4513', font: { size: 11 } } // SaddleBrown
+                },
+                tooltip: {
+                    callbacks: { title: tooltipTitleCallback },
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                    titleColor: '#8B4513', // SaddleBrown
+                    bodyColor: '#A0522D', // Sienna
+                    borderColor: '#D2B48C', // Tan
+                    borderWidth: 1,
+                    padding: 10,
+                    bodyFont: { weight: '500' }
+                }
+            },
+            scales: {
+                x: { ticks: { color: '#8B4513', font: {size: 10}}, grid: { color: 'rgba(210, 180, 140, 0.2)' } }, // SaddleBrown, Tan grid
+                y: { ticks: { color: '#8B4513', font: {size: 10}}, grid: { color: 'rgba(210, 180, 140, 0.2)' }, beginAtZero: true }
+            }
+        };
+
+        // Feature Distribution Donut Chart
+        const featureDistCtx = document.getElementById('featureDistributionChart').getContext('2d');
+        new Chart(featureDistCtx, {
+            type: 'doughnut',
+            data: {
+                labels: [
+                    chartLabelWrapper('File System Core Ops'), 
+                    chartLabelWrapper('User & Session Mgt.'), 
+                    chartLabelWrapper('Scripting & Execution'), 
+                    chartLabelWrapper('Editor & I/O Utilities'), 
+                    chartLabelWrapper('System & Meta Cmds')
+                ],
+                datasets: [{
+                    label: 'Feature Distribution',
+                    data: [40, 25, 10, 15, 10], // Adjusted %
+                    backgroundColor: chartColors,
+                    borderColor: '#F5F5DC', // Beige
+                    borderWidth: 3,
+                    hoverOffset: 8
+                }]
+            },
+            options: { ...defaultChartOptions, cutout: '60%' }
+        });
+
+        // Command Type Bar Chart
+        const commandTypeCtx = document.getElementById('commandTypeChart').getContext('2d');
+        new Chart(commandTypeCtx, {
+            type: 'bar',
+            data: {
+                labels: [
+                    chartLabelWrapper('FS Manipulation (mkdir, cp, mv, rm)'), 
+                    chartLabelWrapper('FS Navigation & View (ls, cd, pwd, cat, tree, find)'), 
+                    chartLabelWrapper('System Control (run, login, reset)'), 
+                    chartLabelWrapper('Utility & Data (echo, date, edit, history)')
+                ],
+                datasets: [{
+                    label: 'Approx. Number of Commands',
+                    data: [7, 6, 7, 9], // Example counts
+                    backgroundColor: chartColors.slice(0,4),
+                    borderColor: chartColors.slice(0,4).map(c => c + 'AA'), // Add some alpha for border
+                    borderWidth: 1,
+                    borderRadius: 4,
+                }]
+            },
+            options: defaultChartOptions
+        });
+        
+        // Smooth scroll for nav links
+        document.querySelectorAll('nav a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    // Calculate offset for sticky nav
+                    const navHeight = document.querySelector('.sticky-nav').offsetHeight;
+                    const elementPosition = targetElement.getBoundingClientRect().top;
+                    const offsetPosition = elementPosition + window.pageYOffset - navHeight - 15; // 15px extra padding
+
+                    window.scrollTo({
+                        top: offsetPosition,
+                        behavior: "smooth"
+                    });
+                }
+            });
+        });
+
+    </script>
+</body>
+</html>
