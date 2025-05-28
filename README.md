@@ -65,3 +65,86 @@ help
 ls
 date
 echo "Hello OopisOS!"
+
+The help command will provide a list of all available commands and their basic usage. Type help <command_name> for more details on a specific command.
+
+## Exploring OopisOS
+OopisOS offers a rich environment. Here are some areas to explore:
+
+**File System:** Create directories (mkdir my_folder), navigate into them (cd my_folder), create files (touch my_file.txt), and edit them (edit my_file.txt).
+**User Accounts:** Try registering a new user (register your_username), logging out (logout), and logging back in (login your_username). Notice how your file system is unique to your user.
+**Session Persistence:** Use savestate to save your current work, then make some changes or reset, and use loadstate to restore your previous session.
+**Scripting:** Create a simple script file using edit (e.g., edit test.sh), add some commands like echo "Script running!" and ls /, save it, and then run it with run test.sh.
+
+## Developer Guide
+Interested in understanding or modifying OopisOS?
+
+**Source Code:** All the logic is contained within the <script> tags in the OopisOS 0.8.2.html file.
+**Core Architecture:** OopisOS is built with a modular JavaScript design using "Manager" objects (e.g., CommandExecutor, FileSystemManager, UserManager).
+**CommandExecutor:** Contains the commands object, which maps command names to their handler functions. This is the primary place to add new commands or modify existing ones.
+**FileSystemManager:** Handles all file operations and persistence to IndexedDB.
+
+## Adding a New Command:
+-Locate the commands object within CommandExecutor.
+-Add a new entry with your command name as the key.
+-Define a handler: async (args, cmdOptions) => { ... } function for its logic.
+-Provide summary, usage, details, and examples metadata for the help system.
+
+##Scripting Guide
+Automate tasks in OopisOS by writing scripts.
+
+**Creating Scripts:** Use edit your_script_name.sh.
+**Format:** Plain text files, one command per line. Lines starting with # are comments.
+**Running Scripts:** run your_script_name.sh.
+
+## Key Scripting Commands:
+**echo "message":** Display output.
+**delay <milliseconds>:** Pause execution.
+**Redirection:** > and >> (e.g., ls > file_list.txt).
+**check_fail "<command_string>":** Executes the quoted command. The script continues if the command fails (useful for testing error conditions) and halts if the command succeeds unexpectedly.
+
+## Diagnostic Script (diag.sh)
+OopisOS comes with a comprehensive diagnostic script, diag.sh (available in the original source files). This script is designed to:
+-Rigorously test core filesystem operations.
+-Verify command parsing and execution, including redirection.
+-Test error handling using the check_fail command.
+-Provide a detailed log of its operations.
+-To run it (assuming you have created diag.sh within OopisOS, e.g., at /etc/diag.sh):
+
+'''Bash
+run /etc/diag.sh
+
+This script is an excellent example of advanced scripting within OopisOS and serves as a benchmark for system stability.
+
+## Technology Stack
+**Frontend & Logic:** HTML5, CSS3 (Tailwind CSS + Custom CSS for theming), JavaScript (ES6+)
+**Data Visualization (in guide/reports):** Chart.js
+**Markdown Parsing (in editor):** Marked.js
+**Persistent Storage**
+**IndexedDB:** For user file systems.
+**LocalStorage:** For user credentials and session states.
+
+## Contributing
+Contributions to OopisOS are welcome! If you'd like to contribute, please consider the following:
+-Fork the repository.
+-Create a new branch for your feature or bug fix (git checkout -b feature/your-new-feature).
+-Make your changes. Ensure you test them thoroughly, perhaps by writing new test cases for diag.sh or a similar script.
+-Update documentation if you're adding new commands or significantly changing behavior.
+-Submit a pull request with a clear description of your changes.
+
+### Areas for potential contribution:
+-Adding new commands or utilities.
+-Enhancing existing command functionalities.
+-Improving the UI/UX of the terminal or editor.
+-Expanding scripting capabilities (e.g., variables, basic control flow).
+-Bug fixes and performance optimizations.
+
+##Future Ideas
+-Basic networking simulation (e.g., ping, fetch-like commands).
+-More advanced scripting features (variables, simple loops, if/else).
+-A very simple graphical element or windowing system (ambitious!).
+-Support for more file types in the editor or for execution.
+-Enhanced tab-completion intelligence.
+
+## License
+This project is distributed under the MIT License. See LICENSE for more information.
