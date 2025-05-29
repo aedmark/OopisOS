@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OopisOs v.01</title>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'VT323', monospace;
+            background-color: #1a1a1a;
+            color: #00ff00;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        #terminal {
+            width: 90vw;
+            max-width: 800px;
+            height: 70vh;
+            max-height: 600px;
+            background-color: #0d0d0d;
+            border: 2px solid #333333;
+            border-radius: 8px;
+            padding: 20px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+        }
+        #output {
+            flex-grow: 1; /* Output area takes up available vertical space */
+            margin-bottom: 10px;
+            overflow-x: hidden; /* Prevent horizontal overflow from output content */
+            width: 100%;
+            min-width: 0; /* Important for flex children to respect overflow */
+        }
+        /* Applies wrapping rules directly to each line of output */
+        .output-line {
+            white-space: normal; /* Prioritize wrapping over preserving whitespace */
+            word-break: break-all; /* Break long words */
+            overflow-wrap: break-word; /* Additional word breaking */
+            overflow-x: hidden; /* Ensure each line itself also clips if somehow still overflowing */
+        }
+        .input-line {
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+        .prompt-path {
+            margin-right: 4px;
+        }
+        .prompt-char {
+            margin-right: 8px;
+        }
+        #current-input {
+            /* flex-grow: 1; /* REMOVED: This was pushing the cursor to the right */
+            flex-shrink: 1; /* Allow shrinking if needed */
+            min-width: 0; /* Allow shrinking below content size */
+            white-space: nowrap; /* Keep typed input on one line */
+            overflow: hidden; /* Hide overflowing typed input text */
+        }
+        .cursor {
+            width: 10px; /* Width of the cursor block */
+            height: 1.2em; /* Height relative to font size */
+            background-color: #00ff00; /* Green cursor */
+            animation: blink 1s step-end infinite;
+            margin-left: 2px; /* Small space after the typed text */
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        #hidden-input {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+            left: -9999px; /* Move it off-screen */
+        }
+        .error-message {
+            color: #ff4136; /* Red for error messages */
+        }
+        .directory-item {
+            color: #7fdbff; /* Light blue for directory names in ls output */
+        }
+    </style>
+</head>
+<body>
+    <div id="terminal">
+        <div id="output"></div>
+        <div class="input-line">
+            <span id="prompt-path" class="prompt-path"></span>
+            <span class="prompt-char">&gt;</span>
+            <span id="current-input"></span>
+            <div class="cursor"></div>
+        </div>
+        <input type="text" id="hidden-input" autofocus>
+    </div>
+
+    <script>
+        const terminal = document.getElementById('terminal');
+        const outputDiv = document.getElementById('output');
+        const currentInputSpan = document.getElementById('current-input');
+        const hiddenInput = document.getElementById('hidden-input');
+        const promptPathSpan = document.getElementById('prompt-path');
+
+        let fsData = {};
+        let currentPath = '/';
+        const localStorageKey = 'terminalFsData';
+        
+        // Initializes the filesystem, loading from localStorage or creating a new one.
+        function initializeFileSystem() {
+            console.log("Initializing new filesystem.");
+            fsData = { '/': { type: 'directory', children: {} } };
+            saveFileSystem();
+        }
+
+        // Saves the current filesystem state to localStorage.
+        function saveFileSystem() {
+            try {
+                localStorage.setItem(localStorageKey, JSON.stringify(fsData));
+            } catch (e) {
+                console.error("Error saving filesystem:", e);
+            }
+        }
+
+        // Loads the filesystem from localStorage. If not found or invalid, initializes a new one.
+        function loadFileSystem() {
+            try {
+                const storedFs = localStorage.getItem(localStorageKey);
+                if (storedFs) {
+                    fsData = JSON.parse(storedFs);
+                    if (!fsData['/'] || fsData['/'].type !== 'directory') {
+                        console.warn("Invalid filesystem data in localStorage. Reinitializing.");
+                        initializeFileSystem();
+                    }
+                } else {
+                    initializeFileSystem();
+                }
+            } catch (e) {
+                console.error("Error loading or parsing filesystem from localStorage:", e);
+                initializeFileSystem(); 
+            }
+            updatePromptPath();
+        }
+        
+        // Resolves a target path (absolute or relative) against a base path.
+        function getAbsolutePath(targetPath, basePath) {
+            if (targetPath.startsWith('/')) { 
+                basePath = '/'; 
+            }
+            const baseSegments = basePath === '/' ? [] : basePath.substring(1).split('/').filter(s => s !== '');
+            const targetSegments = targetPath.split('/').filter(s => s !== ''); 
+            let resolvedSegments = [...baseSegments];
+
+            for (const segment of targetSegments) {
+                if (segment === '.') { 
+                    continue;
+                }
+                if (segment === '..') { 
+                    if (resolvedSegments.length > 0) {
+                        resolvedSegments.pop();
+                    }
+                } else { 
+                    resolvedSegments.push(segment);
+                }
+            }
+            if (resolvedSegments.length === 0) return '/'; 
+            return '/' + resolvedSegments.join('/');
+        }
+
+        // Retrieves a node (file/directory object) from fsData by its absolute path.
+        function getNodeByPath(path) {
+            if (path === '/') return fsData['/'];
+            const segments = path.substring(1).split('/').filter(s => s !== ''); 
+            let currentNode = fsData['/'];
+            for (const segment of segments) {
+                if (currentNode && currentNode.type === 'directory' && currentNode.children && currentNode.children[segment]) {
+                    currentNode = currentNode.children[segment];
+                } else {
+                    return null; 
+                }
+            }
+            return currentNode;
+        }
+
+        // --- Command Handlers ---
+
+        // Handles the 'ls' command to list directory contents.
+        function handleLs(args) {
+            const targetPathArg = args[0] || '.'; 
+            const resolvedPath = getAbsolutePath(targetPathArg, currentPath);
+            const node = getNodeByPath(resolvedPath);
+
+            if (node && node.type === 'directory') {
+                const childrenNames = Object.keys(node.children);
+                if (childrenNames.length === 0) {
+                    return;
+                }
+
+                const fragment = document.createDocumentFragment(); // Create a DocumentFragment
+
+                childrenNames.sort().forEach(name => {
+                    const childNode = node.children[name];
+                    const div = document.createElement('div');
+                    div.classList.add('output-line');
+                    div.textContent = name + (childNode.type === 'directory' ? '/' : '');
+                    if (childNode.type === 'directory') {
+                        div.classList.add('directory-item');
+                    }
+                    fragment.appendChild(div); // Append to the fragment
+                });
+                outputDiv.appendChild(fragment); // Append the fragment to the DOM once
+                outputDiv.scrollTop = outputDiv.scrollHeight; 
+            } else if (node && node.type !== 'directory') {
+                appendToOutput(`ls: ${targetPathArg}: Not a directory`, true);
+            } else {
+                appendToOutput(`ls: cannot access '${targetPathArg}': No such file or directory`, true);
+            }
+        }
+
+        // Handles the 'cd' command to change the current directory.
+        function handleCd(args) {
+            if (args.length === 0) { 
+                return;
+            }
+            const targetPathArg = args[0];
+            const resolvedPath = getAbsolutePath(targetPathArg, currentPath);
+            const node = getNodeByPath(resolvedPath);
+
+            if (node && node.type === 'directory') {
+                currentPath = resolvedPath;
+                updatePromptPath();
+            } else if (node && node.type !== 'directory') {
+                appendToOutput(`cd: ${targetPathArg}: Not a directory`, true);
+            } else {
+                appendToOutput(`cd: ${targetPathArg}: No such file or directory`, true);
+            }
+        }
+
+        // Handles the 'mkdir' command to create a new directory.
+        function handleMkdir(args) {
+            if (args.length === 0) {
+                appendToOutput("mkdir: missing operand", true);
+                return;
+            }
+            const newDirName = args[0];
+            if (newDirName.includes('/') || newDirName === "." || newDirName === "..") {
+                appendToOutput(`mkdir: cannot create directory '${newDirName}': Invalid name or character.`, true);
+                return;
+            }
+
+            const parentDirNode = getNodeByPath(currentPath);
+            if (!parentDirNode || parentDirNode.type !== 'directory') {
+                appendToOutput("mkdir: critical error: current path is not a directory.", true);
+                return;
+            }
+
+            if (parentDirNode.children[newDirName]) {
+                appendToOutput(`mkdir: cannot create directory ‘${newDirName}’: File exists`, true);
+            } else {
+                parentDirNode.children[newDirName] = {
+                    type: 'directory',
+                    children: {} 
+                };
+                saveFileSystem(); 
+            }
+        }
+        
+        // Handles the 'clear' command to clear the terminal output.
+        function handleClear() {
+            outputDiv.innerHTML = '';
+        }
+
+        // Registry of available commands and their handler functions.
+        const commandRegistry = {
+            'ls': handleLs,
+            'cd': handleCd,
+            'mkdir': handleMkdir,
+            'clear': handleClear
+        };
+        
+        // Appends a line of text to the output area.
+        function appendToOutput(text, isError = false) {
+            const newLine = document.createElement('div');
+            newLine.classList.add('output-line'); 
+            newLine.textContent = text;
+            if (isError) {
+                newLine.classList.add('error-message');
+            }
+            outputDiv.appendChild(newLine);
+            outputDiv.scrollTop = outputDiv.scrollHeight; 
+        }
+
+        // Updates the path displayed in the prompt.
+        function updatePromptPath() {
+            promptPathSpan.textContent = currentPath.trim() === '' ? '/' : currentPath;
+        }
+        
+        // Processes the command entered by the user.
+        function processCommand(command) {
+            const trimmedCommand = command.trim();
+            const commandToEcho = trimmedCommand === '' ? `${currentPath}> ` : `${currentPath}> ${trimmedCommand}`;
+            appendToOutput(commandToEcho);
+        
+            const parts = trimmedCommand.split(' ').filter(p => p !== ''); 
+            const baseCommand = parts[0];
+            const args = parts.slice(1);
+        
+            if (!baseCommand) { 
+                currentInputSpan.textContent = ''; 
+                return; 
+            }
+        
+            const handler = commandRegistry[baseCommand.toLowerCase()];
+            if (handler) {
+                handler(args);
+            } else {
+                appendToOutput(`Error: Command not found: "${baseCommand}"`, true);
+            }
+            currentInputSpan.textContent = ''; 
+        }
+
+        // Focuses the hidden input when the terminal area is clicked.
+        terminal.addEventListener('click', () => {
+            hiddenInput.focus();
+        });
+
+        // Handles keyboard input.
+        hiddenInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                const commandText = currentInputSpan.textContent; 
+                processCommand(commandText); 
+            } else if (event.key === 'Backspace') {
+                event.preventDefault();
+                currentInputSpan.textContent = currentInputSpan.textContent.slice(0, -1);
+            } else if (event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey) { 
+                event.preventDefault();
+                currentInputSpan.textContent += event.key;
+            }
+        });
+
+        // Initializes the application when the window loads.
+        window.onload = () => {
+            loadFileSystem();
+            setTimeout(() => { 
+                hiddenInput.focus();
+            }, 100);
+            console.log("OopisOs v.01 loaded.");
+        };
+    </script>
+</body>
+</html>

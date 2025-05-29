@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OopisOs v.1.0.2</title>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        html {
+            box-sizing: border-box;
+        }
+        *, *::before, *::after {
+            box-sizing: inherit;
+        }
+        body {
+            font-family: 'VT323', monospace;
+            background-color: #1a1a1a;
+            color: #00ff00;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        #terminal-bezel {
+            background-color: #2c2c2c;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 
+                inset 0 0 10px rgba(0,0,0,0.5),
+                0 5px 15px rgba(0,0,0,0.3),
+                0 0 3px 1px #111;
+            display: inline-block;
+        }
+        #terminal {
+            width: 90vw;
+            max-width: 800px;
+            height: 70vh;
+            max-height: 600px;
+            background-color: #0d0d0d;
+            border: 2px solid #181818;
+            border-radius: 8px;
+            padding: 20px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            box-shadow: inset 0 0 15px rgba(0, 255, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            scrollbar-width: thin;
+            scrollbar-color: #00ff00 #0d0d0d;
+        }
+        #terminal::-webkit-scrollbar { width: 10px; }
+        #terminal::-webkit-scrollbar-track { background: #0d0d0d; border-radius: 8px; }
+        #terminal::-webkit-scrollbar-thumb { background-color: #00ff00; border-radius: 10px; border: 2px solid #0d0d0d; }
+        #terminal::-webkit-scrollbar-thumb:hover { background-color: #00cc00; }
+        #output { flex-grow: 1; margin-bottom: 10px; overflow-x: hidden; width: 100%; min-width: 0; }
+        .output-line { 
+            white-space: pre-wrap; 
+            word-break: break-all; 
+            overflow-wrap: break-word; 
+            overflow-x: hidden; 
+            min-height: 1.2em;
+        }
+        
+        .input-line { display: flex; align-items: center; width: 100%; }
+        .prompt-user { margin-right: 2px; color: #7fdbff; }
+        .prompt-separator, .prompt-host { margin-right: 2px; }
+        .prompt-path { margin-right: 4px; }
+        .prompt-char { margin-right: 8px; }
+
+        #visual-input-container {
+            display: flex; 
+            align-items: center; 
+            flex-grow: 1; 
+            overflow: hidden; 
+            white-space: nowrap; 
+        }
+        #input-before-cursor, #input-after-cursor {
+            white-space: pre; 
+            display: inline-block; 
+        }
+        .cursor { 
+            width: 10px; 
+            height: 1.2em; 
+            background-color: #00ff00; 
+            animation: blink 1s step-end infinite;
+        }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        
+        #hidden-input { position: absolute; opacity: 0; width: 1px; height: 1px; top: -10px; left: -10px; }
+        
+        .error-message { color: #ff4136; }
+        .console-log-message { color: #aaaaaa; }
+        .directory-item { color: #7fdbff; }
+        .file-item { }
+        .success-message { color: #2ecc40; }
+        .warning-message { color: #ff851b; }
+        .help-command-name, .man-section-title { color: #7fdbff; font-weight: bold; }
+        .help-description, .man-section-content { margin-left: 10px; }
+        .man-example { margin-left: 20px; font-style: italic; color: #aaffaa; }
+        .sysmon-label { color: #7fdbff; /* Light blue for labels */ }
+
+
+    </style>
+</head>
+<body>
+    <div id="terminal-bezel">
+        <div id="terminal">
+            <div id="output"></div>
+            <div class="input-line">
+                <span id="prompt-user" class="prompt-user"></span>
+                <span class="prompt-separator">@</span>
+                <span id="prompt-host" class="prompt-host">OopisOs</span>
+                <span class="prompt-separator">:</span>
+                <span id="prompt-path" class="prompt-path"></span>
+                <span class="prompt-char">&gt;</span>
+                <div id="visual-input-container">
+                    <span id="input-before-cursor"></span>
+                    <div class="cursor"></div>
+                    <span id="input-after-cursor"></span>
+                </div>
+            </div>
+            <input type="text" id="hidden-input" autofocus autocapitalize="none" autocorrect="off" spellcheck="false">
+        </div>
+    </div>
+
+    <script>
+        // --- DOM Elements ---
+        const terminalDiv = document.getElementById('terminal');
+        const outputDiv = document.getElementById('output');
+        const inputBeforeCursorSpan = document.getElementById('input-before-cursor');
+        const inputAfterCursorSpan = document.getElementById('input-after-cursor');
+        const hiddenInput = document.getElementById('hidden-input');
+        const promptUserSpan = document.getElementById('prompt-user');
+        const promptPathSpan = document.getElementById('prompt-path');
+        const promptHostSpan = document.getElementById('prompt-host');
+
+        // --- Constants ---
+        const USER_CREDENTIALS_KEY = 'oopisOsUserCredentials';
+        const FILE_SYSTEM_KEY_PREFIX = 'oopisOsFileSystem_';
+        const USER_TERMINAL_STATE_KEY_PREFIX = 'oopisOsUserTerminalState_';
+        const MANUAL_USER_TERMINAL_STATE_KEY_PREFIX = 'oopisOsManualUserTerminalState_';
+        const DEFAULT_USER = "Guest";
+        const OS_NAME = "OopisOs";
+        const OS_VERSION = "1.0.2"; // Updated OS Version
+        const MAX_HISTORY_SIZE = 50;
+
+        // --- CSS Classes ---
+        const CSS_ERROR_MSG = 'error-message';
+        const CSS_SUCCESS_MSG = 'success-message';
+        const CSS_WARNING_MSG = 'warning-message';
+        const CSS_CONSOLE_LOG_MSG = 'console-log-message';
+        const CSS_DIR_ITEM = 'directory-item';
+        const CSS_FILE_ITEM = 'file-item';
+        const CSS_HELP_CMD_NAME = 'help-command-name';
+        const CSS_HELP_DESC = 'help-description';
+        const CSS_OUTPUT_LINE = 'output-line';
+        const CSS_MAN_SECTION_TITLE = 'man-section-title';
+        const CSS_MAN_SECTION_CONTENT = 'man-section-content';
+        const CSS_MAN_EXAMPLE = 'man-example';
+        const CSS_SYSMON_LABEL = 'sysmon-label';
+
+
+        // --- Application State ---
+        let fsData = {};
+        let currentPath = '/';
+        let currentUser = DEFAULT_USER;
+        let awaitingResetConfirmation = false;
+        let awaitingLoadstateConfirmation = false;
+        let awaitingRmConfirmation = false; 
+        let itemToRemovePath = null; 
+        let pendingManualStateToLoad = null;
+        let commandHistory = [];
+        let historyIndex = 0;
+        let lastCommandFailed = false; 
+
+        // --- Helper to format console arguments ---
+        function formatConsoleArgs(args) {
+            return Array.from(args).map(arg => (typeof arg === 'object' && arg !== null) ? JSON.stringify(arg) : String(arg)).join(' ');
+        }
+
+        // --- Output Management ---
+        function appendToOutput(text, isError = false, typeClass = null) {
+            const newLine = document.createElement('div');
+            newLine.classList.add(CSS_OUTPUT_LINE);
+            if (typeClass) newLine.classList.add(typeClass);
+            if (isError && !typeClass) newLine.classList.add(CSS_ERROR_MSG);
+            newLine.textContent = text;
+            outputDiv.appendChild(newLine);
+            outputDiv.scrollTop = outputDiv.scrollHeight;
+            if(isError) lastCommandFailed = true; 
+        }
+        
+        function appendStyledOutput(label, value) {
+            const line = document.createElement('div');
+            line.classList.add(CSS_OUTPUT_LINE);
+
+            const labelSpan = document.createElement('span');
+            labelSpan.classList.add(CSS_SYSMON_LABEL);
+            labelSpan.textContent = label.padEnd(20, ' '); 
+
+            const valueSpan = document.createElement('span');
+            valueSpan.textContent = value;
+            
+            line.appendChild(labelSpan);
+            line.appendChild(valueSpan);
+            outputDiv.appendChild(line);
+            outputDiv.scrollTop = outputDiv.scrollHeight;
+        }
+
+
+        // --- Console Output Redirection ---
+        const originalConsoleLog = console.log;
+        const originalConsoleWarn = console.warn;
+        const originalConsoleError = console.error;
+        console.log = (...args) => { appendToOutput(`LOG: ${formatConsoleArgs(args)}`, false, CSS_CONSOLE_LOG_MSG); originalConsoleLog.apply(console, args); };
+        console.warn = (...args) => { appendToOutput(`WARN: ${formatConsoleArgs(args)}`, false, CSS_WARNING_MSG); originalConsoleWarn.apply(console, args); };
+        console.error = (...args) => { appendToOutput(`ERROR: ${formatConsoleArgs(args)}`, true, CSS_ERROR_MSG); originalConsoleError.apply(console, args); };
+
+        // --- Unified LocalStorage Helpers ---
+        function loadJSONFromStorage(key, itemName, defaultValue = null) {
+            try {
+                const storedValue = localStorage.getItem(key);
+                if (storedValue) return JSON.parse(storedValue);
+            } catch (e) {
+                console.error(`Error loading ${itemName} for '${key}':`, e.message);
+                appendToOutput(`Warning: ${itemName} for '${key}' corrupted. Using default.`, true, CSS_WARNING_MSG);
+            }
+            return defaultValue;
+        }
+        function saveJSONToStorage(key, data, itemName) {
+            try { localStorage.setItem(key, JSON.stringify(data)); return true; }
+            catch (e) {
+                console.error(`Error saving ${itemName} for '${key}':`, e.message);
+                appendToOutput(`Critical Error: Could not save ${itemName} for '${key}'.`, true, CSS_ERROR_MSG);
+            }
+            return false;
+        }
+
+        // --- Filesystem Management ---
+        function getFileSystemKey(user) { return `${FILE_SYSTEM_KEY_PREFIX}${user}`; }
+        function initializeFileSystem(user = currentUser) {
+            fsData = { '/': { type: 'directory', children: {} } };
+            saveFileSystemData(user);
+        }
+        function saveFileSystemData(user = currentUser) { return saveJSONToStorage(getFileSystemKey(user), fsData, `FS for ${user}`); }
+        function loadFileSystemData(user) {
+            const loadedFs = loadJSONFromStorage(getFileSystemKey(user), `FS for ${user}`);
+            if (loadedFs?.['/']?.type === 'directory') fsData = loadedFs;
+            else {
+                appendToOutput(loadedFs ? `Invalid FS for ${user}. Reinitializing.` : `No FS for ${user}. Initializing.`, false, loadedFs ? CSS_WARNING_MSG : CSS_CONSOLE_LOG_MSG);
+                initializeFileSystem(user);
+            }
+        }
+        
+        // --- Visual Input Update ---
+        function updateVisualInput() {
+            const inputValue = hiddenInput.value;
+            const cursorPos = hiddenInput.selectionStart;
+            inputBeforeCursorSpan.textContent = inputValue.substring(0, cursorPos);
+            inputAfterCursorSpan.textContent = inputValue.substring(cursorPos);
+        }
+
+        // --- Automatic Session State (UI only) ---
+        function getAutomaticSessionStateKey(user) { return `${USER_TERMINAL_STATE_KEY_PREFIX}${user}`; }
+        function saveAutomaticSessionState() {
+            const autoState = { currentPath, outputHTML: outputDiv.innerHTML, currentInput: hiddenInput.value };
+            saveJSONToStorage(getAutomaticSessionStateKey(currentUser), autoState, `Auto session for ${currentUser}`);
+        }
+        function loadAutomaticSessionState(user = currentUser) {
+            const autoState = loadJSONFromStorage(getAutomaticSessionStateKey(user), `Auto session for ${user}`);
+            if (autoState) {
+                currentPath = autoState.currentPath || '/';
+                outputDiv.innerHTML = autoState.outputHTML || '';
+                hiddenInput.value = autoState.currentInput || ''; 
+            } else {
+                outputDiv.innerHTML = ''; hiddenInput.value = ''; currentPath = '/';
+                appendToOutput(`Welcome, ${user}! Type 'help' for commands.`, false, CSS_CONSOLE_LOG_MSG);
+            }
+            updateVisualInput(); 
+            updatePrompt(); outputDiv.scrollTop = outputDiv.scrollHeight;
+            return !!autoState;
+        }
+
+        // --- Manual Save State (UI + Filesystem Snapshot) ---
+        function getManualUserTerminalStateKey(user) { return `${MANUAL_USER_TERMINAL_STATE_KEY_PREFIX}${user}`; }
+
+        // --- Path and Node Utilities ---
+        function getAbsolutePath(targetPath, basePath) {
+            if (!targetPath) targetPath = '.'; 
+            if (targetPath.startsWith('/')) basePath = '/';
+            const baseSegments = basePath === '/' ? [] : basePath.substring(1).split('/').filter(s => s);
+            const targetSegments = targetPath.split('/').filter(s => s);
+            let resolvedSegments = [...baseSegments];
+            for (const segment of targetSegments) {
+                if (segment === '.') continue;
+                if (segment === '..') { if (resolvedSegments.length > 0) resolvedSegments.pop(); }
+                else resolvedSegments.push(segment);
+            }
+            return resolvedSegments.length === 0 ? '/' : '/' + resolvedSegments.join('/');
+        }
+        function getNodeByPath(path) {
+            if (path === '/') return fsData['/'];
+            const segments = path.substring(1).split('/').filter(s => s);
+            let currentNode = fsData['/'];
+            for (const segment of segments) {
+                if (currentNode?.type === 'directory' && currentNode.children?.[segment]) {
+                    currentNode = currentNode.children[segment];
+                } else return null;
+            }
+            return currentNode;
+        }
+        function deepCopyNode(node) { return node ? JSON.parse(JSON.stringify(node)) : null; }
+
+        // --- User Credentials Management ---
+        function getUserCredentials() { return loadJSONFromStorage(USER_CREDENTIALS_KEY, "User creds", {}); }
+        function saveUserCredentials(credentials) { return saveJSONToStorage(USER_CREDENTIALS_KEY, credentials, "User creds"); }
+
+        // --- Command Help Data ---
+        const commandHelpData = {
+            'ls': { 
+                usage: 'ls [path/to/directory]', 
+                summary: 'Lists directory contents.',
+                syntax: 'ls [PATH]',
+                details: 'Displays a list of files and directories within the specified PATH. ' +
+                         'If PATH is omitted, it lists the contents of the current working directory. ' +
+                         'Directories are indicated with a trailing slash (/). Output can be redirected.',
+                examples: [
+                    'ls',
+                    'ls /my_stuff > file_list.txt',
+                    'ls ../old_projects'
+                ]
+            },
+            'cd': { 
+                usage: 'cd <path/to/directory>', 
+                summary: 'Changes current directory.',
+                syntax: 'cd DIRECTORY',
+                details: 'Changes the current working directory to the specified DIRECTORY. ' +
+                         'Use "cd .." to navigate to the parent directory. Use "cd /" to navigate to the root directory. ' +
+                         'Relative and absolute paths are supported.',
+                examples: [
+                    'cd /home/user/documents',
+                    'cd ../images',
+                    'cd project_alpha'
+                ]
+            },
+            'mkdir': { 
+                usage: 'mkdir <path/to/new_directory_name>', 
+                summary: 'Creates a new directory, including parents.',
+                syntax: 'mkdir DIRECTORY_PATH',
+                details: 'Creates a new directory at the specified DIRECTORY_PATH. ' +
+                         'If any parent directories in the path do not exist, they will be created automatically (similar to mkdir -p).',
+                examples: [
+                    'mkdir new_folder',
+                    'mkdir /projects/alpha/assets',
+                    'mkdir backups/2025/may'
+                ]
+            },
+            'touch': { 
+                usage: 'touch <path/to/filename>', 
+                summary: 'Creates an empty file, including parent directories.',
+                syntax: 'touch FILE_PATH',
+                details: 'Creates a new, empty file at the specified FILE_PATH. ' +
+                         'If any parent directories in the path do not exist, they will be created automatically. ' +
+                         'If the file already exists, its timestamp is conceptually updated (no content change).',
+                examples: [
+                    'touch new_document.txt',
+                    'touch /logs/today.log',
+                    'touch notes/project_x/ideas.md'
+                ]
+            },
+            'cat': { 
+                usage: 'cat <path/to/filename>', 
+                summary: 'Displays file contents.',
+                syntax: 'cat FILE_PATH',
+                details: 'Displays the full contents of the file specified by FILE_PATH on the screen. ' +
+                         'This command is intended for text files. Output can be redirected.',
+                examples: [
+                    'cat my_file.txt',
+                    'cat /config/settings.conf > settings_backup.txt'
+                ]
+            },
+            'echo': { 
+                usage: 'echo [text]', 
+                summary: 'Displays text.',
+                syntax: 'echo [STRING...]',
+                details: 'Displays the given STRING(s) to the terminal. ' +
+                         'To write to a file, use redirection operators > (overwrite) or >> (append) after the command, e.g., echo "text" > filename.txt.',
+                examples: [
+                    'echo Hello World!',
+                    'echo "My new note" > notes.txt',
+                    'echo "Another line" >> notes.txt'
+                ]
+            },
+            'mv': { 
+                usage: 'mv <source_path> <destination_path>', 
+                summary: 'Moves or renames a file or directory.',
+                syntax: 'mv SOURCE DESTINATION',
+                details: 'Moves (renames) SOURCE to DESTINATION. ' +
+                         'If DESTINATION is an existing directory, SOURCE is moved into that directory. ' +
+                         'Cannot move a directory into itself or one of its own subdirectories.',
+                examples: [
+                    'mv old_name.txt new_name.txt',
+                    'mv report.doc /archives/',
+                    'mv /temp/data /processed_data/june_data'
+                ]
+            },
+            'cp': { 
+                usage: 'cp <source_path> <destination_path>', 
+                summary: 'Copies a file or directory.',
+                syntax: 'cp SOURCE DESTINATION',
+                details: 'Copies SOURCE to DESTINATION. ' +
+                         'If DESTINATION is an existing directory, SOURCE is copied into that directory. ' +
+                         'Copying a directory also copies all its contents recursively. ' +
+                         'Cannot copy a directory into itself or one of its own subdirectories.',
+                examples: [
+                    'cp original.txt backup.txt',
+                    'cp image.jpg /gallery/photos/',
+                    'cp /assets/logo.png /website/img/logo_copy.png'
+                ]
+            },
+            'rm': { 
+                usage: 'rm <path/to/item>', 
+                summary: 'Removes a file or directory (confirms).',
+                syntax: 'rm ITEM_PATH',
+                details: 'Removes the file or directory specified by ITEM_PATH. ' +
+                         'If ITEM_PATH is a directory, it and all its contents will be removed recursively. ' +
+                         'This command requires confirmation before deletion as it cannot be undone. ' +
+                         'The root directory ("/") cannot be removed.',
+                examples: [
+                    'rm old_file.txt',
+                    'rm /temp/junk_folder'
+                ]
+            },
+             'pwd': {
+                usage: 'pwd',
+                summary: 'Prints the current working directory path.',
+                syntax: 'pwd',
+                details: 'Displays the full absolute path of the current working directory. Output can be redirected.',
+                examples: [
+                    'pwd',
+                    'pwd > current_dir.txt'
+                    ]
+            },
+            'date': {
+                usage: 'date',
+                summary: 'Displays the current date and time.',
+                syntax: 'date',
+                details: 'Shows the current system date and time in a standard format. Output can be redirected.',
+                examples: [
+                    'date',
+                    'date > timestamp.log'
+                    ]
+            },
+            'whoami': {
+                usage: 'whoami',
+                summary: 'Displays the current user\'s username.',
+                syntax: 'whoami',
+                details: 'Prints the username of the currently logged-in user. Output can be redirected.',
+                examples: [
+                    'whoami',
+                    'whoami > user.txt'
+                    ]
+            },
+            'run': {
+                usage: 'run <path/to/scriptfile>',
+                summary: 'Executes commands from a script file.',
+                syntax: 'run SCRIPT_FILE_PATH',
+                details: 'Reads and executes OopisOs commands from the specified SCRIPT_FILE_PATH, one command per line. ' +
+                         'Lines starting with "#" are treated as comments and ignored. ' +
+                         'Script execution stops if a command within the script encounters an error. ' +
+                         'Commands executed from a script are not added to the interactive command history.',
+                examples: [
+                    'run setup_project.sh',
+                    'run /scripts/daily_backup.txt'
+                ]
+            },
+            'grep': {
+                usage: 'grep "PATTERN" <path/to/filename>',
+                summary: 'Searches for a PATTERN in a file.',
+                syntax: 'grep PATTERN FILE_PATH',
+                details: 'Searches for PATTERN in the specified FILE_PATH and prints lines that contain the pattern. ' +
+                         'The search is case-sensitive. If PATTERN contains spaces, it must be enclosed in double quotes. ' +
+                         'Output can be redirected.',
+                examples: [
+                    'grep "error" logfile.txt',
+                    'grep "version 1.0" /docs/readme.md > version_mentions.txt'
+                ]
+            },
+            'sort': {
+                usage: 'sort <path/to/filename>',
+                summary: 'Sorts lines of a text file.',
+                syntax: 'sort FILE_PATH',
+                details: 'Reads the specified FILE_PATH, sorts its lines alphabetically (case-sensitive), and prints the result. ' +
+                         'Output can be redirected.',
+                examples: [
+                    'sort names.txt',
+                    'sort unsorted_list.txt > sorted_list.txt'
+                ]
+            },
+            'sysmon': {
+                usage: 'sysmon',
+                summary: 'Displays virtual system hardware information.',
+                syntax: 'sysmon',
+                details: 'Shows conceptual specifications of the OopisOs virtual machine environment, including CPU, RAM, Storage, and OS details.',
+                examples: ['sysmon']
+            },
+            'clear': { 
+                usage: 'clear', 
+                summary: 'Clears the terminal screen.',
+                syntax: 'clear',
+                details: 'Clears all visible output from the terminal screen, providing a fresh prompt at the top.',
+                examples: ['clear']
+            },
+            'register': { 
+                usage: 'register <username> <password>', 
+                summary: 'Creates a new user profile.',
+                syntax: 'register USERNAME PASSWORD',
+                details: 'Registers a new user with the given USERNAME and PASSWORD. ' +
+                         'Usernames are unique. The username "Guest" is reserved.',
+                examples: ['register myuser mysecretpass']
+            },
+            'login': { 
+                usage: 'login <username> <password>', 
+                summary: 'Logs in as a specified user.',
+                syntax: 'login USERNAME PASSWORD',
+                details: 'Logs in as the specified USERNAME using the provided PASSWORD. ' +
+                         'This loads the user\'s unique filesystem and session state.',
+                examples: ['login myuser mysecretpass']
+            },
+            'logout': { 
+                usage: 'logout', 
+                summary: 'Logs out the current user.',
+                syntax: 'logout',
+                details: 'Logs out the current user and returns to the default Guest session. ' +
+                         'The current user\'s session UI state is saved automatically.',
+                examples: ['logout']
+            },
+            'savestate': { 
+                usage: 'savestate', 
+                summary: 'Manually saves the current session.',
+                syntax: 'savestate',
+                details: 'Creates a full snapshot of the current session, including the entire filesystem and terminal output. ' +
+                         'This saved state can be restored later using the "loadstate" command.',
+                examples: ['savestate']
+            },
+            'loadstate': { 
+                usage: 'loadstate', 
+                summary: 'Loads the last manually saved session (confirms).',
+                syntax: 'loadstate',
+                details: 'Loads the last state saved by the "savestate" command for the current user. ' +
+                         'This is a destructive operation and will overwrite the current session (filesystem and terminal output) after confirmation.',
+                examples: ['loadstate']
+            },
+            'reset': { 
+                usage: 'reset', 
+                summary: 'Performs a full factory reset (confirms).',
+                syntax: 'reset',
+                details: 'Performs a full factory reset of OopisOs. This action deletes ALL users, their filesystems, ' +
+                         'and any saved states. This operation is highly destructive and requires confirmation.',
+                examples: ['reset']
+            },
+            'help': { 
+                usage: 'help [command_name]', 
+                summary: 'Displays command list or brief help.',
+                syntax: 'help [COMMAND]',
+                details: 'Without arguments, "help" lists all available commands and their summaries. ' +
+                         'If a COMMAND is specified, it displays a short usage summary for that command. ' +
+                         'For more detailed information, use "man COMMAND".',
+                examples: [
+                    'help',
+                    'help ls'
+                ]
+            },
+            'man': {
+                usage: 'man <command_name>',
+                summary: 'Displays detailed manual pages for commands.',
+                syntax: 'man COMMAND',
+                details: 'Displays the full manual page for the specified COMMAND, including syntax, detailed explanation, and examples.',
+                examples: ['man mkdir']
+            }
+        };
+
+        // --- Command Handlers ---
+        function handleLs(args) {
+            const targetPathArg = args[0] || '.';
+            const resolvedPath = getAbsolutePath(targetPathArg, currentPath);
+            const node = getNodeByPath(resolvedPath);
+            if (node?.type === 'directory') {
+                const childrenNames = Object.keys(node.children);
+                if (childrenNames.length === 0) return "Directory is empty."; 
+                let outputLines = [];
+                childrenNames.sort().forEach(name => {
+                    const childNode = node.children[name];
+                    let line = name;
+                    if (childNode.type === 'directory') line += '/';
+                    outputLines.push(line);
+                });
+                return outputLines.join('\n');
+            } else if (node) {
+                appendToOutput(`ls: '${targetPathArg}': Not a directory`, true); 
+                return null; 
+            } else {
+                appendToOutput(`ls: cannot access '${targetPathArg}': No such file or directory`, true); 
+                return null;
+            }
+        }
+        function handleCd(args) { 
+            if (!args.length) { appendToOutput("cd: missing operand", true); return null; }
+            const targetPathArg = args[0];
+            const resolvedPath = getAbsolutePath(targetPathArg, currentPath);
+            const node = getNodeByPath(resolvedPath);
+            if (node?.type === 'directory') { currentPath = resolvedPath; updatePrompt(); }
+            else if (node) appendToOutput(`cd: '${targetPathArg}': Not a directory`, true);
+            else appendToOutput(`cd: '${targetPathArg}': No such file or directory`, true);
+            return null; 
+        }
+        function handleMkdir(args) {
+            if (args.length === 0) { appendToOutput("mkdir: missing operand", true); return null; }
+            const fullPathArg = args[0];
+            if (!fullPathArg || fullPathArg === '/' || fullPathArg === '.' || fullPathArg === '..') {
+                appendToOutput(`mkdir: invalid directory name '${fullPathArg}'`, true); return null;
+            }
+            const targetAbsPath = getAbsolutePath(fullPathArg, currentPath);
+            if (targetAbsPath === '/') { appendToOutput(`mkdir: cannot create directory '/': Root already exists`, true); return null; }
+            const pathSegments = targetAbsPath.substring(1).split('/'); 
+            let currentTraversalNode = fsData['/'];
+            let currentBuiltPath = ""; 
+            let createdSomething = false;
+            for (let i = 0; i < pathSegments.length; i++) {
+                const segment = pathSegments[i];
+                currentBuiltPath += "/" + segment;
+                if (!currentTraversalNode.children[segment]) {
+                    currentTraversalNode.children[segment] = { type: 'directory', children: {} };
+                    createdSomething = true;
+                } else if (currentTraversalNode.children[segment].type !== 'directory') {
+                    appendToOutput(`mkdir: cannot create directory '${fullPathArg}': A component of the path '${currentBuiltPath}' is not a directory.`, true); return null;
+                }
+                currentTraversalNode = currentTraversalNode.children[segment];
+            }
+            if (createdSomething) saveFileSystemData();
+            return null; 
+        }
+        function handleTouch(args) { 
+            if (args.length === 0) { appendToOutput("touch: missing file operand", true); return null; }
+            const fullPathArg = args[0]; 
+            if (!fullPathArg || fullPathArg.endsWith('/')) { appendToOutput(`touch: invalid argument '${fullPathArg}'`, true); return null; }
+            const targetAbsPath = getAbsolutePath(fullPathArg, currentPath);
+            if (targetAbsPath === '/') { appendToOutput(`touch: cannot create file at root '/'`, true); return null; }
+            const lastSlashIndex = targetAbsPath.lastIndexOf('/');
+            const parentPath = lastSlashIndex === 0 ? '/' : targetAbsPath.substring(0, lastSlashIndex);
+            const newFileName = targetAbsPath.substring(lastSlashIndex + 1);
+            if (!newFileName || newFileName === "." || newFileName === "..") { appendToOutput(`touch: invalid file name '${newFileName}' in path '${fullPathArg}'`, true); return null; }
+            const parentPathSegments = parentPath.substring(1).split('/').filter(s => s);
+            let currentTraversalNode = fsData['/'];
+            let currentBuiltParentPath = "";
+            for (const segment of parentPathSegments) {
+                currentBuiltParentPath += "/" + segment;
+                if (!currentTraversalNode.children[segment]) {
+                    currentTraversalNode.children[segment] = { type: 'directory', children: {} };
+                } else if (currentTraversalNode.children[segment].type !== 'directory') {
+                    appendToOutput(`touch: cannot create file in '${fullPathArg}': A component of the path '${currentBuiltParentPath}' is not a directory.`, true); return null;
+                }
+                currentTraversalNode = currentTraversalNode.children[segment];
+            }
+            if (currentTraversalNode.children[newFileName]?.type === 'directory') { appendToOutput(`touch: cannot touch '${fullPathArg}': It is a directory.`, true); return null; }
+            if (!currentTraversalNode.children[newFileName]) {
+                currentTraversalNode.children[newFileName] = { type: 'file', content: "" };
+                saveFileSystemData();
+            }
+            return null; 
+        }
+        function handleCat(args) { 
+            if (args.length === 0) { appendToOutput("cat: missing file operand", true); return null; }
+            const targetPathArg = args[0];
+            const resolvedPath = getAbsolutePath(targetPathArg, currentPath);
+            const node = getNodeByPath(resolvedPath);
+            if (!node) { appendToOutput(`cat: ${targetPathArg}: No such file or directory`, true); return null; }
+            if (node.type === 'directory') { appendToOutput(`cat: ${targetPathArg}: Is a directory`, true); return null; }
+            return node.content; 
+        }
+        function handleEcho(args) { 
+            return args.join(' ');
+        }
+        function handleMv(args) { 
+            if (args.length < 2) { appendToOutput("mv: missing source and/or destination", true); return null; }
+            const sourcePathArg = args[0], destPathArg = args[1];
+            const absSourcePath = getAbsolutePath(sourcePathArg, currentPath);
+            let absDestPath = getAbsolutePath(destPathArg, currentPath);
+            if (absSourcePath === '/') { appendToOutput("mv: cannot move root '/'", true); return null; }
+            const sourceNode = getNodeByPath(absSourcePath);
+            if (!sourceNode) { appendToOutput(`mv: '${sourcePathArg}': No such file or directory`, true); return null; }
+            const sourceParentPath = absSourcePath.substring(0, absSourcePath.lastIndexOf('/')) || '/';
+            const sourceName = absSourcePath.substring(absSourcePath.lastIndexOf('/') + 1);
+            const sourceParentNode = getNodeByPath(sourceParentPath);
+            if (!sourceParentNode?.children?.[sourceName]) { appendToOutput(`mv: internal error: source '${sourceName}' not in parent`, true); return null; }
+            let finalDestParentNode, finalDestName;
+            const destNodeAtFullPath = getNodeByPath(absDestPath);
+            if (destNodeAtFullPath?.type === 'directory') {
+                finalDestParentNode = destNodeAtFullPath;
+                finalDestName = sourceName;
+                absDestPath = getAbsolutePath(finalDestName, absDestPath);
+            } else {
+                const lastSlash = absDestPath.lastIndexOf('/');
+                finalDestParentNode = getNodeByPath(lastSlash === 0 ? '/' : absDestPath.substring(0, lastSlash));
+                finalDestName = absDestPath.substring(lastSlash + 1);
+                if (finalDestParentNode?.type !== 'directory') { appendToOutput(`mv: target parent not a directory or non-existent`, true); return null; }
+            }
+            if (!finalDestName || finalDestName === "." || finalDestName === "..") { appendToOutput(`mv: invalid destination name '${finalDestName}'`, true); return null; }
+            if (absSourcePath === absDestPath) { appendToOutput(`mv: '${sourcePathArg}' and '${destPathArg}' are the same.`, false, CSS_CONSOLE_LOG_MSG); return null; }
+            if (finalDestParentNode.children[finalDestName]) { appendToOutput(`mv: destination '${finalDestName}' already exists.`, true); return null; }
+            if (sourceNode.type === 'directory' && (absDestPath.startsWith(absSourcePath + '/') || absDestPath === absSourcePath)) {
+                appendToOutput(`mv: cannot move directory into itself`, true); return null;
+            }
+            finalDestParentNode.children[finalDestName] = sourceNode;
+            delete sourceParentNode.children[sourceName];
+            if (saveFileSystemData()) appendToOutput(`Moved '${sourcePathArg}' to '${destPathArg}'`, false, CSS_SUCCESS_MSG);
+            return null;
+        }
+        function handleCp(args) { 
+            if (args.length < 2) { appendToOutput("cp: missing source and/or destination", true); return null; }
+            const sourcePathArg = args[0], destPathArg = args[1];
+            const absSourcePath = getAbsolutePath(sourcePathArg, currentPath);
+            let absDestPath = getAbsolutePath(destPathArg, currentPath);
+            const sourceNode = getNodeByPath(absSourcePath);
+            if (!sourceNode) { appendToOutput(`cp: '${sourcePathArg}': No such file or directory`, true); return null; }
+            if (absSourcePath === '/') { appendToOutput("cp: cannot copy root '/' itself.", true); return null; }
+            const sourceName = absSourcePath.substring(absSourcePath.lastIndexOf('/') + 1);
+            let finalDestParentNode, finalDestName;
+            const destNodeAtFullPath = getNodeByPath(absDestPath);
+            if (destNodeAtFullPath?.type === 'directory') {
+                finalDestParentNode = destNodeAtFullPath;
+                finalDestName = sourceName;
+                absDestPath = getAbsolutePath(finalDestName, absDestPath);
+            } else {
+                const lastSlash = absDestPath.lastIndexOf('/');
+                finalDestParentNode = getNodeByPath(lastSlash === 0 ? '/' : absDestPath.substring(0, lastSlash));
+                finalDestName = absDestPath.substring(lastSlash + 1);
+                if (finalDestParentNode?.type !== 'directory') { appendToOutput(`cp: target parent not a directory or non-existent`, true); return null; }
+            }
+            if (!finalDestName || finalDestName === "." || finalDestName === "..") { appendToOutput(`cp: invalid destination name '${finalDestName}'`, true); return null; }
+            if (sourceNode.type === 'directory' && (absDestPath.startsWith(absSourcePath + '/') || absDestPath === absSourcePath)) {
+                appendToOutput(`cp: cannot copy directory into itself`, true); return null;
+            }
+            if (finalDestParentNode.children[finalDestName]) { appendToOutput(`cp: destination '${finalDestName}' already exists.`, true); return null; }
+            const copiedNode = deepCopyNode(sourceNode);
+            if (!copiedNode) { appendToOutput(`cp: internal error copying '${sourcePathArg}'.`, true); return null; }
+            finalDestParentNode.children[finalDestName] = copiedNode;
+            if (saveFileSystemData()) appendToOutput(`Copied '${sourcePathArg}' to '${destPathArg}'`, false, CSS_SUCCESS_MSG);
+            return null;
+        }
+        function handleRm(args) { 
+            if (args.length === 0) { appendToOutput("rm: missing operand", true); return null; }
+            const targetPathArg = args[0];
+            const resolvedPath = getAbsolutePath(targetPathArg, currentPath);
+            if (resolvedPath === '/') { appendToOutput("rm: cannot remove root directory '/'", true); return null; }
+            const node = getNodeByPath(resolvedPath);
+            if (!node) { appendToOutput(`rm: cannot remove '${targetPathArg}': No such file or directory`, true); return null; }
+            itemToRemovePath = resolvedPath; 
+            awaitingRmConfirmation = true;
+            const itemType = node.type === 'directory' ? 'directory' : 'file';
+            appendToOutput(`Are you sure you want to remove ${itemType} '${targetPathArg}'? This action cannot be undone.`, false, CSS_WARNING_MSG);
+            appendToOutput("Type 'YES' (all caps) to confirm, or any other input to cancel.", false, CSS_WARNING_MSG);
+            return null;
+        }
+        function handlePwd(args) {
+            return currentPath;
+        }
+        function handleDate(args) {
+            return new Date().toString();
+        }
+        function handleWhoami(args) {
+            return currentUser;
+        }
+         function handleGrep(args) {
+            if (args.length < 2) {
+                appendToOutput("grep: usage: grep PATTERN FILE", true);
+                return null;
+            }
+            const filePathArg = args[args.length - 1];
+            let patternParts = args.slice(0, args.length - 1);
+            let pattern = patternParts.join(' ');
+            if ((pattern.startsWith('"') && pattern.endsWith('"')) || (pattern.startsWith("'") && pattern.endsWith("'"))) {
+                pattern = pattern.substring(1, pattern.length - 1);
+            }
+            if (!pattern) { 
+                appendToOutput("grep: pattern cannot be empty", true);
+                return null;
+            }
+            const resolvedPath = getAbsolutePath(filePathArg, currentPath);
+            const node = getNodeByPath(resolvedPath);
+            if (!node) {
+                appendToOutput(`grep: ${filePathArg}: No such file or directory`, true);
+                return null;
+            }
+            if (node.type === 'directory') {
+                appendToOutput(`grep: ${filePathArg}: Is a directory`, true);
+                return null;
+            }
+            const fileContent = node.content || "";
+            const lines = fileContent.split('\n');
+            const matchingLines = [];
+            for (const line of lines) {
+                if (line.includes(pattern)) { 
+                    matchingLines.push(line);
+                }
+            }
+            if (matchingLines.length > 0) {
+                return matchingLines.join('\n');
+            }
+            return ""; 
+        }
+        function handleRun(args) {
+            if (args.length === 0) {
+                appendToOutput("run: missing script file operand", true);
+                return null; 
+            }
+            const scriptPathArg = args[0];
+            const resolvedPath = getAbsolutePath(scriptPathArg, currentPath);
+            const node = getNodeByPath(resolvedPath);
+
+            if (!node) {
+                appendToOutput(`run: cannot access script '${scriptPathArg}': No such file or directory`, true);
+                return null;
+            }
+            if (node.type === 'directory') {
+                appendToOutput(`run: cannot execute '${scriptPathArg}': It is a directory`, true);
+                return null;
+            }
+
+            const scriptContent = node.content || "";
+            const scriptLines = scriptContent.split('\n');
+            
+            appendToOutput(`Executing script: ${scriptPathArg}`, false, CSS_CONSOLE_LOG_MSG);
+
+            for (let i = 0; i < scriptLines.length; i++) {
+                const line = scriptLines[i];
+                const trimmedLine = line.trim();
+                if (trimmedLine === '' || trimmedLine.startsWith('#')) {
+                    continue;
+                }
+                
+                const commandSuccessful = processCommand(trimmedLine, false); 
+                
+                if (!commandSuccessful) { 
+                    appendToOutput(`Script '${scriptPathArg}' aborted due to error on line ${i + 1}: ${trimmedLine}`, true);
+                    return null; 
+                }
+            }
+            appendToOutput(`Finished script: ${scriptPathArg}`, false, CSS_CONSOLE_LOG_MSG);
+            return null; 
+        }
+        function handleSysmon(args) {
+            const output = [
+                "Ooputer 1 - System Monitor",
+                "----------------------------------",
+                `OS Name:          ${OS_NAME}`,
+                `OS Version:       ${OS_VERSION}`,
+                `Current User:     ${currentUser}`,
+                "",
+                "CPU:",
+                `  Type:           OopisCPU Mark I`,
+                `  Architecture:   CISC-ish`,
+                `  Cores:          1 (Conceptual)`,
+                `  Clock Speed:    ~1-5 OopoHertz (Variable Burst)`,
+                "",
+                "MEMORY (RAM):",
+                `  Type:           DJHAR`,
+                `  Capacity:       ~640 KB (Active Working Memory)`,
+                "",
+                "STORAGE (LS-SSD):",
+                `  Type:           LocalStore Solid State Drive`,
+                `  Capacity:       5 MB (Max Browser localStorage)`,
+                "",
+                "DISPLAY (OTDA):",
+                `  Type:           GreenScreen Deluxe`,
+                `  Mode:           Text-Mode`,
+                "----------------------------------"
+            ];
+            return output.join('\n');
+        }
+        function handleSort(args) {
+            if (args.length === 0) {
+                appendToOutput("sort: missing file operand", true);
+                return null;
+            }
+            const filePathArg = args[0];
+            const resolvedPath = getAbsolutePath(filePathArg, currentPath);
+            const node = getNodeByPath(resolvedPath);
+
+            if (!node) {
+                appendToOutput(`sort: ${filePathArg}: No such file or directory`, true);
+                return null;
+            }
+            if (node.type === 'directory') {
+                appendToOutput(`sort: ${filePathArg}: Is a directory`, true);
+                return null;
+            }
+
+            const fileContent = node.content || "";
+            if (fileContent.trim() === "") { // Handle empty or whitespace-only files
+                return ""; // Return empty string, will be handled by redirection or printed as an empty line
+            }
+            const lines = fileContent.split('\n');
+            lines.sort(); // Default alphabetical sort
+            return lines.join('\n');
+        }
+        function handleClear() { outputDiv.innerHTML = ''; return null; }
+        function handleManualSaveState() {
+            const manualState = { currentPath, outputHTML: outputDiv.innerHTML, currentInput: hiddenInput.value, fsDataSnapshot: deepCopyNode(fsData) };
+            if (saveJSONToStorage(getManualUserTerminalStateKey(currentUser), manualState, `Manual save for ${currentUser}`)) {
+                appendToOutput(`Session manually saved for ${currentUser}.`, false, CSS_SUCCESS_MSG);
+            }
+            return null;
+        }
+        function handleManualLoadState() {
+            pendingManualStateToLoad = loadJSONFromStorage(getManualUserTerminalStateKey(currentUser), `Manual save for ${currentUser}`);
+            if (pendingManualStateToLoad) {
+                appendToOutput("Load manually saved state? This overwrites current session & filesystem.", false, CSS_WARNING_MSG);
+                appendToOutput("Type 'YES' to confirm, or any other input to cancel.", false, CSS_WARNING_MSG);
+                awaitingLoadstateConfirmation = true;
+            } else appendToOutput(`No manually saved state found for ${currentUser}.`, false, CSS_CONSOLE_LOG_MSG);
+            return null;
+        }
+        function performFullReset() {
+            outputDiv.innerHTML = ''; 
+            hiddenInput.value = ''; updateVisualInput(); 
+            localStorage.removeItem(getAutomaticSessionStateKey(currentUser));
+            localStorage.removeItem(getFileSystemKey(currentUser));
+            localStorage.removeItem(getManualUserTerminalStateKey(currentUser));
+            if (currentUser !== DEFAULT_USER) {
+                localStorage.removeItem(getAutomaticSessionStateKey(DEFAULT_USER));
+                localStorage.removeItem(getFileSystemKey(DEFAULT_USER));
+                localStorage.removeItem(getManualUserTerminalStateKey(DEFAULT_USER));
+            }
+            localStorage.removeItem(USER_CREDENTIALS_KEY);
+            commandHistory = []; historyIndex = commandHistory.length; 
+            currentUser = DEFAULT_USER;
+            initializeFileSystem(DEFAULT_USER);
+            loadAutomaticSessionState(DEFAULT_USER); 
+            appendToOutput("Terminal fully reset. All user data and states cleared.", false, CSS_SUCCESS_MSG);
+        }
+        function handleReset() {
+            appendToOutput("Reset ALL terminal data? This cannot be undone.", false, CSS_WARNING_MSG);
+            appendToOutput("Type 'YES' to confirm, or any other input to cancel.", false, CSS_WARNING_MSG);
+            awaitingResetConfirmation = true;
+            return null;
+        }
+        function handleRegister(args) {
+            if (args.length < 2) { appendToOutput("Usage: register <username> <password>", true); return null; }
+            const [username, password] = args;
+            const credentials = getUserCredentials();
+            if (credentials[username]) { appendToOutput(`Error: User '${username}' already exists.`, true); return null; }
+            if (username.toLowerCase() === DEFAULT_USER.toLowerCase()) { appendToOutput(`Error: Cannot register '${DEFAULT_USER}'.`, true); return null; }
+            credentials[username] = password;
+            if (saveUserCredentials(credentials)) {
+                initializeFileSystem(username);
+                console.warn(`SECURITY WARNING: Plaintext password for ${username}.`);
+                appendToOutput(`User '${username}' registered. You can now login.`, false, CSS_SUCCESS_MSG);
+            }
+            return null;
+        }
+        function handleLogin(args) {
+            if (args.length < 2) { appendToOutput("Usage: login <username> <password>", true); return null; }
+            const [username, password] = args;
+            const credentials = getUserCredentials();
+            if (credentials[username] === password) {
+                if (currentUser !== DEFAULT_USER && currentUser !== username) saveAutomaticSessionState();
+                currentUser = username;
+                commandHistory = []; historyIndex = commandHistory.length; 
+                loadFileSystemData(currentUser);
+                loadAutomaticSessionState(currentUser); 
+                appendToOutput(`Logged in as ${currentUser}.`, false, CSS_SUCCESS_MSG);
+            } else appendToOutput("Login failed: Invalid username or password.", true);
+            return null;
+        }
+        function handleLogout() {
+            if (currentUser === DEFAULT_USER) { appendToOutput("Already Guest.", false, CSS_CONSOLE_LOG_MSG); return null; }
+            saveAutomaticSessionState();
+            const prevUser = currentUser;
+            currentUser = DEFAULT_USER;
+            commandHistory = []; historyIndex = commandHistory.length;
+            loadFileSystemData(DEFAULT_USER);
+            loadAutomaticSessionState(DEFAULT_USER); 
+            appendToOutput(`User ${prevUser} logged out. Now ${currentUser}.`, false, CSS_SUCCESS_MSG);
+            return null;
+        }
+        function handleHelp(args) {
+            let outputLines = [];
+            if (!args.length) {
+                outputLines.push("Available commands (type 'help <command>' or 'man <command>'):");
+                const commandNames = Object.keys(commandRegistry).sort();
+                commandNames.forEach(cmdName => {
+                    outputLines.push(`- ${cmdName.padEnd(10, ' ')} ${commandHelpData[cmdName]?.summary || ''}`);
+                });
+            } else {
+                const commandName = args[0].toLowerCase();
+                const helpInfo = commandHelpData[commandName];
+                if (helpInfo) {
+                    outputLines.push(`${commandName}: ${helpInfo.summary || 'No summary available.'}`);
+                    outputLines.push(`  Usage: ${helpInfo.usage || 'N/A'}`);
+                    outputLines.push(`  For more details, type: man ${commandName}`);
+                } else {
+                    appendToOutput(`No help available for '${commandName}'. Try 'man ${commandName}'.`, true);
+                    return null;
+                }
+            }
+            return outputLines.join('\n');
+        }
+         function handleMan(args) {
+            if (args.length === 0) {
+                return "What manual page do you want? (e.g., man ls)";
+            }
+            const commandName = args[0].toLowerCase();
+            const manDataFromHelp = commandHelpData[commandName]; 
+            let outputLines = [];
+
+            if (manDataFromHelp) {
+                outputLines.push(`NAME`); 
+                outputLines.push(`    ${commandName} - ${manDataFromHelp.summary || 'No summary available.'}`);
+                outputLines.push(`\nSYNOPSIS`);
+                outputLines.push(`    ${manDataFromHelp.syntax || manDataFromHelp.usage || 'No syntax information available.'}`);
+                outputLines.push(`\nDESCRIPTION`);
+                outputLines.push(`    ${manDataFromHelp.details || 'No detailed description available.'}`);
+                if (manDataFromHelp.examples && manDataFromHelp.examples.length > 0) {
+                    outputLines.push(`\nEXAMPLES`);
+                    manDataFromHelp.examples.forEach(example => {
+                        outputLines.push(`        ${example}`); 
+                    });
+                }
+                 outputLines.push(""); 
+                 return outputLines.join('\n');
+            } else {
+                appendToOutput(`No manual entry for ${commandName}`, true); 
+                return null;
+            }
+        }
+
+
+        // --- Command Registry ---
+        const commandRegistry = {
+            'ls': handleLs, 'cd': handleCd, 'mkdir': handleMkdir, 'touch': handleTouch,
+            'cat': handleCat, 'echo': handleEcho, 'rm': handleRm, 'pwd': handlePwd, 
+            'date': handleDate, 'whoami': handleWhoami, 'run': handleRun, 'grep': handleGrep, 
+            'sort': handleSort, // Added sort
+            'sysmon': handleSysmon, 
+            'mv': handleMv, 'cp': handleCp,
+            'clear': handleClear,
+            'register': handleRegister, 'login': handleLogin, 'logout': handleLogout,
+            'savestate': handleManualSaveState, 'loadstate': handleManualLoadState,
+            'reset': handleReset, 'help': handleHelp, 'man': handleMan 
+        };
+
+        // --- UI Update Functions ---
+        function updatePrompt() {
+            promptUserSpan.textContent = currentUser;
+            promptHostSpan.textContent = OS_NAME;
+            promptPathSpan.textContent = currentPath.trim() === '' ? '/' : currentPath;
+        }
+
+        // --- Command Processing ---
+        function processCommand(commandInputText, isInteractive = true) {
+            lastCommandFailed = false; 
+            const trimmedCommand = commandInputText.trim();
+            
+            if (isInteractive) { 
+                const promptText = `${currentUser}@${OS_NAME}:${promptPathSpan.textContent}> `;
+                appendToOutput(`${promptText}${trimmedCommand}`);
+            } else { 
+                appendToOutput(`> ${trimmedCommand}`);
+            }
+
+            if (isInteractive && trimmedCommand && (commandHistory.length === 0 || commandHistory[commandHistory.length - 1] !== trimmedCommand)) {
+                commandHistory.push(trimmedCommand);
+                if (commandHistory.length > MAX_HISTORY_SIZE) commandHistory.shift();
+            }
+            if (isInteractive) {
+                historyIndex = commandHistory.length; 
+            }
+            
+            let commandSuccessful = true; 
+
+            if (awaitingResetConfirmation) { /* ... (confirmation logic as before) ... */ }
+            else if (awaitingLoadstateConfirmation) { /* ... (confirmation logic as before) ... */ }
+            else if (awaitingRmConfirmation) { /* ... (confirmation logic as before) ... */ }
+            else {
+                let commandToExecute = trimmedCommand;
+                let redirectionType = null;
+                let redirectionFile = null;
+
+                const overwriteMatch = commandToExecute.match(/\s+>\s+(\S+)$/);
+                const appendMatch = commandToExecute.match(/\s+>>\s+(\S+)$/);
+
+                if (appendMatch) {
+                    redirectionType = 'append';
+                    redirectionFile = appendMatch[1];
+                    commandToExecute = commandToExecute.substring(0, appendMatch.index).trim();
+                } else if (overwriteMatch) {
+                    redirectionType = 'overwrite';
+                    redirectionFile = overwriteMatch[1];
+                    commandToExecute = commandToExecute.substring(0, overwriteMatch.index).trim();
+                }
+
+                if (commandToExecute !== '') {
+                    const parts = commandToExecute.split(' ').filter(p => p);
+                    const baseCommand = parts[0].toLowerCase();
+                    const args = parts.slice(1);
+                    const handler = commandRegistry[baseCommand];
+
+                    if (handler) {
+                        try {
+                            const commandOutput = handler(args); 
+                            
+                            if (commandOutput === null && lastCommandFailed) {
+                                commandSuccessful = false;
+                            } else if (redirectionType && redirectionFile) {
+                                if (commandOutput !== null && commandOutput !== undefined) { 
+                                    const targetAbsPath = getAbsolutePath(redirectionFile, currentPath);
+                                    if (targetAbsPath === '/') {
+                                        appendToOutput(`Error: cannot redirect to root '/'`, true);
+                                        commandSuccessful = false;
+                                    } else {
+                                        const lastSlashIndex = targetAbsPath.lastIndexOf('/');
+                                        const parentPath = lastSlashIndex === 0 ? '/' : targetAbsPath.substring(0, lastSlashIndex);
+                                        const newFileName = targetAbsPath.substring(lastSlashIndex + 1);
+
+                                        if (!newFileName || newFileName === "." || newFileName === "..") {
+                                            appendToOutput(`Error: invalid filename '${newFileName}' in path '${redirectionFile}'`, true);
+                                            commandSuccessful = false;
+                                        } else {
+                                            const parentPathSegments = parentPath.substring(1).split('/').filter(s => s);
+                                            let parentDirNode = fsData['/'];
+                                            let currentBuiltParentPath = "";
+                                            let parentCreationFailed = false;
+
+                                            for (const segment of parentPathSegments) {
+                                                currentBuiltParentPath += "/" + segment;
+                                                if (!parentDirNode.children[segment]) {
+                                                    parentDirNode.children[segment] = { type: 'directory', children: {} };
+                                                } else if (parentDirNode.children[segment].type !== 'directory') {
+                                                    appendToOutput(`Error: cannot write to '${redirectionFile}': A component of the path '${currentBuiltParentPath}' is not a directory.`, true);
+                                                    parentCreationFailed = true; commandSuccessful = false;
+                                                    break;
+                                                }
+                                                parentDirNode = parentDirNode.children[segment];
+                                            }
+
+                                            if (!parentCreationFailed) {
+                                                const targetNode = parentDirNode.children[newFileName];
+                                                if (targetNode?.type === 'directory') {
+                                                    appendToOutput(`Error: cannot write to '${redirectionFile}': It is a directory.`, true);
+                                                    commandSuccessful = false;
+                                                } else {
+                                                    if (redirectionType === 'overwrite' || !targetNode) {
+                                                        parentDirNode.children[newFileName] = { type: 'file', content: String(commandOutput) };
+                                                    } else if (redirectionType === 'append') {
+                                                        const existingContent = targetNode?.content || ""; 
+                                                        parentDirNode.children[newFileName].content = existingContent + (existingContent ? "\n" : "") + String(commandOutput);
+                                                    }
+                                                    if(!saveFileSystemData()) commandSuccessful = false; 
+                                                }
+                                            }
+                                        }
+                                    }
+                                } else if (commandOutput === null && redirectionType) {
+                                     if (redirectionType === 'overwrite') {
+                                        const targetAbsPath = getAbsolutePath(redirectionFile, currentPath);
+                                        const lastSlashIndex = targetAbsPath.lastIndexOf('/');
+                                        const parentPath = lastSlashIndex === 0 ? '/' : targetAbsPath.substring(0, lastSlashIndex);
+                                        const newFileName = targetAbsPath.substring(lastSlashIndex + 1);
+                                        
+                                        let parentDirNode = fsData['/'];
+                                        const parentPathSegmentsForRedir = parentPath.substring(1).split('/').filter(s => s);
+                                        let parentRedirCreationFailed = false;
+                                        for (const segment of parentPathSegmentsForRedir) {
+                                            if (!parentDirNode.children[segment]) {
+                                                parentDirNode.children[segment] = { type: 'directory', children: {} };
+                                            } else if (parentDirNode.children[segment].type !== 'directory') {
+                                                appendToOutput(`Error: cannot write to '${redirectionFile}': Component '${segment}' is not a directory.`, true);
+                                                parentRedirCreationFailed = true; commandSuccessful = false; break;
+                                            }
+                                            parentDirNode = parentDirNode.children[segment];
+                                        }
+
+                                        if (!parentRedirCreationFailed && parentDirNode && parentDirNode.type === 'directory' && newFileName && newFileName !== "." && newFileName !== "..") {
+                                            if (!parentDirNode.children[newFileName] || parentDirNode.children[newFileName].type === 'file') {
+                                                parentDirNode.children[newFileName] = { type: 'file', content: "" };
+                                                if(!saveFileSystemData()) commandSuccessful = false;
+                                            } else { 
+                                                appendToOutput(`Error: cannot overwrite '${redirectionFile}': It is a directory.`, true);
+                                                commandSuccessful = false;
+                                            }
+                                        } else if (!parentRedirCreationFailed) { 
+                                             appendToOutput(`Error: invalid path or filename for redirection '${redirectionFile}'.`, true);
+                                             commandSuccessful = false;
+                                        }
+                                    }
+                                }
+                            } else if (commandOutput !== null && commandOutput !== undefined) {
+                                const lines = String(commandOutput).split('\n');
+                                lines.forEach(line => {
+                                    if (baseCommand === 'man') {
+                                        if (/^[A-Z\s]+$/.test(line.trim()) && line.trim() === line.trim().toUpperCase() && line.trim() === line && line.trim().length > 0 && line.trim().length < 20) {
+                                            appendToOutput(line.trim(), false, CSS_MAN_SECTION_TITLE);
+                                        } else if (line.startsWith("        ")) { 
+                                            appendToOutput(line, false, CSS_MAN_EXAMPLE);
+                                        } else if (line.startsWith("    ")) { 
+                                            appendToOutput(line, false, CSS_MAN_SECTION_CONTENT);
+                                        } else {
+                                            appendToOutput(line);
+                                        }
+                                    } else if (baseCommand === 'sysmon' && line.includes(':')) {
+                                        const parts = line.split(/:(.+)/);
+                                        if (parts.length > 1) {
+                                            appendStyledOutput(parts[0] + ':', parts[1].trim());
+                                        } else {
+                                            appendToOutput(line);
+                                        }
+                                    } else if (baseCommand === 'ls') {
+                                        const div = document.createElement('div');
+                                        div.classList.add(CSS_OUTPUT_LINE);
+                                        const isDir = line.endsWith('/');
+                                        div.textContent = line;
+                                        if (isDir) div.classList.add(CSS_DIR_ITEM);
+                                        else div.classList.add(CSS_FILE_ITEM);
+                                        outputDiv.appendChild(div); 
+                                        outputDiv.scrollTop = outputDiv.scrollHeight;
+                                    }
+                                     else {
+                                        appendToOutput(line);
+                                    }
+                                });
+                            }
+                            if (commandOutput === null && !lastCommandFailed) { 
+                                commandSuccessful = true;
+                            } else if (commandOutput === null && lastCommandFailed) { 
+                                commandSuccessful = false; 
+                            } else if (commandOutput !== null && commandOutput !== undefined && !lastCommandFailed) { 
+                                commandSuccessful = true;
+                            }
+
+
+                        } catch (e) {
+                            console.error(`Error in '${baseCommand}':`, e);
+                            appendToOutput(`Unexpected error in '${baseCommand}'.`, true);
+                            commandSuccessful = false;
+                        }
+                    } else {
+                        appendToOutput(`Error: Command not found: "${parts[0]}"`, true);
+                        commandSuccessful = false;
+                    }
+                } else if (trimmedCommand === '') { 
+                    commandSuccessful = true; 
+                }
+            }
+            if (isInteractive) { 
+                hiddenInput.value = ''; 
+                updateVisualInput(); 
+            }
+            if (!awaitingLoadstateConfirmation && !awaitingResetConfirmation && !awaitingRmConfirmation) {
+                updatePrompt();
+            }
+            return commandSuccessful; 
+        }
+
+        // --- Event Listeners ---
+        terminalDiv.addEventListener('click', e => { 
+            if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'A' && !e.target.closest('#visual-input-container')) {
+                 hiddenInput.focus(); 
+            }
+            if (e.target.closest('#visual-input-container') || e.target.classList.contains('input-line')) {
+                hiddenInput.focus();
+            }
+        });
+        
+        hiddenInput.addEventListener('keydown', e => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                processCommand(hiddenInput.value, true); 
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (commandHistory.length > 0 && historyIndex > 0) {
+                    historyIndex--;
+                    hiddenInput.value = commandHistory[historyIndex];
+                    setTimeout(() => { 
+                        const len = hiddenInput.value.length;
+                        hiddenInput.setSelectionRange(len, len);
+                        updateVisualInput();
+                        hiddenInput.focus(); 
+                    }, 0);
+                }
+            } else if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (commandHistory.length > 0 && historyIndex < commandHistory.length - 1) {
+                    historyIndex++;
+                    hiddenInput.value = commandHistory[historyIndex];
+                     setTimeout(() => {
+                        const len = hiddenInput.value.length;
+                        hiddenInput.setSelectionRange(len, len);
+                        updateVisualInput();
+                        hiddenInput.focus();
+                    }, 0);
+                } else if (historyIndex >= commandHistory.length - 1) {
+                    historyIndex = commandHistory.length;
+                    hiddenInput.value = "";
+                    updateVisualInput();
+                }
+            } else if (['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) {
+                setTimeout(updateVisualInput, 0); 
+            }
+        });
+
+        hiddenInput.addEventListener('input', () => {
+            updateVisualInput();
+            historyIndex = commandHistory.length;
+        });
+
+        // --- Initialization ---
+        window.onload = () => {
+            console.warn("SECURITY WARNING: User credentials are NOT secure in this demo.");
+            currentUser = DEFAULT_USER;
+            loadFileSystemData(currentUser);
+            loadAutomaticSessionState(currentUser); 
+            setTimeout(() => { hiddenInput.focus(); }, 100);
+            console.log(`${OS_NAME} v.${OS_VERSION} (sort Command) loaded. Welcome!`);
+        };
+    </script>
+</body>
+</html>
