@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OopisOS v1.0.5.3 - Space Cadet's Digital Poster</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'VT323', monospace; /* Classic retro terminal font */
+            background-color: #0a0f0f; /* Deep space dark teal/black */
+            color: #00ff99; /* Bright retro green */
+        }
+        .poster-container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 2rem;
+            border: 3px solid #00cc66; /* Slightly darker green border */
+            box-shadow: 0 0 15px #00ff99, inset 0 0 10px #00331a;
+            background-color: #0d1a1a; /* Slightly lighter dark teal for contrast */
+        }
+        h1, h2, h3 {
+            color: #00ffff; /* Cyan for headers */
+            text-shadow: 0 0 5px #00ffff;
+        }
+        h1 {
+            font-size: 2.5rem; /* VT323 is small, so larger sizes needed */
+            text-align: center;
+            margin-bottom: 1rem;
+            border-bottom: 2px dashed #00cc66;
+            padding-bottom: 0.5rem;
+        }
+        h2 {
+            font-size: 2rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #00994d;
+            padding-bottom: 0.25rem;
+            text-transform: uppercase;
+        }
+        h3 {
+            font-size: 1.6rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: #ffff00; /* Yellow for sub-sub-headers */
+            text-shadow: 0 0 5px #ffff00;
+        }
+        p, li {
+            font-size: 1.3rem; /* Larger base size for VT323 */
+            line-height: 1.6;
+            margin-bottom: 0.75rem;
+            color: #00ff99; /* Main text green */
+        }
+        pre {
+            background-color: #001a0d;
+            border: 1px dashed #00994d;
+            padding: 1rem;
+            margin: 1rem 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 1.1rem; /* Slightly smaller for pre to fit ASCII art */
+            color: #99ffcc; /* Lighter green for pre content */
+            box-shadow: inset 0 0 8px #000000;
+        }
+        strong {
+            color: #ffffff; /* White for emphasis */
+            font-weight: normal; /* VT323 bold is not very distinct, rely on color */
+        }
+        em {
+            color: #ff9933; /* Orange for italics/secondary emphasis */
+            font-style: normal;
+        }
+        .section-divider {
+            border: 0;
+            height: 2px;
+            background-image: linear-gradient(to right, rgba(0,0,0,0), #00ff99, rgba(0,0,0,0));
+            margin: 2.5rem 0;
+        }
+        .manager-card {
+            background-color: #102525;
+            border: 1px solid #00994d;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 5px;
+        }
+        .manager-card strong {
+            color: #00ffff; /* Cyan for droid names */
+        }
+        .capability-card {
+            background-color: #0f2020;
+            border-left: 4px solid #ffff00; /* Yellow accent for capabilities */
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        .emoji-icon {
+            font-size: 1.5em;
+            margin-right: 0.5em;
+            vertical-align: middle;
+        }
+        @media (max-width: 768px) {
+            body { font-size: 14px; } /* Adjust base for mobile */
+            .poster-container { margin: 1rem; padding: 1rem; }
+            h1 { font-size: 2rem; }
+            h2 { font-size: 1.7rem; }
+            h3 { font-size: 1.4rem; }
+            p, li { font-size: 1.1rem; }
+            pre { font-size: 0.9rem; }
+        }
+
+        /* Add VT323 font from Google Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+    </style>
+</head>
+<body>
+    <div class="poster-container">
+        <pre>
+********************************************************************************
+* *
+* OOOOOOO   OOOOOOO   PPPPPPP   IIIIIIIII   SSSSSSS      OOOOOOO   SSSSSSS   *
+* OO     OO OO     OO  PP    PP     III     SS            OO     OO SS         *
+* OO     OO OO     OO  PP    PP     III     SSSSSSS       OO     OO SSSSSSS    *
+* OO     OO OO     OO  PPPPPPP      III          SS       OO     OO      SS    *
+* OOOOOOO   OOOOOOO   PP           III     SSSSSSS        OOOOOOO  SSSSSSS    *
+* *
+* VERSION 1.0.5.3 - NOW WITH MORE PIXELS (AND LESS JAGGIES)!                 *
+* *
+* A SPACE CADET'S UNOFFICIAL (BUT TOTALLY RAD) DIGITAL DATASLATE!         *
+* *
+********************************************************************************
+        </pre>
+
+        <h1>LOG ENTRY: STARDATE 8008.5 - YOUR MISSION BRIEFING!</h1>
+        <p>Greetings, intrepid Space Cadet! You've been assigned to the S.S. Oopis, a marvel of modern (for last Tuesday) browser-based technology! This ain't your mom's operating system. This is <strong>OopisOS v1.0.5.3</strong> – a full-blown desktop simulation running entirely in that glowing rectangle you call a "web browser." Forget boring spreadsheets; we're talking retro-terminal action, file systems more persistent than that green stuff in the ship's replicator, and an editor so advanced, it <em>almost</em> knows what you want to type!</p>
+
+        <hr class="section-divider">
+
+        <h2><span class="emoji-icon">💻</span>YOUR COCKPIT: THE OOPISOS TERMINAL - IT'S GOT BUTTONS (SORT OF)!</h2>
+        <h3>🚀 THE VIEWSCREEN (What is OopisOS?):</h3>
+        <p>Imagine, if you can, a tiny, self-contained universe of computing logic, all squished into a single HTML file! OopisOS is your personal digital playground, complete with:</p>
+        <ul class="list-disc list-inside ml-4">
+            <li>A <strong>Retro-Styled Terminal:</strong> Green text on a black background? Oh yeah, we went there.</li>
+            <li><strong>Advanced Shenanigans:</strong>
+                <ul class="list-disc list-inside ml-6">
+                    <li><em>TAB-O-MATIC COMPLETION:</em> Guesses what you're typing! Mostly.</li>
+                    <li><em>COMMAND PIPELINER 5000:</em> Chain commands like a cosmic daisy chain! (`cat log.txt | grep "aliens"`)</li>
+                    <li><em>BACKGROUND PROCESSOR UNIT:</em> Run stuff in the... well, background! (`&`) So you can, like, do two things at once! Mind. Blown.</li>
+                </ul>
+            </li>
+        </ul>
+
+        <hr class="section-divider">
+
+        <h2><span class="emoji-icon">🤖</span>MEET THE CREW: YOUR TRUSTY (AND OCCASIONALLY RUSTY) SYSTEM MANAGERS!</h2>
+        <p>These aren't just lines of code, cadet! They're... <em>personalities</em>!</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="manager-card">
+                <strong>COMMANDER EXECUTOR:</strong> The ship's slightly manic captain. Takes your garbled orders (text input), barks them through the LEXTRON-9000 (Lexer), tries to make sense of them with the PARSE-O-TRON (Parser), and then (hopefully) tells the right droid what to do. <em>His catchphrase: "I've got a bad feeling about this token..."</em>
+            </div>
+            <div class="manager-card">
+                <strong>QUARTERMASTER FILESYSTEM:</strong> This gruff, multi-armed alienoid manages your digital locker (the file system). Creates, deletes, moves, and occasionally loses your precious files in the vastness of IndexedDB. <em>Warning: Do NOT ask about the "Great Deletion of Stardate 7999."</em>
+            </div>
+            <div class="manager-card">
+                <strong>USER MANAGER "REGGIE":</strong> A shifty character who handles identities. Lets new recruits sign up (`register`), logs you in (`login`), kicks you out (`logout`), and can even... <em>disappear</em> users (`removeuser`). <em>Always asks for "Buckazoids for the paperwork, kid."</em>
+            </div>
+            <div class="manager-card">
+                <strong>ENGINEER SESSIONIS:</strong> Keeps your seat warm. Saves your progress automatically and lets you make manual "Cryo-Sleep" backups (`savestate`, `backup`) for when things inevitably go sideways.
+            </div>
+            <div class="manager-card md:col-span-2">
+                <strong>COMMUNICATIONS OFFICER "EDDIE" EDITOR:</strong> Upgraded from a rusty Speak & Spell, Eddie now runs the <strong>Holo-Scribe 9000</strong>! This bad boy features: Line Numbers, a Status Bar, multiple View Modes (Split, Edit, Preview), a Word Wrap Toggle, and HTML Preview Export!
+            </div>
+        </div>
+
+        <hr class="section-divider">
+
+        <h2><span class="emoji-icon">🎯</span>YOUR MISSION DIRECTIVES: KEY CAPABILITIES (AKA "STUFF YOU CAN DO")</h2>
+        <div class="capability-card">
+            <h3><span class="emoji-icon">📂</span> CHARTING UNEXPLORED DIRECTORIES (File System Ops):</h3>
+            <p>`mkdir -p`, `ls -la`, `touch`, `cat`, `cp -rf`, `mv -f`, `rm -rf` (BE CAREFUL!), `pwd`, `cd`, `tree -L`, `find`. You're basically a digital Magellan!</p>
+        </div>
+        <div class="capability-card">
+            <h3><span class="emoji-icon">📜</span> AUTOMATED ASTROGATION PROTOCOLS (Scripting & Execution):</h3>
+            <p>Use `run <script_name> $1 $2` to automate boring tasks! `delay` your scripts, make 'em `check_fail` for when you <em>expect</em> explosions!</p>
+        </div>
+        <div class="capability-card">
+            <h3><span class="emoji-icon">👤</span> CLONING & CRYO-SLEEP CONTROLS (User & Session Management):</h3>
+            <p>`register`, `login`, `logout`, `whoami`, `removeuser` (yikes!). `savestate`, `loadstate`, `backup`, `restore`, `savefs`, `reset` (THE BIG RED BUTTON!).</p>
+        </div>
+        <div class="capability-card">
+            <h3><span class="emoji-icon">💡</span> UNIVERSAL TRANSLATOR & UTILITY BELT (I/O, Utilities & Shell Features):</h3>
+            <p>`echo` your brilliance! Redirect it (`>`, `>>`)! Pipe it (`|`)! `date`, `help`, `clear`, `history -c`, `export`, `upload`! `shutdown`, `reboot`!</p>
+        </div>
+
+        <hr class="section-divider">
+
+        <h2><span class="emoji-icon">⚙️</span>THE ENGINE ROOM: POWERED BY ANCIENT EARTH RELICS! (Tech Stack)</h2>
+        <ul class="list-disc list-inside ml-4">
+            <li><strong>Hyper-Textual Matter Transporter (HTML):</strong> The ship's basic hull.</li>
+            <li><strong>Cascading Style Sheets of Invisibility (CSS via Tailwind):</strong> Makes the rust buckets look shiny.</li>
+            <li><strong>JavaScrambler Drive (JavaScript ES6+):</strong> The real magic! Powers <em>everything</em>.</li>
+            <li><strong>Indexed Holo-Storage (IndexedDB):</strong> Where your files go to live (or get lost).</li>
+            <li><strong>Localized Memory Crystals (LocalStorage):</strong> For remembering who you are.</li>
+            <li><strong>Marked-Down Matter Converter (Marked.js):</strong> For fancy text previews in the Holo-Scribe 9000.</li>
+        </ul>
+
+        <hr class="section-divider">
+
+        <h2><span class="emoji-icon">🛠️</span>CAPTAIN'S ORDERS: FROM YOUR BRAIN TO THE MAINFRAME! (Command Lifecycle)</h2>
+        <p>Ever wonder how your brilliant command <em>`give_me_buckazoids`</em> (sadly, not a real command) gets processed?</p>
+        <ol class="list-decimal list-inside ml-4">
+            <li><strong>YOU YELL IT (User Input):</strong> You type something. Hopefully coherent.</li>
+            <li><strong>LEXTRON-9000 DECONSTRUCTS (Lexing):</strong> Breaks it into tiny, manageable word-bits.</li>
+            <li><strong>PARSE-O-TRON ASSEMBLES (Parsing):</strong> Tries to build a sensible "command pipeline".</li>
+            <li><strong>DROIDS SCRAMBLE (Execution):</strong> The CommandExecutor droid delegates tasks.</li>
+            <li><strong>RESULTS (OR EXPLOSIONS) ON SCREEN (Output):</strong> You see stuff! Or an error message.</li>
+        </ol>
+
+        <hr class="section-divider">
+
+        <h2><span class="emoji-icon">🔬</span>SELF-DESTRUCT SEQU... I MEAN, DIAGNOSTICS! (The `diag.sh` Script)</h2>
+        <p>To prevent total system meltdown (and ensure the devs didn't drink too much Tang before coding), a `diag.sh` script runs <strong>NUMEROUS</strong> automated tests. It checks if things that <em>should</em> break <em>do</em> break (`check_fail` is its favorite command), and if things that <em>shouldn't</em> break... well, you get the idea. It's the only thing keeping this rust bucket flying straight (mostly).</p>
+
+        <hr class="section-divider">
+        <pre>
+********************************************************************************
+* *
+* GO FORTH AND OOPIS, SPACE CADET! TRY NOT TO BREAK IT. (TOO MUCH)        *
+* (BUT IF YOU DO, THAT'S HALF THE FUN! HAPPY OOPIS-ING!)            *
+* *
+********************************************************************************
+        </pre>
+    </div>
+
+    <script>
+        // Minimal JS, if any, would go here.
+        // For a static poster, likely not much needed.
+        // Could add a "PRINT" button or easter eggs in the future.
+        console.log("OopisOS Digital Dataslate Initialized. All systems nominal... for now.");
+    </script>
+</body>
+</html>
