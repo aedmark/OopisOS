@@ -206,5 +206,6 @@ Contributions to OopisOS are welcome! If you'd like to contribute, please consid
 * Permissions model for files/directories.
 
 ## License
+This code was designed with the help of Google Gemini 2.5 Pro.
 
 This project is distributed under the MIT License. See `LICENSE` file for more information (if a separate LICENSE file exists, otherwise assume MIT License from context).
