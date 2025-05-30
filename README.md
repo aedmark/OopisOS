@@ -95,3 +95,116 @@ mkdir my_projects
 cd my_projects
 edit my_script.sh
 ```
+
+The `help` command will provide a list of all available commands and their basic usage. Type `help <command_name>` for more details on a specific command.
+
+## Exploring OopisOS
+
+OopisOS offers a rich environment. Here are some areas to explore:
+
+* **File System:** Create directories (`mkdir -p my_folder/sub_folder`), navigate (`cd my_folder`), create files (`touch my_file.txt`), and edit them (`edit my_file.txt`). Try `tree -L 2` to see the structure.
+* **User Accounts:** Register a new user (`useradd your_username`), log out (`logout`), and log back in (`login your_username`). Notice how your file system is unique. Try `removeuser some_other_user` after creating one.
+* **Session Persistence:** Use `savestate` to save your current work, then make changes or `reset`, and use `loadstate` to restore your previous session. Use `backup` to get a downloadable JSON of your filesystem.
+* **Editor Features:** Open a `.md` file with `edit test.md`. Try toggling word wrap, changing view modes (Ctrl+P), and exporting the preview. Note the status bar.
+* **Piping and Redirection:** Try `ls -l | cat > file_list.txt` or `echo "Hello" >> some_file.txt`.
+* **Background Processes:** Execute a long-running script or command with `&` at the end, e.g., `run my_long_script.sh &`.
+* **Scripting:** Create a simple script file (e.g., `edit test.sh`) with:
+    ```sh
+    #!/bin/oopisos_shell
+    # My test script
+    echo "Script running with $# arguments: $@"
+    echo "First argument: $1"
+    ls -l /
+    delay 1000
+    echo "Script finished."
+    ```
+    Save it, and then run it with `run test.sh arg1 "second arg"`.
+
+## Developer Guide
+
+Interested in understanding or modifying OopisOS?
+
+* **Source Code:** All the logic is contained within the `<script>` tags in the `OopisOS 1.0.5.3.html` file.
+* **Core Architecture:** OopisOS is built with a modular JavaScript design using "Manager" objects (e.g., `CommandExecutor`, `FileSystemManager`, `UserManager`, `EditorManager`).
+* **CommandExecutor:** Contains the `commands` object, which maps command names to their handler functions. This is the primary place to add new commands or modify existing ones. It now includes a Lexer and Parser for more robust command line processing, including pipes and background operators.
+* **FileSystemManager:** Handles all file operations and persistence to IndexedDB.
+* **EditorManager:** Manages the enhanced text editor state and functionalities.
+
+**Adding a New Command:**
+* Locate the `commands` object within `CommandExecutor`.
+* Add a new entry with your command name as the key.
+* Define a handler: `async (args, cmdOptions) => { ... }` function for its logic. `cmdOptions` includes `isInteractive`, `explicitForce`, and `stdinContent`.
+* Provide `description` and `helpText` metadata for the help system.
+
+## Scripting Guide
+
+Automate tasks in OopisOS by writing scripts.
+
+* **Creating Scripts:** Use `edit your_script_name.sh`.
+* **Format:** Plain text files, one command per line.
+    * Lines starting with `#` (unless within quotes) are comments.
+    * Scripts can start with a shebang line (e.g., `#!/bin/oopisos_shell`), which will be ignored.
+* **Running Scripts:** `run your_script_name.sh [arg1] [arg2] ...`
+
+**Key Scripting Features & Commands:**
+* **Arguments:**
+    * `$1`, `$2`, ...: Access positional arguments passed to the script.
+    * `$@`: Represents all arguments passed to the script as a single string, space-separated.
+    * `$#`: Represents the number of arguments passed to the script.
+* **`echo "message"`:** Display output.
+* **`delay <milliseconds>`:** Pause execution.
+* **Redirection:** `>` and `>>` (e.g., `ls > file_list.txt`).
+* **Piping:** `|` (e.g., `cat myfile.txt | find -name "pattern"`).
+* **`check_fail "<command_string>"`:** Executes the quoted command. The script continues if the command fails (useful for testing error conditions) and halts if the command succeeds unexpectedly.
+
+## Diagnostic Script (`diag.sh`)
+
+OopisOS comes with a comprehensive diagnostic script, `diag.sh` (available in the original source files). This script is designed to:
+* Rigorously test core filesystem operations.
+* Verify command parsing and execution, including redirection and potentially piping.
+* Test error handling using the `check_fail` command.
+* Provide a detailed log of its operations.
+* To run it (assuming you have created `diag.sh` within OopisOS, e.g., at `/etc/diag.sh`):
+
+```bash
+run /etc/diag.sh
+```
+
+This script is an excellent example of advanced scripting within OopisOS and serves as a benchmark for system stability.
+
+## Technology Stack
+
+* **Frontend & Logic:** HTML5, CSS3 (Tailwind CSS + Custom CSS for theming), JavaScript (ES6+)
+* **Markdown Parsing (in editor):** Marked.js
+* **Persistent Storage:**
+    * **IndexedDB:** For user file systems.
+    * **LocalStorage:** For user credentials (though now passwordless), session states, and editor word wrap preference.
+
+## Contributing
+
+Contributions to OopisOS are welcome! If you'd like to contribute, please consider the following:
+* Fork the repository (if applicable, or simply modify your local HTML file).
+* Create a new branch for your feature or bug fix (if using Git).
+* Make your changes. Ensure you test them thoroughly, perhaps by writing new test cases for `diag.sh` or a similar script.
+* Update documentation (like this README) if you're adding new commands or significantly changing behavior.
+* Submit a pull request (if using Git) with a clear description of your changes.
+
+**Areas for potential contribution:**
+* Adding new commands or utilities.
+* Enhancing existing command functionalities.
+* Improving the UI/UX of the terminal or editor.
+* Expanding scripting capabilities (e.g., variables, more advanced control flow like if/else, loops).
+* Bug fixes and performance optimizations.
+
+## Future Ideas
+
+* Basic networking simulation (e.g., `ping`, `fetch`-like commands).
+* More advanced scripting features (variables, simple loops, if/else).
+* A very simple graphical element or windowing system (ambitious!).
+* Support for more file types in the editor or for execution.
+* Enhanced tab-completion intelligence.
+* Permissions model for files/directories.
+
+## License
+
+This project is distributed under the MIT License. See `LICENSE` file for more information (if a separate LICENSE file exists, otherwise assume MIT License from context).
