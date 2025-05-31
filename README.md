@@ -1,6 +1,6 @@
 # OopisOS - A Browser-Based OS Simulation
 
-![OopisOS Screenshot](https://i.imgur.com/Seol95t.png) OopisOS is a unique, single-file HTML application that simulates a desktop operating system environment entirely within a web browser. It features a retro-style terminal, a persistent hierarchical file system, user management, session handling, an advanced built-in text editor, and a suite of command-line utilities with support for I/O redirection, piping, and background processes, all powered by client-side JavaScript.
+![OopisOS Screenshot](https://i.imgur.com/0MnLhqh.png) OopisOS is a unique, single-file HTML application that simulates a desktop operating system environment entirely within a web browser. It features a retro-style terminal, a persistent hierarchical file system, user management, session handling, an advanced built-in text editor, and a suite of command-line utilities with support for I/O redirection, piping, and background processes, all powered by client-side JavaScript.
 
 ## Table of Contents
 
@@ -206,5 +206,6 @@ Contributions to OopisOS are welcome! If you'd like to contribute, please consid
 * Permissions model for files/directories.
 
 ## License
+This code was designed with the help of Google Gemini 2.5 Pro.
 
 This project is distributed under the MIT License. See `LICENSE` file for more information (if a separate LICENSE file exists, otherwise assume MIT License from context).
