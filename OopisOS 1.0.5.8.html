@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OopisOS Version 1.0.5.3</title>
-    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <title>OopisOS Version 1.0.5.8</title> <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
@@ -60,9 +59,8 @@
 
         #output { flex-grow: 1; margin-bottom: 10px; overflow-x: hidden; width: 100%; min-width: 0; overflow-y: auto;}
         .output-line {
-            white-space: pre-wrap; /* Preserves whitespace, wraps at spaces and newlines */
-            /* word-break: break-all; -- Removed to prevent arbitrary word splitting */
-            overflow-wrap: break-word; /* Allows breaking long words if they would overflow, but respects spaces first */
+            white-space: pre-wrap;
+            overflow-wrap: break-word;
             overflow-x: hidden;
             min-height: 1.2em;
             line-height: 1.2em;
@@ -94,9 +92,8 @@
         #editable-input {
             min-height: 1.2em;
             line-height: 1.2em;
-            white-space: pre-wrap; /* Preserves whitespace, wraps at spaces and newlines */
-            /* word-break: break-all; -- Removed to prevent arbitrary word splitting */
-            overflow-wrap: break-word; /* Allows breaking long words if they would overflow, but respects spaces first */
+            white-space: pre-wrap;
+            overflow-wrap: break-word;
             outline: none;
             caret-color: #00ff00;
             color: #00ff00;
@@ -216,7 +213,7 @@
                 },
                 OS: {
                     NAME: "OopisOs",
-                    VERSION: "1.0.5.3", // Updated version
+                    VERSION: "1.0.5.8", // Updated version
                     DEFAULT_HOST_NAME: "OopisOs"
                 },
                 USER: {
@@ -278,9 +275,15 @@
                     PARENT_DIR_SYMBOL: '..',
                     DEFAULT_DIRECTORY_TYPE: 'directory',
                     DEFAULT_FILE_TYPE: 'file',
-                    PATH_SEPARATOR: '/'
+                    PATH_SEPARATOR: '/',
+                    DEFAULT_FILE_MODE: 0o64, 
+                    DEFAULT_DIR_MODE: 0o75,  
+                    PERMISSION_BIT_READ: 0b100,    
+                    PERMISSION_BIT_WRITE: 0b010,   
+                    PERMISSION_BIT_EXECUTE: 0b001, 
                 },
                 MESSAGES: { 
+                    PERMISSION_DENIED_SUFFIX: ": Permission denied", 
                     CONFIRMATION_PROMPT: "Type 'YES' (all caps) to confirm, or any other input to cancel.",
                     OPERATION_CANCELLED: "Operation cancelled.",
                     ALREADY_LOGGED_IN_AS_PREFIX: "Already logged in as '",
@@ -292,7 +295,6 @@
                     TIMESTAMP_UPDATED_PREFIX: "Timestamp of '",
                     TIMESTAMP_UPDATED_SUFFIX: "' updated.",
                     FILE_CREATED_SUFFIX: "' created.",
-                    // Config.MESSAGES.DIRECTORY_CREATED_SUFFIX removed
                     ITEM_REMOVED_SUFFIX: "' removed.",
                     FORCIBLY_REMOVED_PREFIX: "Forcibly removed '",
                     FORCIBLY_REMOVED_SUFFIX: "'.",
@@ -339,7 +341,6 @@
                     DB_NOT_INITIALIZED_FS_DELETE: "DB not initialized for FS delete",
                     DB_NOT_INITIALIZED_FS_CLEAR: "DB not initialized for clearing all FS",
                     CORRUPTED_FS_DATA_PRE_SAVE: "Corrupted FS data before saving.",
-                    // Config.INTERNAL_ERRORS.REDIRECTION_FILE_NOT_SPECIFIED removed
                     SOURCE_NOT_FOUND_IN_PARENT_PREFIX: "internal error: source '", 
                     SOURCE_NOT_FOUND_IN_PARENT_MIDDLE: "' not found in parent '",
                     SOURCE_NOT_FOUND_IN_PARENT_SUFFIX: "'"
@@ -747,9 +748,14 @@
 
             function _getFileSystemKey(user) { return `fs_${user}`; }
             
-            async function initialize(user) {
+            async function initialize(user) { 
                 fsData = {
-                    [Config.FILESYSTEM.ROOT_PATH]: { type: Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE, children: {} }
+                    [Config.FILESYSTEM.ROOT_PATH]: { 
+                        type: Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE, 
+                        children: {},
+                        owner: user, 
+                        mode: Config.FILESYSTEM.DEFAULT_DIR_MODE 
+                    }
                 };
             }
             async function save(user) {
@@ -798,11 +804,12 @@
                             const result = event.target.result;
                             if (result && result.data && result.data[Config.FILESYSTEM.ROOT_PATH]?.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE) {
                                 fsData = result.data;
+                                _ensurePermissionsRecursive(fsData[Config.FILESYSTEM.ROOT_PATH], user, Config.FILESYSTEM.DEFAULT_DIR_MODE);
                             } else {
                                 const message = result ? `Warning: File system for '${user}' appears invalid or corrupted. Reinitializing.` : `No file system found for '${user}'. Initializing new one.`;
                                 const messageType = result ? Config.CSS_CLASSES.WARNING_MSG : Config.CSS_CLASSES.CONSOLE_LOG_MSG;
                                 OutputManager.appendToOutput(message, { typeClass: messageType });
-                                await initialize(user);
+                                await initialize(user); 
                                 await save(user); 
                             }
                             resolve();
@@ -823,6 +830,22 @@
                     }
                 });
             }
+
+            function _ensurePermissionsRecursive(node, defaultOwner, defaultMode) {
+                if (!node) return;
+                if (typeof node.owner === 'undefined') node.owner = defaultOwner;
+                if (typeof node.mode === 'undefined') {
+                    node.mode = (node.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE) ? 
+                                Config.FILESYSTEM.DEFAULT_DIR_MODE : 
+                                Config.FILESYSTEM.DEFAULT_FILE_MODE;
+                }
+                if (node.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE && node.children) {
+                    for (const childName in node.children) {
+                        _ensurePermissionsRecursive(node.children[childName], defaultOwner, defaultMode);
+                    }
+                }
+            }
+
             async function deleteUserFS(user) { 
                 const db = IndexedDBManager.getDbInstance();
                 if (!db) return Promise.reject(Config.INTERNAL_ERRORS.DB_NOT_INITIALIZED_FS_DELETE);
@@ -897,68 +920,158 @@
                 }
                 return currentNode;
             }
-            function createParentDirectoriesIfNeeded(fullPath) {
-                if (fullPath === Config.FILESYSTEM.ROOT_PATH) return { parentNode: null, error: "Cannot create directory structure for root." };
-
-                const lastSlashIndex = fullPath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR);
-                const parentPath = (lastSlashIndex === 0) ? Config.FILESYSTEM.ROOT_PATH : fullPath.substring(0, lastSlashIndex);
-                const newDirName = fullPath.substring(lastSlashIndex + 1);
-
-                if (!newDirName || newDirName === Config.FILESYSTEM.CURRENT_DIR_SYMBOL || newDirName === Config.FILESYSTEM.PARENT_DIR_SYMBOL) {
-                    return { parentNode: null, error: `Invalid name component '${newDirName}' in path '${fullPath}'` };
+            
+            function calculateNodeSize(node) { 
+                if (!node) return 0;
+                if (node.type === Config.FILESYSTEM.DEFAULT_FILE_TYPE) return (node.content || "").length;
+                if (node.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE) {
+                    let totalSize = 0;
+                    for (const childName in node.children) {
+                        totalSize += calculateNodeSize(node.children[childName]); 
+                    }
+                    return totalSize;
                 }
+                return 0;
+            }
 
-                if (parentPath === Config.FILESYSTEM.ROOT_PATH) {
+            function createParentDirectoriesIfNeeded(fullPath) {
+                const currentUserForCPDIF = UserManager.getCurrentUser().name; 
+                if (fullPath === Config.FILESYSTEM.ROOT_PATH) {
+                    return { parentNode: null, error: "Cannot create directory structure for root." };
+                }
+                const lastSlashIndex = fullPath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR);
+                const parentPathForSegments = (lastSlashIndex === 0) ? Config.FILESYSTEM.ROOT_PATH : fullPath.substring(0, lastSlashIndex);
+                const finalDirNameInPath = fullPath.substring(lastSlashIndex + 1);
+            
+                if (!finalDirNameInPath || finalDirNameInPath === Config.FILESYSTEM.CURRENT_DIR_SYMBOL || finalDirNameInPath === Config.FILESYSTEM.PARENT_DIR_SYMBOL) {
+                    return { parentNode: null, error: `Invalid name component '${finalDirNameInPath}' in path '${fullPath}'` };
+                }
+            
+                if (parentPathForSegments === Config.FILESYSTEM.ROOT_PATH) {
                     return { parentNode: fsData[Config.FILESYSTEM.ROOT_PATH], error: null };
                 }
                 
-                const parentPathSegments = parentPath.substring(1).split(Config.FILESYSTEM.PATH_SEPARATOR).filter(s => s);
-                let currentDirNode = fsData[Config.FILESYSTEM.ROOT_PATH];
-                let currentBuiltParentPath = "";
-
-                for (const segment of parentPathSegments) {
-                    currentBuiltParentPath += Config.FILESYSTEM.PATH_SEPARATOR + segment;
-                    if (!currentDirNode.children[segment]) {
-                        currentDirNode.children[segment] = { type: Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE, children: {} };
-                    } else if (currentDirNode.children[segment].type !== Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE) {
-                        return { parentNode: null, error: `Path component '${currentBuiltParentPath}' is not a directory.` };
+                const segmentsToCreate = parentPathForSegments.substring(1).split(Config.FILESYSTEM.PATH_SEPARATOR).filter(s => s);
+                let currentParentNode = fsData[Config.FILESYSTEM.ROOT_PATH];
+                let currentProcessedPath = Config.FILESYSTEM.ROOT_PATH;
+            
+                if (!currentParentNode || typeof currentParentNode.owner === 'undefined' || typeof currentParentNode.mode === 'undefined') {
+                     return { parentNode: null, error: "Internal error: Root FS node is malformed." };
+                }
+            
+                for (const segment of segmentsToCreate) {
+                    if (!currentParentNode.children || typeof currentParentNode.children !== 'object') {
+                        const errorMsg = `Internal error: currentParentNode.children is not an object at path "${currentProcessedPath}" for segment "${segment}".`;
+                        return { parentNode: null, error: errorMsg };
                     }
-                    currentDirNode = currentDirNode.children[segment];
+            
+                    if (!currentParentNode.children[segment]) {
+                        if (!hasPermission(currentParentNode, currentUserForCPDIF, 'write')) { 
+                             const errorMsg = `Cannot create directory '${segment}' in '${currentProcessedPath}'${Config.MESSAGES.PERMISSION_DENIED_SUFFIX}`;
+                             return { parentNode: null, error: errorMsg };
+                        }
+                        currentParentNode.children[segment] = { 
+                            type: Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE, 
+                            children: {},
+                            owner: currentUserForCPDIF,
+                            mode: Config.FILESYSTEM.DEFAULT_DIR_MODE
+                        };
+                    } else if (currentParentNode.children[segment].type !== Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE) {
+                        const errorMsg = `Path component '${getAbsolutePath(segment, currentProcessedPath)}' is not a directory.`; 
+                        return { parentNode: null, error: errorMsg };
+                    }
+                    
+                    currentParentNode = currentParentNode.children[segment];
+                    currentProcessedPath = getAbsolutePath(segment, currentProcessedPath); 
+                    if (!currentParentNode || typeof currentParentNode.owner === 'undefined' || typeof currentParentNode.mode === 'undefined') {
+                        return { parentNode: null, error: `Internal error: Node for "${currentProcessedPath}" is malformed.` };
+                   }
                 }
-                return { parentNode: currentDirNode, error: null };
+                return { parentNode: currentParentNode, error: null };
             }
-            function calculateNodeSize(node) { 
-                if (!node) return 0;
-                if (node.type === Config.FILESYSTEM.DEFAULT_FILE_TYPE) return (node.content || "").length; 
-                if (node.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE) {
-                    let totalSize = 0;
-                    for (const childName in node.children) totalSize += calculateNodeSize(node.children[childName]); 
-                    return totalSize;
-                }
-                return 0; 
-            }
-            function validatePath(commandName, pathArg, options = {}) { 
-                const { expectedType = 'any', allowMissing = false, disallowRoot = false, defaultToCurrentIfEmpty = true } = options;
-                let effectivePathArg = pathArg;
-                if (defaultToCurrentIfEmpty && (pathArg === undefined || pathArg === null || String(pathArg).trim() === '')) effectivePathArg = Config.FILESYSTEM.CURRENT_DIR_SYMBOL;
-                if (effectivePathArg === undefined || effectivePathArg === null) return { node: null, resolvedPath: null, error: `${commandName}: missing path operand` };
-                const resolvedPath = getAbsolutePath(String(effectivePathArg), getCurrentPath());
+
+            function validatePath(commandName, pathArg, options = {}) {
+                const { allowMissing = false, expectedType = null, disallowRoot = false, defaultToCurrentIfEmpty = true } = options;
+                const effectivePathArg = (pathArg === "" && defaultToCurrentIfEmpty) ? Config.FILESYSTEM.CURRENT_DIR_SYMBOL : pathArg;
+                const resolvedPath = getAbsolutePath(effectivePathArg, currentPath);
                 const node = getNodeByPath(resolvedPath);
-                if (disallowRoot && resolvedPath === Config.FILESYSTEM.ROOT_PATH) return { node: null, resolvedPath: resolvedPath, error: `${commandName}: operation not permitted on root directory '${Config.FILESYSTEM.ROOT_PATH}'` };
-                if (node) { 
-                    if (expectedType === Config.FILESYSTEM.DEFAULT_FILE_TYPE && node.type !== Config.FILESYSTEM.DEFAULT_FILE_TYPE) return { node: node, resolvedPath: resolvedPath, error: `${commandName}: '${pathArg}': Is a directory` };
-                    if (expectedType === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE && node.type !== Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE) return { node: node, resolvedPath: resolvedPath, error: `${commandName}: '${pathArg}': Not a directory` };
-                    return { node: node, resolvedPath: resolvedPath, error: null, optionsUsed: options };
-                } else { 
-                    if (allowMissing) return { node: null, resolvedPath: resolvedPath, error: null, optionsUsed: options };
-                    else return { node: null, resolvedPath: resolvedPath, error: `${commandName}: '${pathArg}': No such file or directory`, optionsUsed: options };
+
+                if (disallowRoot && resolvedPath === Config.FILESYSTEM.ROOT_PATH) {
+                    return { error: `${commandName}: '${pathArg}' (resolved to root) is not a valid target for this operation.`, node: null, resolvedPath, optionsUsed: options };
                 }
+                if (!node) {
+                    if (allowMissing) return { error: null, node: null, resolvedPath, optionsUsed: options };
+                    return { error: `${commandName}: '${pathArg}' (resolved to '${resolvedPath}'): No such file or directory`, node: null, resolvedPath, optionsUsed: options };
+                }
+                if (expectedType && node.type !== expectedType) {
+                    const typeName = expectedType === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE ? 'directory' : 'file';
+                    const actualTypeName = node.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE ? 'directory' : (node.type === Config.FILESYSTEM.DEFAULT_FILE_TYPE ? 'file' : 'unknown type');
+                    return { error: `${commandName}: '${pathArg}' (resolved to '${resolvedPath}') is not a ${typeName} (it's a ${actualTypeName})`, node, resolvedPath, optionsUsed: options };
+                }
+                return { error: null, node, resolvedPath, optionsUsed: options };
             }
+
+            function hasPermission(node, username, permissionType) {
+                if (!node || typeof node.mode !== 'number' || typeof node.owner !== 'string') {
+                    console.warn("hasPermission: Invalid node or missing permissions info.", node);
+                    return false; 
+                }
+
+                let permissionMask;
+                switch (permissionType) {
+                    case 'read':   permissionMask = Config.FILESYSTEM.PERMISSION_BIT_READ; break;
+                    case 'write':  permissionMask = Config.FILESYSTEM.PERMISSION_BIT_WRITE; break;
+                    case 'execute': permissionMask = Config.FILESYSTEM.PERMISSION_BIT_EXECUTE; break;
+                    default: 
+                        console.warn("hasPermission: Unknown permission type requested:", permissionType);
+                        return false;
+                }
+
+                const isOwner = (node.owner === username);
+                let effectiveModeBits;
+
+                if (isOwner) {
+                    effectiveModeBits = (node.mode >> 3) & 0b111; 
+                } else {
+                    effectiveModeBits = node.mode & 0b111;       
+                }
+                
+                return (effectiveModeBits & permissionMask) === permissionMask;
+            }
+
+            function formatModeToString(node) {
+                if (!node || typeof node.mode !== 'number') return '---------';
+                const mode = node.mode;
+                const typeChar = node.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE ? 'd' : '-';
+                
+                const ownerPerms = (mode >> 3) & 0b111;
+                const otherPerms = mode & 0b111;
+
+                const r = Config.FILESYSTEM.PERMISSION_BIT_READ;
+                const w = Config.FILESYSTEM.PERMISSION_BIT_WRITE;
+                const x = Config.FILESYSTEM.PERMISSION_BIT_EXECUTE;
+
+                let str = typeChar;
+                str += (ownerPerms & r) ? 'r' : '-';
+                str += (ownerPerms & w) ? 'w' : '-';
+                str += (ownerPerms & x) ? 'x' : '-';
+                str += (otherPerms & r) ? 'r' : '-'; 
+                str += (otherPerms & w) ? 'w' : '-';
+                str += (otherPerms & x) ? 'x' : '-';
+                str += (otherPerms & r) ? 'r' : '-'; // This was the cosmetic bug area, should be group/world if implemented
+                str += (otherPerms & w) ? 'w' : '-'; // For now, "other" covers non-owners.
+                str += (otherPerms & x) ? 'x' : '-';
+                
+                return str;
+            }
+
 
             return {
                 initialize, save, load, deleteUserFS, clearAllFS, getCurrentPath, setCurrentPath,
                 getFsData, setFsData, getAbsolutePath, getNodeByPath, createParentDirectoriesIfNeeded,
-                calculateNodeSize, validatePath
+                calculateNodeSize, 
+                validatePath,
+                hasPermission, formatModeToString 
             };
         })();
 
@@ -1016,9 +1129,14 @@
                 };
                 confirmationContext.promptMessageLines.forEach(line => OutputManager.appendToOutput(line, { typeClass: Config.CSS_CLASSES.WARNING_MSG }));
                 OutputManager.appendToOutput(Config.MESSAGES.CONFIRMATION_PROMPT, { typeClass: Config.CSS_CLASSES.WARNING_MSG });
+                
+                // --- MODIFICATION START: Ensure input is editable for confirmation ---
+                TerminalUI.setInputState(true); // Explicitly make input editable
+                // --- MODIFICATION END ---
+                
                 TerminalUI.clearInput(); 
                 DOM.inputLineContainerDiv.style.visibility = 'visible'; 
-                TerminalUI.focusInput();
+                TerminalUI.focusInput(); // Focus after ensuring it's editable and visible
                 DOM.outputDiv.scrollTop = DOM.outputDiv.scrollHeight; 
             }
             async function handleConfirmation(input) {
@@ -1483,6 +1601,7 @@ ${contentToExport}
 
             async function exit(saveChanges = false) {
                 let proceedToExit = true; 
+                const currentUser = UserManager.getCurrentUser().name;
 
                 if (!saveChanges && isDirty) {
                     const userConfirmedDiscard = await new Promise((resolveConfirmation) => {
@@ -1510,40 +1629,59 @@ ${contentToExport}
                 let saveSuccess = true;
                 if (saveChanges && editorTextareaElement && currentFilePath) {
                     const newContent = editorTextareaElement.value;
-                    const parentDirResult = FileSystemManager.createParentDirectoriesIfNeeded(currentFilePath);
-                    if (parentDirResult.error) { 
-                        OutputManager.appendToOutput(`edit: ${parentDirResult.error}`, { typeClass: Config.CSS_CLASSES.EDITOR_MSG }); 
-                        saveSuccess = false; 
-                    } else {
-                        const parentNode = parentDirResult.parentNode;
-                        if (parentNode) {
-                            const fileName = currentFilePath.substring(currentFilePath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR) + 1);
-                            parentNode.children[fileName] = { type: Config.FILESYSTEM.DEFAULT_FILE_TYPE, content: newContent };
-                            const currentUser = UserManager.getCurrentUser();
-                            if (currentUser) {
-                                if (await FileSystemManager.save(currentUser.name)) {
-                                    OutputManager.appendToOutput(`File '${currentFilePath}' saved.`, { typeClass: Config.CSS_CLASSES.SUCCESS_MSG });
-                                    originalContent = newContent; 
-                                    isDirty = false;
-                                    _updateFilenameDisplay();
-                                } else { 
+                    const existingNode = FileSystemManager.getNodeByPath(currentFilePath);
+                    
+                    if (existingNode) { 
+                        if (!FileSystemManager.hasPermission(existingNode, currentUser, 'write')) {
+                            OutputManager.appendToOutput(`Error saving '${currentFilePath}': Permission denied.`, { typeClass: Config.CSS_CLASSES.ERROR_MSG });
+                            saveSuccess = false;
+                        }
+                    } else { 
+                        const parentPath = currentFilePath.substring(0, currentFilePath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR)) || Config.FILESYSTEM.ROOT_PATH;
+                        const parentNode = FileSystemManager.getNodeByPath(parentPath);
+                        if (!parentNode || !FileSystemManager.hasPermission(parentNode, currentUser, 'write')) {
+                             OutputManager.appendToOutput(`Error creating '${currentFilePath}': Permission denied in parent directory.`, { typeClass: Config.CSS_CLASSES.ERROR_MSG });
+                             saveSuccess = false;
+                        }
+                    }
+
+                    if (saveSuccess) {
+                        const parentDirResult = FileSystemManager.createParentDirectoriesIfNeeded(currentFilePath);
+                        if (parentDirResult.error) { 
+                            OutputManager.appendToOutput(`edit: ${parentDirResult.error}`, { typeClass: Config.CSS_CLASSES.EDITOR_MSG }); 
+                            saveSuccess = false; 
+                        } else {
+                            const parentNode = parentDirResult.parentNode;
+                            if (parentNode) {
+                                const fileName = currentFilePath.substring(currentFilePath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR) + 1);
+                                parentNode.children[fileName] = { 
+                                    type: Config.FILESYSTEM.DEFAULT_FILE_TYPE, 
+                                    content: newContent,
+                                    owner: existingNode ? existingNode.owner : currentUser, 
+                                    mode: existingNode ? existingNode.mode : Config.FILESYSTEM.DEFAULT_FILE_MODE 
+                                };
+                                if (!await FileSystemManager.save(currentUser)) { 
                                     OutputManager.appendToOutput(`Error saving file '${currentFilePath}'. Changes might be lost.`, { typeClass: Config.CSS_CLASSES.ERROR_MSG }); 
                                     saveSuccess = false; 
+                                } else {
+                                     OutputManager.appendToOutput(`File '${currentFilePath}' saved.`, { typeClass: Config.CSS_CLASSES.SUCCESS_MSG });
+                                     originalContent = newContent; 
+                                     isDirty = false;
+                                     _updateFilenameDisplay();
                                 }
                             } else { 
-                                OutputManager.appendToOutput(`Error saving file: No current user context.`, { typeClass: Config.CSS_CLASSES.ERROR_MSG }); 
+                                OutputManager.appendToOutput(`Failed to save '${currentFilePath}'. Could not obtain parent directory.`, { typeClass: Config.CSS_CLASSES.ERROR_MSG }); 
                                 saveSuccess = false; 
                             }
-                        } else { 
-                            OutputManager.appendToOutput(`Failed to save '${currentFilePath}'. Could not obtain parent directory.`, { typeClass: Config.CSS_CLASSES.ERROR_MSG }); 
-                            saveSuccess = false; 
                         }
                     }
                 } else if (!saveChanges && !isDirty) { 
                      OutputManager.appendToOutput(`Exited editor for '${currentFilePath || 'Untitled'}' without saving. No changes made.`, { typeClass: Config.CSS_CLASSES.CONSOLE_LOG_MSG });
                 }
                 
-                await _performExitActions();
+                if (saveSuccess) { 
+                    await _performExitActions();
+                }
                 return saveSuccess; 
             }
 
@@ -1575,56 +1713,76 @@ ${contentToExport}
         })();
 
         // --- USER MANAGER ---
-        const UserManager = (() => { 
-            'use strict';
-            let currentUser = { name: Config.USER.DEFAULT_NAME }; 
-            function getCurrentUser() { return currentUser; }
-            async function register(username) {
-                const formatValidation = Utils.validateUsernameFormat(username);
-                if (!formatValidation.isValid) {
-                    return { success: false, error: formatValidation.error };
-                }
+const UserManager = (() => { 
+    'use strict';
+    let currentUser = { name: Config.USER.DEFAULT_NAME }; 
+    function getCurrentUser() { return currentUser; }
 
-                const users = StorageManager.loadItem(Config.STORAGE_KEYS.USER_CREDENTIALS, "User list", {});
-                if (users[username]) {
-                    return { success: false, error: `User '${username}' already exists.` };
-                }
-                
-                users[username] = {}; 
-                if (StorageManager.saveItem(Config.STORAGE_KEYS.USER_CREDENTIALS, users, "User list")) {
-                    await FileSystemManager.initialize(username); await FileSystemManager.save(username);
-                    return { success: true, message: `User '${username}' registered. You can now login.` };
-                } else {
-                    return { success: false, error: "Failed to save new user credentials." };
-                }
+    async function register(username) {
+        const formatValidation = Utils.validateUsernameFormat(username);
+        if (!formatValidation.isValid) {
+            return { success: false, error: formatValidation.error };
+        }
+
+        const users = StorageManager.loadItem(Config.STORAGE_KEYS.USER_CREDENTIALS, "User list", {});
+        if (users[username]) {
+            return { success: false, error: `User '${username}' already exists.` };
+        }
+        
+        users[username] = {}; 
+        if (StorageManager.saveItem(Config.STORAGE_KEYS.USER_CREDENTIALS, users, "User list")) {
+            const activeUserAtStart = UserManager.getCurrentUser().name; 
+            let activeFsDataSnapshot = null;
+            let activePathSnapshot = null;
+            let restoreNeeded = false;
+
+            if (FileSystemManager.getFsData() && Object.keys(FileSystemManager.getFsData()).length > 0) {
+                activeFsDataSnapshot = Utils.deepCopyNode(FileSystemManager.getFsData());
+                activePathSnapshot = FileSystemManager.getCurrentPath();
+                restoreNeeded = true;
             }
-            async function login(username) {
-                if (currentUser.name === username) return { success: true, message: `${Config.MESSAGES.ALREADY_LOGGED_IN_AS_PREFIX}${username}${Config.MESSAGES.ALREADY_LOGGED_IN_AS_SUFFIX}`, noAction: true };
-                const users = StorageManager.loadItem(Config.STORAGE_KEYS.USER_CREDENTIALS, "User list", {});
-                if (!users.hasOwnProperty(username)) return { success: false, error: "Invalid username." };
-                if (currentUser.name !== Config.USER.DEFAULT_NAME && currentUser.name !== username) SessionManager.saveAutomaticState(currentUser.name);
-                currentUser = { name: username }; 
-                HistoryManager.clearHistory(); 
-                await FileSystemManager.load(username); 
-                SessionManager.loadAutomaticState(username); 
-                TerminalUI.updatePrompt(); 
-                return { success: true, message: `Logged in as ${username}.` };
+
+            await FileSystemManager.initialize(username); 
+            await FileSystemManager.save(username);       
+
+            if (restoreNeeded) {
+                FileSystemManager.setFsData(activeFsDataSnapshot);    
+                FileSystemManager.setCurrentPath(activePathSnapshot); 
             }
-            async function logout() {
-                if (currentUser.name === Config.USER.DEFAULT_NAME) return { success: true, message: `Already logged in as Guest. ${Config.MESSAGES.NO_ACTION_TAKEN}`, noAction: true };
-                SessionManager.saveAutomaticState(currentUser.name); 
-                const prevUserName = currentUser.name;
-                currentUser = { name: Config.USER.DEFAULT_NAME }; 
-                HistoryManager.clearHistory();
-                await FileSystemManager.load(Config.USER.DEFAULT_NAME); 
-                SessionManager.loadAutomaticState(Config.USER.DEFAULT_NAME); 
-                TerminalUI.updatePrompt();
-                return { success: true, message: `User ${prevUserName} logged out. Now logged in as ${Config.USER.DEFAULT_NAME}.` };
-            }
-            function setCurrentUserObject(userObject) { currentUser = userObject; }
-            function getDefaultUser() { return Config.USER.DEFAULT_NAME; }
-            return { getCurrentUser, register, login, logout, setCurrentUserObject, getDefaultUser };
-        })();
+            return { success: true, message: `User '${username}' registered. You can now login.` };
+        } else {
+            return { success: false, error: "Failed to save new user credentials." };
+        }
+    }
+
+    async function login(username) {
+        if (currentUser.name === username) return { success: true, message: `${Config.MESSAGES.ALREADY_LOGGED_IN_AS_PREFIX}${username}${Config.MESSAGES.ALREADY_LOGGED_IN_AS_SUFFIX}`, noAction: true };
+        const users = StorageManager.loadItem(Config.STORAGE_KEYS.USER_CREDENTIALS, "User list", {});
+        if (!users.hasOwnProperty(username)) return { success: false, error: "Invalid username." };
+        if (currentUser.name !== Config.USER.DEFAULT_NAME && currentUser.name !== username) SessionManager.saveAutomaticState(currentUser.name);
+        currentUser = { name: username }; 
+        HistoryManager.clearHistory(); 
+        await FileSystemManager.load(username); 
+        SessionManager.loadAutomaticState(username); 
+        TerminalUI.updatePrompt(); 
+        return { success: true, message: `Logged in as ${username}.` };
+    }
+
+    async function logout() {
+        if (currentUser.name === Config.USER.DEFAULT_NAME) return { success: true, message: `Already logged in as Guest. ${Config.MESSAGES.NO_ACTION_TAKEN}`, noAction: true };
+        SessionManager.saveAutomaticState(currentUser.name); 
+        const prevUserName = currentUser.name;
+        currentUser = { name: Config.USER.DEFAULT_NAME }; 
+        HistoryManager.clearHistory();
+        await FileSystemManager.load(Config.USER.DEFAULT_NAME); 
+        SessionManager.loadAutomaticState(Config.USER.DEFAULT_NAME); 
+        TerminalUI.updatePrompt();
+        return { success: true, message: `User ${prevUserName} logged out. Now logged in as ${Config.USER.DEFAULT_NAME}.` };
+    }
+    function setCurrentUserObject(userObject) { currentUser = userObject; }
+    function getDefaultUser() { return Config.USER.DEFAULT_NAME; }
+    return { getCurrentUser, register, login, logout, setCurrentUserObject, getDefaultUser };
+})();
 
         // --- SESSION MANAGER ---
         const SessionManager = (() => { 
@@ -1806,7 +1964,7 @@ ${contentToExport}
                     DOM.editableInputDiv.contentEditable = isEditable ? 'true' : 'false';
                     DOM.editableInputDiv.style.opacity = isEditable ? '1' : '0.5';
                     if (isEditable) {
-                        focusInput(); 
+                        // No automatic focus here; let specific callers like ConfirmationManager or _finalizeInteractiveModeUI handle focus.
                     } else {
                         DOM.editableInputDiv.blur(); 
                     }
@@ -1827,7 +1985,7 @@ ${contentToExport}
         // --- TAB COMPLETION MANAGER ---
         const TabCompletionManager = (() => { 
             'use strict';
-            const PATH_COMMANDS = ['ls', 'cd', 'cat', 'edit', 'run', 'mv', 'cp', 'rm', 'mkdir', 'touch', 'export', 'find', 'tree']; 
+            const PATH_COMMANDS = ['ls', 'cd', 'cat', 'edit', 'run', 'mv', 'cp', 'rm', 'mkdir', 'touch', 'export', 'find', 'tree', 'chmod', 'chown']; 
             function findLongestCommonPrefix(strs) {
                 if (!strs || strs.length === 0) return "";
                 if (strs.length === 1) return strs[0];
@@ -1880,7 +2038,8 @@ ${contentToExport}
                         effectiveBasePath = FileSystemManager.getAbsolutePath(pathPrefixTyped, FileSystemManager.getCurrentPath());
                     }
                     const baseNode = FileSystemManager.getNodeByPath(effectiveBasePath);
-                    if (baseNode && baseNode.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE) {
+                    const currentUser = UserManager.getCurrentUser().name;
+                    if (baseNode && baseNode.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE && FileSystemManager.hasPermission(baseNode, currentUser, 'read')) {
                         suggestions = Object.keys(baseNode.children)
                             .filter(name => name.startsWith(segmentToMatch))
                             .map(name => {
@@ -2128,65 +2287,84 @@ ${contentToExport}
                     description: "Prints the current working directory.",
                     helpText: "Usage: pwd\n\nDisplays the full path of the current directory."
                 },
-                               'ls': {
+                'ls': {
                     handler: async (args, options) => {
                         const { flags, remainingArgs } = Utils.parseFlags(args, [
                             { name: 'long', short: '-l', long: '--long' },
-                            { name: 'all', short: '-a', long: '--all' } 
+                            { name: 'all', short: '-a', long: '--all' }
                         ]);
-
+                
                         const validationResult = Utils.validateArguments(remainingArgs, { max: 1 });
-                        if (!validationResult.isValid) return { success: false, error: `ls: ${validationResult.errorDetail}` };
-                        
+                        if (!validationResult.isValid) {
+                            return { success: false, error: `ls: ${validationResult.errorDetail}` };
+                        }
+                
                         const pathArg = remainingArgs.length > 0 ? remainingArgs[0] : Config.FILESYSTEM.CURRENT_DIR_SYMBOL;
-                        const pathValidation = FileSystemManager.validatePath('ls', pathArg, { expectedType: Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE });
-                        if (pathValidation.error) return { success: false, error: pathValidation.error };
-
-                        const dirNode = pathValidation.node;
-                        if (!dirNode || dirNode.type !== Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE) {
-                             return { success: false, error: `ls: '${pathArg}': Not a directory` }; 
+                        const pathValidation = FileSystemManager.validatePath('ls', pathArg); // No expectedType
+                
+                        if (pathValidation.error) {
+                            return { success: false, error: pathValidation.error };
                         }
-
-                        // Get all children names initially
-                        const allChildrenNames = Object.keys(dirNode.children).sort();
-                        let effectiveChildrenNames;
-
-                        // Filter out dotfiles if -a or --all is NOT specified
-                        if (flags.all) {
-                            effectiveChildrenNames = allChildrenNames;
-                        } else {
-                            effectiveChildrenNames = allChildrenNames.filter(name => !name.startsWith('.'));
+                
+                        const targetNode = pathValidation.node;
+                        const currentUser = UserManager.getCurrentUser().name;
+                
+                        if (!FileSystemManager.hasPermission(targetNode, currentUser, 'read')) {
+                            return { success: false, error: `ls: cannot access '${pathArg}'${Config.MESSAGES.PERMISSION_DENIED_SUFFIX}` };
                         }
-
-                        // Check if the directory (after filtering) is empty
-                        if (effectiveChildrenNames.length === 0) {
-                            return { success: true, output: Config.MESSAGES.DIRECTORY_EMPTY };
-                        }
-                        
+                
                         let outputLines = [];
-                        if (flags.long) {
-                            // Display total count based on effective (filtered or all) children
-                            outputLines.push(`Total ${effectiveChildrenNames.length} items`);
-                            effectiveChildrenNames.forEach(name => {
-                                const childNode = dirNode.children[name];
-                                const typeChar = childNode.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE ? 'd' : '-';
-                                const size = Utils.formatBytes(FileSystemManager.calculateNodeSize(childNode));
-                                const perms = 'rwxr-xr-x'; // Placeholder permissions
-                                const owner = UserManager.getCurrentUser().name; // Placeholder owner
-                                const modified = new Date().toLocaleDateString(); // Placeholder modified date
-                                outputLines.push(`${typeChar}${perms}  1 ${owner.padEnd(8)} ${owner.padEnd(8)} ${String(size).padStart(6)} ${modified} ${name}${childNode.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE ? Config.FILESYSTEM.PATH_SEPARATOR : ''}`);
-                            });
+                
+                        if (targetNode.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE) {
+                            const dirNode = targetNode;
+                            const allChildrenNames = Object.keys(dirNode.children).sort();
+                            let effectiveChildrenNames;
+                
+                            if (flags.all) {
+                                effectiveChildrenNames = allChildrenNames;
+                            } else {
+                                effectiveChildrenNames = allChildrenNames.filter(name => !name.startsWith('.'));
+                            }
+                
+                            if (effectiveChildrenNames.length === 0 && !flags.long) { // Only show "Directory is empty" if not -l
+                                return { success: true, output: Config.MESSAGES.DIRECTORY_EMPTY };
+                            }
+                
+                            if (flags.long) {
+                                outputLines.push(`Total ${effectiveChildrenNames.length} items`);
+                                effectiveChildrenNames.forEach(name => {
+                                    const childNode = dirNode.children[name];
+                                    const perms = FileSystemManager.formatModeToString(childNode);
+                                    const owner = (childNode.owner || "unknown").padEnd(10);
+                                    const size = Utils.formatBytes(FileSystemManager.calculateNodeSize(childNode)).padStart(8);
+                                    outputLines.push(`${perms}  1 ${owner} ${size} ${name}${childNode.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE ? Config.FILESYSTEM.PATH_SEPARATOR : ''}`);
+                                });
+                            } else {
+                                effectiveChildrenNames.forEach(name => {
+                                    const childNode = dirNode.children[name];
+                                    const suffix = childNode.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE ? Config.FILESYSTEM.PATH_SEPARATOR : '';
+                                    outputLines.push(`${name}${suffix}`);
+                                });
+                            }
+                        } else if (targetNode.type === Config.FILESYSTEM.DEFAULT_FILE_TYPE) {
+                            const fileNode = targetNode;
+                            const fileNameForDisplay = pathValidation.resolvedPath.substring(pathValidation.resolvedPath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR) + 1);
+                            if (flags.long) {
+                                const perms = FileSystemManager.formatModeToString(fileNode);
+                                const owner = (fileNode.owner || "unknown").padEnd(10);
+                                const size = Utils.formatBytes(FileSystemManager.calculateNodeSize(fileNode)).padStart(8);
+                                outputLines.push(`${perms}  1 ${owner} ${size} ${fileNameForDisplay}`);
+                            } else {
+                                outputLines.push(fileNameForDisplay);
+                            }
                         } else {
-                            effectiveChildrenNames.forEach(name => {
-                                const childNode = dirNode.children[name];
-                                const suffix = childNode.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE ? Config.FILESYSTEM.PATH_SEPARATOR : '';
-                                outputLines.push(`${name}${suffix}`);
-                            });
+                            return { success: false, error: `ls: '${pathArg}' is not a file or directory.` };
                         }
+                
                         return { success: true, output: outputLines.join('\n') };
                     },
-                    description: "Lists directory contents.",
-                    helpText: "Usage: ls [-l] [-a] [path]\n\nLists files and directories in the specified [path] (or current directory if none given).\n  -l, --long    Use a long listing format.\n  -a, --all     Do not ignore entries starting with ."
+                    description: "Lists directory contents or file information.",
+                    helpText: "Usage: ls [-l] [-a] [path]\n\nLists files and directories in the specified [path] (or current directory if none given).\nIf [path] is a file, it lists information about that file.\n  -l, --long    Use a long listing format (shows permissions, owner, size).\n  -a, --all     Do not ignore entries starting with . (applies to directory listings)."
                 },
                 'cd': {
                     handler: async (args, options) => {
@@ -2196,6 +2374,12 @@ ${contentToExport}
                         const targetPath = args[0];
                         const pathValidation = FileSystemManager.validatePath('cd', targetPath, { expectedType: Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE });
                         if (pathValidation.error) return { success: false, error: pathValidation.error };
+
+                        const dirNode = pathValidation.node;
+                        const currentUser = UserManager.getCurrentUser().name;
+                        if (!FileSystemManager.hasPermission(dirNode, currentUser, 'execute')) {
+                            return { success: false, error: `cd: '${targetPath}'${Config.MESSAGES.PERMISSION_DENIED_SUFFIX}` };
+                        }
 
                         if (FileSystemManager.getCurrentPath() === pathValidation.resolvedPath) {
                             return { success: true, output: `${Config.MESSAGES.ALREADY_IN_DIRECTORY_PREFIX}${pathValidation.resolvedPath}${Config.MESSAGES.ALREADY_IN_DIRECTORY_SUFFIX} ${Config.MESSAGES.NO_ACTION_TAKEN}`, messageType: Config.CSS_CLASSES.CONSOLE_LOG_MSG };
@@ -2212,84 +2396,90 @@ ${contentToExport}
                         const { flags, remainingArgs } = Utils.parseFlags(args, [
                             { name: 'parents', short: '-p', long: '--parents' }
                         ]);
-
+                
                         const validationResult = Utils.validateArguments(remainingArgs, { min: 1 });
-                        if (!validationResult.isValid) return { success: false, error: `mkdir: ${validationResult.errorDetail}` };
-                        
+                        if (!validationResult.isValid) {
+                            return { success: false, error: `mkdir: ${validationResult.errorDetail}` };
+                        }
+                
                         let allSuccess = true;
                         const messages = [];
                         let changesMade = false;
-
+                        const currentUser = UserManager.getCurrentUser().name;
+                
                         for (const pathArg of remainingArgs) {
                             const resolvedPath = FileSystemManager.getAbsolutePath(pathArg, FileSystemManager.getCurrentPath());
-                            if (resolvedPath === Config.FILESYSTEM.ROOT_PATH) {
-                                messages.push(`mkdir: cannot create directory '${pathArg}': Operation not permitted on root`);
-                                allSuccess = false; continue;
-                            }
-
-                            const existingNode = FileSystemManager.getNodeByPath(resolvedPath);
-                            if (existingNode) {
-                                if (existingNode.type === Config.FILESYSTEM.DEFAULT_FILE_TYPE) {
-                                     messages.push(`mkdir: cannot create directory '${pathArg}': File exists`);
-                                     allSuccess = false; 
-                                } else if (flags.parents) { 
-                                } else { 
-                                     messages.push(`mkdir: cannot create directory '${pathArg}': Directory already exists`);
-                                     allSuccess = false; 
-                                }
-                                continue; 
-                            }
-                            
-                            let parentNodeToCreateIn;
                             const dirName = resolvedPath.substring(resolvedPath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR) + 1);
-
+                
+                            if (resolvedPath === Config.FILESYSTEM.ROOT_PATH || dirName === "" || dirName === Config.FILESYSTEM.CURRENT_DIR_SYMBOL || dirName === Config.FILESYSTEM.PARENT_DIR_SYMBOL) {
+                                messages.push(`mkdir: cannot create directory '${pathArg}': Invalid path or name`);
+                                allSuccess = false;
+                                continue;
+                            }
+                
+                            let parentNodeToCreateIn;
+                
                             if (flags.parents) {
                                 const parentDirResult = FileSystemManager.createParentDirectoriesIfNeeded(resolvedPath);
                                 if (parentDirResult.error) {
                                     messages.push(`mkdir: ${parentDirResult.error}`);
-                                    allSuccess = false; continue;
+                                    allSuccess = false;
+                                    continue;
                                 }
                                 parentNodeToCreateIn = parentDirResult.parentNode;
                             } else {
-                                const parentPath = resolvedPath.substring(0, resolvedPath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR)) || Config.FILESYSTEM.ROOT_PATH;
-                                parentNodeToCreateIn = FileSystemManager.getNodeByPath(parentPath);
+                                const parentPathForTarget = resolvedPath.substring(0, resolvedPath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR)) || Config.FILESYSTEM.ROOT_PATH;
+                                parentNodeToCreateIn = FileSystemManager.getNodeByPath(parentPathForTarget);
+                
                                 if (!parentNodeToCreateIn) {
-                                    messages.push(`mkdir: cannot create directory '${pathArg}': Parent directory '${parentPath}' does not exist`);
-                                    allSuccess = false; continue;
+                                    messages.push(`mkdir: cannot create directory '${pathArg}': Parent directory '${parentPathForTarget}' does not exist`);
+                                    allSuccess = false;
+                                    continue;
                                 }
                                 if (parentNodeToCreateIn.type !== Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE) {
-                                    messages.push(`mkdir: cannot create directory '${pathArg}': Parent '${parentPath}' is not a directory`);
-                                    allSuccess = false; continue;
+                                    messages.push(`mkdir: cannot create directory '${pathArg}': Path component '${parentPathForTarget}' is not a directory`);
+                                    allSuccess = false;
+                                    continue;
+                                }
+                                if (!FileSystemManager.hasPermission(parentNodeToCreateIn, currentUser, 'write')) {
+                                    messages.push(`mkdir: cannot create directory '${pathArg}' in '${parentPathForTarget}'${Config.MESSAGES.PERMISSION_DENIED_SUFFIX}`);
+                                    allSuccess = false;
+                                    continue;
                                 }
                             }
-                            
+                
                             if (parentNodeToCreateIn.children[dirName]) {
                                 if (parentNodeToCreateIn.children[dirName].type === Config.FILESYSTEM.DEFAULT_FILE_TYPE) {
-                                     messages.push(`mkdir: cannot create directory '${pathArg}': A file with the same name exists in the parent path`);
-                                     allSuccess = false; 
-                                } else if (!flags.parents) { 
-                                     messages.push(`mkdir: cannot create directory '${pathArg}': Directory already exists`);
-                                     allSuccess = false; 
+                                    messages.push(`mkdir: cannot create directory '${pathArg}': A file with the same name exists`);
+                                    allSuccess = false;
+                                } else if (parentNodeToCreateIn.children[dirName].type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE) {
+                                    if (!flags.parents) {
+                                        messages.push(`mkdir: cannot create directory '${pathArg}': Directory already exists`);
+                                        allSuccess = false;
+                                    }
                                 }
-                                continue;
+                                continue; 
                             } else {
-                                parentNodeToCreateIn.children[dirName] = { type: Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE, children: {} };
-                                if (!messages.some(m => m.includes(`'${pathArg}'`) && (m.includes("File exists") || m.includes("Directory already exists")))) {
-                                    messages.push(`mkdir: created directory '${pathArg}' (resolved as '${resolvedPath}')`);
-                                }
+                                parentNodeToCreateIn.children[dirName] = {
+                                    type: Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE,
+                                    children: {},
+                                    owner: currentUser,
+                                    mode: Config.FILESYSTEM.DEFAULT_DIR_MODE
+                                };
+                                messages.push(`mkdir: created directory '${pathArg}'`);
                                 changesMade = true;
                             }
                         }
-                        
-                        if (changesMade) { 
-                            if (!await FileSystemManager.save(UserManager.getCurrentUser().name)) {
+                
+                        if (changesMade) {
+                            if (!await FileSystemManager.save(currentUser)) {
                                 return { success: false, error: "mkdir: Failed to save file system changes after creating directories.", output: messages.join('\n'), messageType: Config.CSS_CLASSES.ERROR_MSG };
                             }
                         }
-                        
+                
                         if (!allSuccess) {
                             const errorMessages = messages.filter(m => !m.startsWith("mkdir: created directory") || m.includes("error") || m.includes("cannot create"));
-                             return { success: false, error: "mkdir: Not all directories were created successfully. See output for details.", output: errorMessages.length > 0 ? errorMessages.join('\n') : "One or more paths already existed or could not be created.", messageType: Config.CSS_CLASSES.ERROR_MSG };
+                            return { success: false, error: "mkdir: Not all directories were created successfully. See output for details.", output: errorMessages.length > 0 ? errorMessages.join('\n') : "One or more paths already existed or could not be created.", messageType: Config.CSS_CLASSES.ERROR_MSG };
                         }
                         return { success: true, output: messages.join('\n'), messageType: Config.CSS_CLASSES.SUCCESS_MSG };
                     },
@@ -2315,6 +2505,11 @@ ${contentToExport}
 
                         const startNode = pathValidation.node;
                         const absStartPath = pathValidation.resolvedPath;
+                        const currentUser = UserManager.getCurrentUser().name;
+
+                        if (!FileSystemManager.hasPermission(startNode, currentUser, 'read')) {
+                            return { success: false, error: `tree: '${pathArg}'${Config.MESSAGES.PERMISSION_DENIED_SUFFIX}` };
+                        }
 
                         const outputLines = [absStartPath];
                         let dirCount = 0;
@@ -2325,6 +2520,11 @@ ${contentToExport}
 
                             const node = FileSystemManager.getNodeByPath(currentDirPath);
                             if (!node || node.type !== Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE) return;
+                            
+                            if (currentDepth > 1 && !FileSystemManager.hasPermission(node, currentUser, 'read')) {
+                                outputLines.push(indentPrefix + "└── [Permission Denied]");
+                                return;
+                            }
 
                             const childrenNames = Object.keys(node.children).sort();
                             childrenNames.forEach((childName, index) => {
@@ -2371,6 +2571,7 @@ ${contentToExport}
                         let allSuccess = true;
                         const messages = [];
                         let changesMade = false; 
+                        const currentUser = UserManager.getCurrentUser().name;
 
                         for (const pathArg of args) {
                             const pathValidation = FileSystemManager.validatePath('touch', pathArg, { allowMissing: true, disallowRoot: true });
@@ -2390,9 +2591,12 @@ ${contentToExport}
                                 continue;
                             }
 
-
                             if (pathValidation.node) { 
                                 if (pathValidation.node.type === Config.FILESYSTEM.DEFAULT_FILE_TYPE) {
+                                    if (!FileSystemManager.hasPermission(pathValidation.node, currentUser, 'write')) {
+                                        messages.push(`touch: '${pathArg}'${Config.MESSAGES.PERMISSION_DENIED_SUFFIX}`);
+                                        allSuccess = false; continue;
+                                    }
                                     messages.push(`${Config.MESSAGES.TIMESTAMP_UPDATED_PREFIX}${pathArg}${Config.MESSAGES.TIMESTAMP_UPDATED_SUFFIX}`);
                                     changesMade = true; 
                                 } else if (pathValidation.node.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE) {
@@ -2403,20 +2607,32 @@ ${contentToExport}
                                     allSuccess = false;
                                 }
                             } else { 
-                                const parentDirResult = FileSystemManager.createParentDirectoriesIfNeeded(resolvedPath);
+                                const parentPath = resolvedPath.substring(0, resolvedPath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR)) || Config.FILESYSTEM.ROOT_PATH;
+                                const parentNode = FileSystemManager.getNodeByPath(parentPath);
+                                if (!parentNode || !FileSystemManager.hasPermission(parentNode, currentUser, 'write')) {
+                                     messages.push(`touch: cannot create file in '${parentPath}'${Config.MESSAGES.PERMISSION_DENIED_SUFFIX}`);
+                                     allSuccess = false; continue;
+                                }
+
+                                const parentDirResult = FileSystemManager.createParentDirectoriesIfNeeded(resolvedPath); 
                                 if (parentDirResult.error) {
                                     messages.push(`touch: ${parentDirResult.error}`); 
                                     allSuccess = false;
                                     continue;
                                 }
-                                const parentNode = parentDirResult.parentNode;
+                                const effectiveParentNode = parentDirResult.parentNode; 
                                 const fileName = resolvedPath.substring(resolvedPath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR) + 1);
                                 
                                 if (fileName === "" && resolvedPath !== Config.FILESYSTEM.ROOT_PATH) { 
                                      messages.push(`touch: cannot create file with empty name at '${resolvedPath}'. Path might be intended as a directory.`);
                                      allSuccess = false; 
-                                } else if (parentNode) { 
-                                    parentNode.children[fileName] = { type: Config.FILESYSTEM.DEFAULT_FILE_TYPE, content: "" };
+                                } else if (effectiveParentNode) { 
+                                    effectiveParentNode.children[fileName] = { 
+                                        type: Config.FILESYSTEM.DEFAULT_FILE_TYPE, 
+                                        content: "",
+                                        owner: currentUser,
+                                        mode: Config.FILESYSTEM.DEFAULT_FILE_MODE
+                                    };
                                     messages.push(`'${pathArg}'${Config.MESSAGES.FILE_CREATED_SUFFIX}`);
                                     changesMade = true; 
                                 } else {
@@ -2427,7 +2643,7 @@ ${contentToExport}
                         } 
 
                         if (changesMade) { 
-                           if (!await FileSystemManager.save(UserManager.getCurrentUser().name)) {
+                           if (!await FileSystemManager.save(currentUser)) {
                                 return { success: false, error: "touch: Failed to save file system changes.", output: messages.join('\n'), messageType: Config.CSS_CLASSES.ERROR_MSG };
                             }
                         }
@@ -2452,6 +2668,7 @@ ${contentToExport}
                         
                         let outputContent = "";
                         let firstFile = true;
+                        const currentUser = UserManager.getCurrentUser().name;
 
                         if (options.stdinContent !== null && options.stdinContent !== undefined) {
                             outputContent += options.stdinContent;
@@ -2462,6 +2679,10 @@ ${contentToExport}
                             const pathValidation = FileSystemManager.validatePath('cat', pathArg, { expectedType: Config.FILESYSTEM.DEFAULT_FILE_TYPE });
                             if (pathValidation.error) return { success: false, error: pathValidation.error }; 
                             
+                            if (!FileSystemManager.hasPermission(pathValidation.node, currentUser, 'read')) {
+                                return { success: false, error: `cat: '${pathArg}'${Config.MESSAGES.PERMISSION_DENIED_SUFFIX}` };
+                            }
+
                             if (!firstFile && outputContent && !outputContent.endsWith('\n')) outputContent += "\n"; 
                             outputContent += pathValidation.node.content || "";
                             firstFile = false;
@@ -2493,17 +2714,25 @@ ${contentToExport}
                         let changesMade = false;
 
                         async function removeItemRecursively(itemResolvedPath, itemNode, pathArgForMessages, isTopLevelCall = true) {
-                            if (itemNode.type === Config.FILESYSTEM.DEFAULT_FILE_TYPE) {
-                                let doPrompt = false;
-                                if (isInteractiveOpt) { 
-                                    doPrompt = true;
-                                } else if (options.isInteractive && isTopLevelCall) { 
-                                    doPrompt = true;
-                                }
-                                if (isForceOpt) {
-                                    doPrompt = false;
-                                }
+                            const parentPath = itemResolvedPath.substring(0, itemResolvedPath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR)) || Config.FILESYSTEM.ROOT_PATH;
+                            const parentNode = FileSystemManager.getNodeByPath(parentPath);
 
+                            if (!parentNode) { 
+                                if (!isForceOpt) messages.push(`rm: Cannot remove '${pathArgForMessages}', parent directory '${parentPath}' not found (internal error).`);
+                                return false;
+                            }
+                            if (!FileSystemManager.hasPermission(parentNode, currentUser, 'write')) {
+                                if (!isForceOpt) messages.push(`rm: cannot remove '${pathArgForMessages}' from '${parentPath}'${Config.MESSAGES.PERMISSION_DENIED_SUFFIX}`);
+                                return false;
+                            }
+                            if (itemNode.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE && isRecursiveOpt && !FileSystemManager.hasPermission(itemNode, currentUser, 'write')) {
+                                 if (!isForceOpt) messages.push(`rm: cannot remove directory '${pathArgForMessages}' (contents)${Config.MESSAGES.PERMISSION_DENIED_SUFFIX}`);
+                                 return false;
+                            }
+
+
+                            if (itemNode.type === Config.FILESYSTEM.DEFAULT_FILE_TYPE) {
+                                let doPrompt = (isInteractiveOpt || (options.isInteractive && isTopLevelCall)) && !isForceOpt;
                                 let confirmed = true; 
                                 if (doPrompt) {
                                     confirmed = await new Promise(resolve => {
@@ -2514,10 +2743,8 @@ ${contentToExport}
                                 }
 
                                 if (confirmed) {
-                                    const parentPath = itemResolvedPath.substring(0, itemResolvedPath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR)) || Config.FILESYSTEM.ROOT_PATH;
                                     const itemName = itemResolvedPath.substring(itemResolvedPath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR) + 1);
-                                    const parentNode = FileSystemManager.getNodeByPath(parentPath);
-                                    if (parentNode && parentNode.children && parentNode.children[itemName]) {
+                                    if (parentNode.children && parentNode.children[itemName]) {
                                         delete parentNode.children[itemName];
                                         messages.push(`${isForceOpt ? Config.MESSAGES.FORCIBLY_REMOVED_PREFIX : ''}'${pathArgForMessages}'${Config.MESSAGES.ITEM_REMOVED_SUFFIX}${isForceOpt ? Config.MESSAGES.FORCIBLY_REMOVED_SUFFIX : ''}`);
                                         changesMade = true;
@@ -2536,16 +2763,7 @@ ${contentToExport}
                                     return false;
                                 }
 
-                                let doPromptForDir = false;
-                                if (isInteractiveOpt) { 
-                                    doPromptForDir = true;
-                                } else if (options.isInteractive && isTopLevelCall) { 
-                                    doPromptForDir = true;
-                                }
-                                if (isForceOpt) {
-                                    doPromptForDir = false;
-                                }
-
+                                let doPromptForDir = (isInteractiveOpt || (options.isInteractive && isTopLevelCall)) && !isForceOpt;
                                 let confirmedDir = true; 
                                 if (doPromptForDir) {
                                     const promptMsg = isTopLevelCall ?
@@ -2566,23 +2784,16 @@ ${contentToExport}
                                 const childrenNames = Object.keys(itemNode.children);
                                 for (const childName of childrenNames) {
                                     if (!itemNode.children[childName]) continue;
-
                                     const childNode = itemNode.children[childName];
                                     const childResolvedPath = FileSystemManager.getAbsolutePath(childName, itemResolvedPath);
-
                                     if (!await removeItemRecursively(childResolvedPath, childNode, childResolvedPath, false)) {
-                                        if (!isForceOpt) {
-                                            return false; 
-                                        }
+                                        if (!isForceOpt) return false; 
                                     }
                                 }
 
-                                const parentPath = itemResolvedPath.substring(0, itemResolvedPath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR)) || Config.FILESYSTEM.ROOT_PATH;
                                 const dirName = itemResolvedPath.substring(itemResolvedPath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR) + 1);
-                                const parentNode = FileSystemManager.getNodeByPath(parentPath);
-
-                                if (parentNode && parentNode.children && parentNode.children[dirName]) {
-                                    const currentDirNodeCheck = FileSystemManager.getNodeByPath(itemResolvedPath);
+                                if (parentNode.children && parentNode.children[dirName]) {
+                                    const currentDirNodeCheck = FileSystemManager.getNodeByPath(itemResolvedPath); 
                                     if (currentDirNodeCheck && Object.keys(currentDirNodeCheck.children).length > 0 && !isForceOpt) {
                                          messages.push(`rm: cannot remove directory '${pathArgForMessages}': Directory not empty (recursive removal failed for some contents).`);
                                          return false;
@@ -2627,8 +2838,8 @@ ${contentToExport}
                             }
                         }
 
-                        if (!allSuccess) {
-                             return { success: false, error: "rm: Not all items were removed successfully. See output for details.", output: messages.join('\n'), messageType: isForceOpt ? Config.CSS_CLASSES.CONSOLE_LOG_MSG : Config.CSS_CLASSES.ERROR_MSG };
+                        if (!allSuccess && !isForceOpt) { 
+                             return { success: false, error: "rm: Not all items were removed successfully. See output for details.", output: messages.join('\n'), messageType: Config.CSS_CLASSES.ERROR_MSG };
                         }
                         return { success: true, output: messages.join('\n'), messageType: Config.CSS_CLASSES.SUCCESS_MSG };
                     },
@@ -2642,12 +2853,19 @@ ${contentToExport}
                         
                         const sourcePathArg = args[0];
                         const destPathArg = args[1];
+                        const currentUser = UserManager.getCurrentUser().name;
 
                         const sourceValidation = FileSystemManager.validatePath('mv (source)', sourcePathArg, { disallowRoot: true });
                         if (sourceValidation.error) return { success: false, error: sourceValidation.error };
                         
                         const sourceNode = sourceValidation.node;
                         const absSourcePath = sourceValidation.resolvedPath;
+                        const sourceParentPath = absSourcePath.substring(0, absSourcePath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR)) || Config.FILESYSTEM.ROOT_PATH;
+                        const sourceParentNode = FileSystemManager.getNodeByPath(sourceParentPath);
+
+                        if (!sourceParentNode || !FileSystemManager.hasPermission(sourceParentNode, currentUser, 'write')) {
+                            return { success: false, error: `mv: cannot move '${sourcePathArg}' from '${sourceParentPath}'${Config.MESSAGES.PERMISSION_DENIED_SUFFIX}` };
+                        }
 
                         const destValidation = FileSystemManager.validatePath('mv (destination)', destPathArg, { allowMissing: true });
                         if (destValidation.error && destValidation.node && destValidation.resolvedPath !== absSourcePath) { 
@@ -2658,16 +2876,31 @@ ${contentToExport}
                         let destNode = destValidation.node;
                         const sourceName = absSourcePath.substring(absSourcePath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR) + 1);
 
-                        if (destNode && destNode.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE) {
+                        if (destNode && destNode.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE) { 
+                            const destDirNode = destNode; 
                             absDestPath = FileSystemManager.getAbsolutePath(sourceName, absDestPath); 
                             destNode = FileSystemManager.getNodeByPath(absDestPath); 
+
+                            if (!FileSystemManager.hasPermission(destDirNode, currentUser, 'write')) {
+                                return { success: false, error: `mv: cannot move into '${destPathArg}'${Config.MESSAGES.PERMISSION_DENIED_SUFFIX}` };
+                            }
+                        } else { 
+                            const destParentDirForPermCheck = absDestPath.substring(0, absDestPath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR)) || Config.FILESYSTEM.ROOT_PATH;
+                            const destParentNodeForPermCheck = FileSystemManager.getNodeByPath(destParentDirForPermCheck);
+                            if (!destParentNodeForPermCheck || !FileSystemManager.hasPermission(destParentNodeForPermCheck, currentUser, 'write')) {
+                                return { success: false, error: `mv: cannot create item in '${destParentDirForPermCheck}'${Config.MESSAGES.PERMISSION_DENIED_SUFFIX}` };
+                            }
                         }
+
 
                         if (absSourcePath === absDestPath) {
                              return { success: true, output: `mv: '${sourcePathArg}' and '${destPathArg}' are the same file. ${Config.MESSAGES.NO_ACTION_TAKEN}`, messageType: Config.CSS_CLASSES.CONSOLE_LOG_MSG };
                         }
 
-                        if (destNode) {
+                        if (destNode) { 
+                            if (!FileSystemManager.hasPermission(destNode, currentUser, 'write')) { 
+                                return { success: false, error: `mv: cannot overwrite '${destPathArg}'${Config.MESSAGES.PERMISSION_DENIED_SUFFIX}` };
+                            }
                             if (options.explicitForce || options.isInteractive) { 
                                 if (destNode.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE && sourceNode.type === Config.FILESYSTEM.DEFAULT_FILE_TYPE) {
                                     return { success: false, error: `mv: cannot overwrite directory '${destPathArg}' with non-directory '${sourcePathArg}'` };
@@ -2692,16 +2925,14 @@ ${contentToExport}
                             return { success: false, error: `mv: cannot move '${sourcePathArg}' to a subdirectory of itself, '${destPathArg}'` };
                         }
 
-                        const destParentDirResult = FileSystemManager.createParentDirectoriesIfNeeded(absDestPath);
+                        const destParentDirResult = FileSystemManager.createParentDirectoriesIfNeeded(absDestPath); 
                         if (destParentDirResult.error) return { success: false, error: `mv: ${destParentDirResult.error}` };
                         
                         const destParentNode = destParentDirResult.parentNode;
                         const destName = absDestPath.substring(absDestPath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR) + 1);
                         
-                        destParentNode.children[destName] = Utils.deepCopyNode(sourceNode);
+                        destParentNode.children[destName] = Utils.deepCopyNode(sourceNode); 
 
-                        const sourceParentPath = absSourcePath.substring(0, absSourcePath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR)) || Config.FILESYSTEM.ROOT_PATH;
-                        const sourceParentNode = FileSystemManager.getNodeByPath(sourceParentPath);
                         if (sourceParentNode && sourceParentNode.children && sourceParentNode.children[sourceName]) {
                             delete sourceParentNode.children[sourceName];
                         } else {
@@ -2710,7 +2941,7 @@ ${contentToExport}
                             return { success: false, error: `mv: Internal error - source item not found for removal after copy.` };
                         }
 
-                        if (!await FileSystemManager.save(UserManager.getCurrentUser().name)) {
+                        if (!await FileSystemManager.save(currentUser)) {
                             return { success: false, error: "mv: Failed to save file system changes." };
                         }
                         return { success: true, output: `${Config.MESSAGES.MOVED_PREFIX}${sourcePathArg}${Config.MESSAGES.MOVED_TO}${destPathArg}${Config.MESSAGES.MOVED_SUFFIX}`, messageType: Config.CSS_CLASSES.SUCCESS_MSG };
@@ -2729,6 +2960,7 @@ ${contentToExport}
 
                         const destPathArg = remainingArgs.pop(); 
                         const sourcePathArgs = remainingArgs;   
+                        const currentUser = UserManager.getCurrentUser().name;
 
                         let allSourcesProcessedSuccessfully = true;
                         const sourcesInfo = [];
@@ -2737,6 +2969,10 @@ ${contentToExport}
                             if (srcValidation.error) {
                                 OutputManager.appendToOutput(srcValidation.error, { typeClass: Config.CSS_CLASSES.ERROR_MSG }); 
                                 allSourcesProcessedSuccessfully = false; continue; 
+                            }
+                            if (!FileSystemManager.hasPermission(srcValidation.node, currentUser, 'read')) {
+                                OutputManager.appendToOutput(`cp: cannot stat '${srcArg}'${Config.MESSAGES.PERMISSION_DENIED_SUFFIX}`, { typeClass: Config.CSS_CLASSES.ERROR_MSG });
+                                allSourcesProcessedSuccessfully = false; continue;
                             }
                             if (srcValidation.node.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE && !flags.recursive) {
                                 OutputManager.appendToOutput(`cp: -r not specified; omitting directory '${srcArg}'`, { typeClass: Config.CSS_CLASSES.WARNING_MSG });
@@ -2752,14 +2988,12 @@ ${contentToExport}
 
 
                         const destValidation = FileSystemManager.validatePath('cp (destination)', destPathArg, { allowMissing: true });
-                        if (destValidation.error && destValidation.node) {
+                        if (destValidation.error && destValidation.node) { 
                             if (sourcesInfo.length === 1 && sourcesInfo[0].node.type === Config.FILESYSTEM.DEFAULT_FILE_TYPE && destValidation.node.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE) {
                             } else if (sourcesInfo.length === 1 && sourcesInfo[0].node.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE && destValidation.node.type === Config.FILESYSTEM.DEFAULT_FILE_TYPE) {
                                 return { success: false, error: `cp: cannot overwrite non-directory '${destPathArg}' with directory '${sourcesInfo[0].originalArg}'` };
                             } else if (destValidation.node.type === Config.FILESYSTEM.DEFAULT_FILE_TYPE && sourcesInfo.some(s => s.node.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE)) {
                                 return { success: false, error: `cp: cannot overwrite non-directory '${destPathArg}' with a directory source` };
-                            } else {
-                                return { success: false, error: destValidation.error };
                             }
                         }
                         
@@ -2780,9 +3014,19 @@ ${contentToExport}
                         for (const src of sourcesInfo) {
                             const sourceName = src.path.substring(src.path.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR) + 1);
                             let currentAbsDestPathForThisSource = absDestPath;
+                            let targetParentNodeForPermCheck;
                             
                             if (destIsDir) {
                                 currentAbsDestPathForThisSource = FileSystemManager.getAbsolutePath(sourceName, absDestPath);
+                                targetParentNodeForPermCheck = FileSystemManager.getNodeByPath(absDestPath); 
+                            } else {
+                                const parentOfDest = currentAbsDestPathForThisSource.substring(0, currentAbsDestPathForThisSource.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR)) || Config.FILESYSTEM.ROOT_PATH;
+                                targetParentNodeForPermCheck = FileSystemManager.getNodeByPath(parentOfDest);
+                            }
+
+                            if (!targetParentNodeForPermCheck || !FileSystemManager.hasPermission(targetParentNodeForPermCheck, currentUser, 'write')) {
+                                messages.push(`cp: cannot create item in '${destIsDir ? absDestPath : (targetParentNodeForPermCheck.path || '/')}'${Config.MESSAGES.PERMISSION_DENIED_SUFFIX}`);
+                                overallCopySuccess = false; continue;
                             }
                             
                             const existingDestItemNode = FileSystemManager.getNodeByPath(currentAbsDestPathForThisSource);
@@ -2793,6 +3037,10 @@ ${contentToExport}
                             }
 
                             if (existingDestItemNode) {
+                                if (!FileSystemManager.hasPermission(existingDestItemNode, currentUser, 'write')) {
+                                    messages.push(`cp: cannot overwrite '${currentAbsDestPathForThisSource}'${Config.MESSAGES.PERMISSION_DENIED_SUFFIX}`);
+                                    overallCopySuccess = false; continue;
+                                }
                                 if (!flags.force && options.isInteractive) {
                                     const confirmed = await new Promise(resolve => {
                                         ConfirmationManager.request(
@@ -2809,7 +3057,7 @@ ${contentToExport}
                                 }
                             }
                             
-                            const destParentDirResult = FileSystemManager.createParentDirectoriesIfNeeded(currentAbsDestPathForThisSource);
+                            const destParentDirResult = FileSystemManager.createParentDirectoriesIfNeeded(currentAbsDestPathForThisSource); 
                             if (destParentDirResult.error) {
                                 messages.push(`cp: ${destParentDirResult.error} (for source '${src.originalArg}' to '${currentAbsDestPathForThisSource}')`);
                                 overallCopySuccess = false; continue;
@@ -2817,13 +3065,17 @@ ${contentToExport}
                             const destParentNode = destParentDirResult.parentNode;
                             const destName = currentAbsDestPathForThisSource.substring(currentAbsDestPathForThisSource.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR) + 1);
                             
-                            destParentNode.children[destName] = Utils.deepCopyNode(src.node);
+                            const copiedNode = Utils.deepCopyNode(src.node);
+                            copiedNode.owner = currentUser; 
+                            copiedNode.mode = src.node.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE ? Config.FILESYSTEM.DEFAULT_DIR_MODE : Config.FILESYSTEM.DEFAULT_FILE_MODE; 
+
+                            destParentNode.children[destName] = copiedNode;
                             changesMade = true;
                             messages.push(`${Config.MESSAGES.COPIED_PREFIX}${src.originalArg}${Config.MESSAGES.COPIED_TO}'${currentAbsDestPathForThisSource}'${Config.MESSAGES.COPIED_SUFFIX}`);
                         }
                         
                         if (changesMade) {
-                           if (!await FileSystemManager.save(UserManager.getCurrentUser().name)) {
+                           if (!await FileSystemManager.save(currentUser)) {
                                 return { success: false, error: "cp: Failed to save file system changes after copy operations.", output: messages.join('\n'), messageType: Config.CSS_CLASSES.ERROR_MSG };
                             }
                         }
@@ -2851,19 +3103,24 @@ ${contentToExport}
                     description: "Displays command history.",
                     helpText: "Usage: history [-c]\n\nDisplays the list of previously executed commands.\n  -c, --clear   Clears the command history."
                 },
-                'edit': {
+                'edit': { 
                     handler: async (args, options) => {
                         const validationResult = Utils.validateArguments(args, { exact: 1 });
                         if (!validationResult.isValid) return { success: false, error: `edit: ${validationResult.errorDetail}` };
                         
                         const filePathArg = args[0];
                         const pathValidation = FileSystemManager.validatePath('edit', filePathArg, { allowMissing: true, disallowRoot: true });
+                        const currentUser = UserManager.getCurrentUser().name;
 
                         if (pathValidation.error && pathValidation.node && pathValidation.node.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE) {
                             return { success: false, error: `edit: '${filePathArg}' is a directory. Cannot edit.` };
                         }
-                        if (pathValidation.error && !pathValidation.node) { 
-                            return { success: false, error: pathValidation.error };
+                        if (pathValidation.node && !FileSystemManager.hasPermission(pathValidation.node, currentUser, 'read')) {
+                            return { success: false, error: `edit: '${filePathArg}'${Config.MESSAGES.PERMISSION_DENIED_SUFFIX}` };
+                        }
+
+                        if (pathValidation.error && !pathValidation.node && !pathValidation.optionsUsed.allowMissing) { 
+                             return { success: false, error: pathValidation.error };
                         }
                         
                         const resolvedPath = pathValidation.resolvedPath;
@@ -2972,6 +3229,11 @@ ${contentToExport}
                         if (pathValidation.error) return { success: false, error: pathValidation.error };
 
                         const fileNode = pathValidation.node;
+                        const currentUser = UserManager.getCurrentUser().name;
+                        if (!FileSystemManager.hasPermission(fileNode, currentUser, 'read')) {
+                            return { success: false, error: `export: '${pathArg}'${Config.MESSAGES.PERMISSION_DENIED_SUFFIX}` };
+                        }
+
                         const fileName = pathValidation.resolvedPath.substring(pathValidation.resolvedPath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR) + 1);
                         
                         try {
@@ -2998,10 +3260,17 @@ ${contentToExport}
                         if (!validationResult.isValid) return { success: false, error: `upload: ${validationResult.errorDetail}` };
 
                         let targetDirPath = FileSystemManager.getCurrentPath();
+                        const currentUser = UserManager.getCurrentUser().name;
+
                         if (args.length === 1) {
                             const destPathValidation = FileSystemManager.validatePath('upload (destination)', args[0], { expectedType: Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE });
                             if (destPathValidation.error) return { success: false, error: destPathValidation.error };
                             targetDirPath = destPathValidation.resolvedPath;
+                        }
+                        
+                        const targetDirNode = FileSystemManager.getNodeByPath(targetDirPath);
+                        if (!targetDirNode || !FileSystemManager.hasPermission(targetDirNode, currentUser, 'write')) {
+                            return { success: false, error: `upload: cannot write to directory '${targetDirPath}'${Config.MESSAGES.PERMISSION_DENIED_SUFFIX}` };
                         }
 
                         const input = Utils.createElement('input', { type: 'file' });
@@ -3032,13 +3301,17 @@ ${contentToExport}
                             });
                             
                             const targetPath = FileSystemManager.getAbsolutePath(file.name, targetDirPath);
-                            const parentDirResult = FileSystemManager.createParentDirectoriesIfNeeded(targetPath);
+                            const parentDirResult = FileSystemManager.createParentDirectoriesIfNeeded(targetPath); 
                             if (parentDirResult.error) throw new Error(parentDirResult.error);
                             
-                            const parentNode = parentDirResult.parentNode;
+                            const parentNode = parentDirResult.parentNode; 
                             const newFileName = targetPath.substring(targetPath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR) + 1);
                             
-                            if (parentNode.children[newFileName]) {
+                            const existingFileNode = parentNode.children[newFileName];
+                            if (existingFileNode) {
+                                if (!FileSystemManager.hasPermission(existingFileNode, currentUser, 'write')) {
+                                    throw new Error(`cannot overwrite existing file '${newFileName}'${Config.MESSAGES.PERMISSION_DENIED_SUFFIX}`);
+                                }
                                 if (!options.explicitForce) { 
                                     const confirmed = await new Promise(resolveInner => {
                                         ConfirmationManager.request(
@@ -3052,8 +3325,13 @@ ${contentToExport}
                                 }
                             }
 
-                            parentNode.children[newFileName] = { type: Config.FILESYSTEM.DEFAULT_FILE_TYPE, content: content };
-                            if (!await FileSystemManager.save(UserManager.getCurrentUser().name)) {
+                            parentNode.children[newFileName] = { 
+                                type: Config.FILESYSTEM.DEFAULT_FILE_TYPE, 
+                                content: content,
+                                owner: currentUser,
+                                mode: Config.FILESYSTEM.DEFAULT_FILE_MODE
+                            };
+                            if (!await FileSystemManager.save(currentUser)) {
                                 throw new Error("Failed to save uploaded file to FS.");
                             }
                             return { success: true, output: `${Config.MESSAGES.UPLOAD_SUCCESS_PREFIX}${file.name}${Config.MESSAGES.UPLOAD_SUCCESS_MIDDLE}${targetDirPath}${Config.MESSAGES.UPLOAD_SUCCESS_SUFFIX}`, messageType: Config.CSS_CLASSES.SUCCESS_MSG };
@@ -3217,11 +3495,16 @@ ${contentToExport}
                         
                         const scriptPathArg = args[0];
                         const scriptArgs = args.slice(1); 
+                        const currentUser = UserManager.getCurrentUser().name;
 
                         const pathValidation = FileSystemManager.validatePath('run', scriptPathArg, { expectedType: Config.FILESYSTEM.DEFAULT_FILE_TYPE });
                         if (pathValidation.error) return { success: false, error: pathValidation.error };
 
                         const scriptNode = pathValidation.node;
+                        if (!FileSystemManager.hasPermission(scriptNode, currentUser, 'read') || !FileSystemManager.hasPermission(scriptNode, currentUser, 'execute')) {
+                            return { success: false, error: `run: '${scriptPathArg}'${Config.MESSAGES.PERMISSION_DENIED_SUFFIX}` };
+                        }
+
                         if (!scriptNode.content) return { success: true, output: `run: Script '${scriptPathArg}' is empty.` };
 
                         let scriptContent = scriptNode.content;
@@ -3267,8 +3550,9 @@ ${contentToExport}
                         let overallScriptSuccess = true; 
                         let lastOutput = null; 
                         
+                        const previousScriptExecutionState = scriptExecutionInProgress; // Save previous state
                         scriptExecutionInProgress = true; 
-                        if (options.isInteractive) TerminalUI.setInputState(false);
+                        if (options.isInteractive) TerminalUI.setInputState(false); // Disable input if 'run' is interactive
 
                         for (const commandLine of commandsToRun) { 
                             let processedCommandLineWithArgs = commandLine; 
@@ -3283,24 +3567,33 @@ ${contentToExport}
                                 continue;
                             }
 
-                            const result = await CommandExecutor.processSingleCommand(processedCommandLineWithArgs, false);
+                            // Pass 'isInteractive: false' for commands within the script
+                            const result = await CommandExecutor.processSingleCommand(processedCommandLineWithArgs, false); 
                             if (!result.success) {
-                                const scriptErrorMsg = `Script '${scriptPathArg}' error on line: ${commandLine}\nError: ${result.error || 'Unknown error in command.'}`;
-                                if (options.isInteractive) { 
-                                     await OutputManager.appendToOutput(scriptErrorMsg, { typeClass: Config.CSS_CLASSES.ERROR_MSG });
-                                }
+                                let scriptErrorMsg = `Script '${scriptPathArg}' error on line: ${commandLine}\nError: ${result.error || 'Unknown error in command.'}`;
+                                if (result.output && typeof result.output === 'string' && result.output.trim() !== "" && result.output.trim() !== (result.error || "").trim()) {
+                                scriptErrorMsg += `\nDetails: ${result.output}`;
+                              }
+                                // Output error to terminal even if script is not top-level interactive
+                                await OutputManager.appendToOutput(scriptErrorMsg, { typeClass: Config.CSS_CLASSES.ERROR_MSG });
+                                
                                 overallScriptSuccess = false;
                                 break; 
                             }
                             lastOutput = result.output; 
                         }
                         
-                        scriptExecutionInProgress = false;
-                        if (options.isInteractive) TerminalUI.setInputState(true);
+                        scriptExecutionInProgress = previousScriptExecutionState; // Restore previous state
+                        // Only re-enable input if 'run' was interactive AND this is the outermost script finishing
+                        if (options.isInteractive && !scriptExecutionInProgress) {
+                             TerminalUI.setInputState(true); 
+                        }
+
 
                         if (overallScriptSuccess) {
-                            return { success: true, output: null }; 
+                            return { success: true, output: null }; // Script output is handled line-by-line or by redirection
                         } else {
+                            // Error already printed by the failing command or loop above
                             return { success: false, error: `Script '${scriptPathArg}' failed.` }; 
                         }
                     },
@@ -3314,6 +3607,7 @@ ${contentToExport}
 
                         const startPathArg = args[0];
                         const remainingArgs = args.slice(1);
+                        const currentUser = UserManager.getCurrentUser().name;
 
                         let namePattern = null;
                         let typeFilter = null; 
@@ -3341,6 +3635,10 @@ ${contentToExport}
                         const results = [];
 
                         function recurseFind(currentNode, currentPath) {
+                            if (!FileSystemManager.hasPermission(currentNode, currentUser, 'read')) {
+                                return;
+                            }
+
                             if (currentNode.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE) {
                                 if (!typeFilter || typeFilter === 'd') {
                                     if (!namePattern || currentPath.substring(currentPath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR) + 1).includes(namePattern)) { 
@@ -3450,7 +3748,12 @@ ${contentToExport}
 
                         const users = StorageManager.loadItem(Config.STORAGE_KEYS.USER_CREDENTIALS, "User list", {});
                         if (!users[usernameToDelete]) {
-                            return { success: false, error: `removeuser: User '${usernameToDelete}' not found.` };
+                            const notFoundMsg = `removeuser: User '${usernameToDelete}' not found. No action taken.`;
+                            return { 
+                                success: true, 
+                                output: notFoundMsg, 
+                                messageType: Config.CSS_CLASSES.CONSOLE_LOG_MSG 
+                            };
                         }
 
                         const confirmed = await new Promise(resolve => {
@@ -3496,6 +3799,68 @@ ${contentToExport}
                     },
                     description: "Removes a user account and all associated data.",
                     helpText: "Usage: removeuser <username>\n\nPermanently deletes the specified user account, their file system, and any saved session states. This action is irreversible and requires confirmation.\nYou cannot remove the currently logged-in user or reserved system users."
+                },
+                'chmod': {
+                    handler: async (args, options) => {
+                        const validationResult = Utils.validateArguments(args, { exact: 2 });
+                        if (!validationResult.isValid) return { success: false, error: `chmod: ${validationResult.errorDetail}` };
+
+                        const modeArg = args[0];
+                        const pathArg = args[1];
+                        const currentUser = UserManager.getCurrentUser().name;
+
+                        if (!/^[0-7]{2}$/.test(modeArg)) { 
+                            return { success: false, error: `chmod: invalid mode '${modeArg}'. Use two octal digits (e.g., 75 for rwxr-x, 64 for rw-r--).` };
+                        }
+                        const newMode = parseInt(modeArg, 8); 
+
+                        const pathValidation = FileSystemManager.validatePath('chmod', pathArg);
+                        if (pathValidation.error) return { success: false, error: pathValidation.error };
+
+                        const node = pathValidation.node;
+                        if (node.owner !== currentUser) {
+                            return { success: false, error: `chmod: changing permissions of '${pathArg}'${Config.MESSAGES.PERMISSION_DENIED_SUFFIX} (not owner)` };
+                        }
+
+                        node.mode = newMode;
+                        if (!await FileSystemManager.save(currentUser)) {
+                            return { success: false, error: "chmod: Failed to save file system changes." };
+                        }
+                        return { success: true, output: `Permissions of '${pathArg}' changed to ${modeArg}`, messageType: Config.CSS_CLASSES.SUCCESS_MSG };
+                    },
+                    description: "Changes file mode bits (permissions).",
+                    helpText: "Usage: chmod <mode> <path>\n\nChanges the permissions of <path> to <mode>.\n<mode> is a two-digit octal number (e.g., 75 for rwxr-x, 64 for rw-r--).\nThe first digit is for the owner, the second for others.\n  r (read) = 4, w (write) = 2, x (execute) = 1.\nExample: 'chmod 75 myfile' sets owner=rwx, other=r-x."
+                },
+                'chown': {
+                    handler: async (args, options) => {
+                        const validationResult = Utils.validateArguments(args, { exact: 2 });
+                        if (!validationResult.isValid) return { success: false, error: `chown: ${validationResult.errorDetail}` };
+
+                        const newOwnerArg = args[0];
+                        const pathArg = args[1];
+                        const currentUser = UserManager.getCurrentUser().name;
+
+                        const users = StorageManager.loadItem(Config.STORAGE_KEYS.USER_CREDENTIALS, "User list", {});
+                        if (!users[newOwnerArg] && newOwnerArg !== Config.USER.DEFAULT_NAME) { 
+                            return { success: false, error: `chown: user '${newOwnerArg}' does not exist.` };
+                        }
+
+                        const pathValidation = FileSystemManager.validatePath('chown', pathArg);
+                        if (pathValidation.error) return { success: false, error: pathValidation.error };
+
+                        const node = pathValidation.node;
+                        if (node.owner !== currentUser) {
+                            return { success: false, error: `chown: changing ownership of '${pathArg}'${Config.MESSAGES.PERMISSION_DENIED_SUFFIX} (not owner)` };
+                        }
+
+                        node.owner = newOwnerArg;
+                        if (!await FileSystemManager.save(currentUser)) {
+                            return { success: false, error: "chown: Failed to save file system changes." };
+                        }
+                        return { success: true, output: `Owner of '${pathArg}' changed to ${newOwnerArg}`, messageType: Config.CSS_CLASSES.SUCCESS_MSG };
+                    },
+                    description: "Changes file owner.",
+                    helpText: "Usage: chown <new_owner> <path>\n\nChanges the owner of <path> to <new_owner>.\nCurrently, only the current owner of the file can change its ownership."
                 }
             }; 
 
@@ -3526,6 +3891,7 @@ ${contentToExport}
             async function _executePipeline(pipeline, isInteractive) {
                 let currentStdinContent = null;
                 let lastCommandResult = { success: true, output: "" }; 
+                const currentUser = UserManager.getCurrentUser().name; 
 
                 for (let i = 0; i < pipeline.segments.length; i++) {
                     const segment = pipeline.segments[i];
@@ -3540,7 +3906,7 @@ ${contentToExport}
                         } else {
                             console.log(`Info: Background process pipeline error: ${errorMsg}`); 
                         }
-                        return { success: false, error: errorMsg }; 
+                        return { success: false, error: errorMsg, output: lastCommandResult.output }; 
                     }
                     currentStdinContent = lastCommandResult.output; 
                 }
@@ -3550,21 +3916,43 @@ ${contentToExport}
                     const outputToRedirect = lastCommandResult.output || "";
                     
                     const redirValidation = FileSystemManager.validatePath('redirection', redirFile, { 
-                        expectedType: Config.FILESYSTEM.DEFAULT_FILE_TYPE, 
                         allowMissing: true, 
                         disallowRoot: true, 
                         defaultToCurrentIfEmpty: false 
                     });
 
-                    if (redirValidation.error) {
+                    if (redirValidation.error && !(redirValidation.optionsUsed.allowMissing && !redirValidation.node)) { 
                         const redirErrorMsg = redirValidation.error;
                         if (!pipeline.isBackground) await OutputManager.appendToOutput(redirErrorMsg, { typeClass: Config.CSS_CLASSES.ERROR_MSG });
                         return { success: false, error: redirErrorMsg };
                     }
 
                     const absRedirectPath = redirValidation.resolvedPath;
-                    const parentDirResult = FileSystemManager.createParentDirectoriesIfNeeded(absRedirectPath);
+                    let targetNode = redirValidation.node;
 
+                    if (targetNode) { 
+                        if (targetNode.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE) {
+                            const dirErrorMsg = `Redirection error: '${redirFile}' is a directory.`;
+                            if (!pipeline.isBackground) await OutputManager.appendToOutput(dirErrorMsg, { typeClass: Config.CSS_CLASSES.ERROR_MSG });
+                            return { success: false, error: dirErrorMsg };
+                        }
+                        if (!FileSystemManager.hasPermission(targetNode, currentUser, 'write')) {
+                            const permErrorMsg = `Redirection error: cannot write to '${redirFile}'${Config.MESSAGES.PERMISSION_DENIED_SUFFIX}`;
+                            if (!pipeline.isBackground) await OutputManager.appendToOutput(permErrorMsg, { typeClass: Config.CSS_CLASSES.ERROR_MSG });
+                            return { success: false, error: permErrorMsg };
+                        }
+                    } else { 
+                        const parentPath = absRedirectPath.substring(0, absRedirectPath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR)) || Config.FILESYSTEM.ROOT_PATH;
+                        const parentNodeForRedir = FileSystemManager.getNodeByPath(parentPath);
+                        if (!parentNodeForRedir || !FileSystemManager.hasPermission(parentNodeForRedir, currentUser, 'write')) {
+                            const permErrorMsg = `Redirection error: cannot create file in '${parentPath}'${Config.MESSAGES.PERMISSION_DENIED_SUFFIX}`;
+                            if (!pipeline.isBackground) await OutputManager.appendToOutput(permErrorMsg, { typeClass: Config.CSS_CLASSES.ERROR_MSG });
+                            return { success: false, error: permErrorMsg };
+                        }
+                    }
+
+
+                    const parentDirResult = FileSystemManager.createParentDirectoriesIfNeeded(absRedirectPath); 
                     if (parentDirResult.error) {
                         const parentErrorMsg = `Redirection error: ${parentDirResult.error}`;
                         if (!pipeline.isBackground) await OutputManager.appendToOutput(parentErrorMsg, { typeClass: Config.CSS_CLASSES.ERROR_MSG });
@@ -3574,13 +3962,23 @@ ${contentToExport}
                     const parentNode = parentDirResult.parentNode;
                     const redirectFileName = absRedirectPath.substring(absRedirectPath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR) + 1);
                     let existingContent = "";
-                    if (redirType === 'append' && parentNode.children[redirectFileName]) {
+
+                    if (redirType === 'append' && parentNode.children[redirectFileName] && parentNode.children[redirectFileName].type === Config.FILESYSTEM.DEFAULT_FILE_TYPE) {
                         existingContent = parentNode.children[redirectFileName].content || "";
                         if (existingContent && !existingContent.endsWith('\n') && outputToRedirect.length > 0) existingContent += '\n'; 
                     }
-                    parentNode.children[redirectFileName] = { type: Config.FILESYSTEM.DEFAULT_FILE_TYPE, content: existingContent + outputToRedirect };
                     
-                    if (!await FileSystemManager.save(UserManager.getCurrentUser().name)) {
+                    const currentOwner = parentNode.children[redirectFileName] ? parentNode.children[redirectFileName].owner : currentUser;
+                    const currentMode = parentNode.children[redirectFileName] ? parentNode.children[redirectFileName].mode : Config.FILESYSTEM.DEFAULT_FILE_MODE;
+
+                    parentNode.children[redirectFileName] = { 
+                        type: Config.FILESYSTEM.DEFAULT_FILE_TYPE, 
+                        content: existingContent + outputToRedirect,
+                        owner: currentOwner,
+                        mode: currentMode
+                    };
+                    
+                    if (!await FileSystemManager.save(currentUser)) {
                         const saveErrorMsg = `Failed to save redirected output to '${redirFile}'.`;
                         if (!pipeline.isBackground) await OutputManager.appendToOutput(saveErrorMsg, { typeClass: Config.CSS_CLASSES.ERROR_MSG });
                         return { success: false, error: saveErrorMsg };
@@ -3616,14 +4014,24 @@ ${contentToExport}
             async function processSingleCommand(rawCommandText, isInteractive = true) {
                 let finalPipelineResult = { success: true, output: null, error: null };
                 
-                if (scriptExecutionInProgress && isInteractive) {
+                // If a script is running and this is an interactive command (e.g. user trying to type while script runs)
+                // and it's not a confirmation, block it.
+                if (scriptExecutionInProgress && isInteractive && !ConfirmationManager.isAwaiting()) {
+                     OutputManager.appendToOutput("Script execution in progress. Input suspended.", { typeClass: Config.CSS_CLASSES.WARNING_MSG });
                     return { success: false, error: "Script execution in progress. Input suspended."};
                 }
 
                 if (EditorManager.isActive()) return finalPipelineResult; 
                 if (ConfirmationManager.isAwaiting()) { 
                     await ConfirmationManager.handleConfirmation(rawCommandText); 
-                    if (isInteractive) await _finalizeInteractiveModeUI(rawCommandText); 
+                    // Only finalize UI if the confirmation was handled interactively.
+                    // If it was part of a script, the script's run command will handle UI finalization.
+                    if (isInteractive) { // This 'isInteractive' refers to the current command being processed (e.g. 'YES')
+                         await _finalizeInteractiveModeUI(rawCommandText);
+                         // If a script was running and this confirmation was the last part of it,
+                         // the script's 'run' command might need to re-enable input if it was the top-level interactive call.
+                         // This is handled by the 'run' command's own logic.
+                    }
                     return finalPipelineResult; 
                 }
                 
@@ -3660,6 +4068,8 @@ ${contentToExport}
                 }
                 
                 const execute = async () => {
+                    // When executing commands from a script, 'isInteractive' for _executePipeline should be false.
+                    // When executing a direct interactive command, 'isInteractive' for _executePipeline is true.
                     return await _executePipeline(parsedPipeline, isInteractive);
                 };
 
@@ -3668,7 +4078,7 @@ ${contentToExport}
                     parsedPipeline.jobId = backgroundProcessIdCounter; 
                     await OutputManager.appendToOutput(`${Config.MESSAGES.BACKGROUND_PROCESS_STARTED_PREFIX}${parsedPipeline.jobId}${Config.MESSAGES.BACKGROUND_PROCESS_STARTED_SUFFIX}`, { typeClass: Config.CSS_CLASSES.CONSOLE_LOG_MSG });
                     setTimeout(async () => {
-                        const bgResult = await execute();
+                        const bgResult = await execute(); // isInteractive is passed from processSingleCommand
                         if (!bgResult.success) {
                             console.log(`Info: Background job ${parsedPipeline.jobId} (${parsedPipeline.segments.map(s=>s.command).join(' | ')}) completed with error: ${bgResult.error || 'Unknown background error'}`);
                              OutputManager.appendToOutput(`[Job ${parsedPipeline.jobId} finished with error]`, { typeClass: Config.CSS_CLASSES.WARNING_MSG, isBackground: true });
@@ -3678,10 +4088,17 @@ ${contentToExport}
                     }, 0);
                     finalPipelineResult = { success: true, output: null }; 
                 } else {
-                    finalPipelineResult = await execute();
+                    finalPipelineResult = await execute(); // isInteractive is passed from processSingleCommand
                 }
                 
-                if (isInteractive) await _finalizeInteractiveModeUI(rawCommandText); 
+                // Only finalize UI if the command was top-level interactive and not part of a script that's still running.
+                if (isInteractive && !scriptExecutionInProgress) {
+                     await _finalizeInteractiveModeUI(rawCommandText); 
+                } else if (isInteractive && scriptExecutionInProgress && ConfirmationManager.isAwaiting()) {
+                    // If an interactive confirmation happened mid-script, the UI is already handled by ConfirmationManager.
+                    // _finalizeInteractiveModeUI was called when 'YES' was processed.
+                }
+
                 return finalPipelineResult;
             }
 
@@ -3692,11 +4109,16 @@ ${contentToExport}
             function isScriptRunning() { 
                 return scriptExecutionInProgress;
             }
+             // Expose for run command to manage nested scripts
+            function setScriptExecutionInProgress(status) {
+                scriptExecutionInProgress = status;
+            }
 
             return {
                 processSingleCommand,
                 getCommands,
-                isScriptRunning 
+                isScriptRunning,
+                setScriptExecutionInProgress 
             };
         })();
 
@@ -3704,32 +4126,42 @@ ${contentToExport}
         function initializeTerminalEventListeners() { 
             DOM.terminalDiv.addEventListener('click', e => { 
                 if (EditorManager.isActive()) return; 
-                if (CommandExecutor.isScriptRunning()) return; 
+                // Allow focus even if script is running for confirmation inputs
+                // if (CommandExecutor.isScriptRunning() && !ConfirmationManager.isAwaiting()) return; 
                 if (!e.target.closest('button, a') && (!DOM.editableInputDiv || !DOM.editableInputDiv.contains(e.target))) {
-                    TerminalUI.focusInput();
+                    if (DOM.editableInputDiv.contentEditable === 'true') { // Only focus if editable
+                        TerminalUI.focusInput();
+                    }
                 }
             });
             
             const getCurrentInputTarget = () => DOM.editableInputDiv;
 
             document.addEventListener('keydown', async e => {
-                if (CommandExecutor.isScriptRunning()) {
+                // If a script is running AND it's not waiting for confirmation,
+                // prevent most inputs.
+                if (CommandExecutor.isScriptRunning() && !ConfirmationManager.isAwaiting()) {
                     if (e.key === "Enter" || e.key === "Tab" || e.key.startsWith("Arrow")) {
                         e.preventDefault();
                     }
+                    // Allow Ctrl+C or similar to break script in future? For now, script runs to completion or error.
                     return; 
                 }
 
                 if (EditorManager.isActive()) return; 
                 const activeInputTarget = getCurrentInputTarget();
-                if (!activeInputTarget || (document.activeElement !== activeInputTarget && !activeInputTarget.contains(document.activeElement))) {
+                // Only process keydown if the editable input is the target or contains the target,
+                // AND it's actually editable (not locked by a running script that isn't asking for confirmation)
+                if (!activeInputTarget || (document.activeElement !== activeInputTarget && !activeInputTarget.contains(document.activeElement)) || activeInputTarget.contentEditable !== 'true') {
                     return;
                 }
+
 
                 TerminalUI.setIsNavigatingHistory(false); 
                 if (e.key === 'Enter') { 
                     e.preventDefault(); 
                     const commandText = TerminalUI.getCurrentInputValue(); 
+                    // When user hits Enter, it's always an interactive command submission at this point
                     await CommandExecutor.processSingleCommand(commandText, true); 
                 } else if (e.key === 'ArrowUp') { 
                     e.preventDefault(); 
@@ -3773,6 +4205,7 @@ ${contentToExport}
             if (DOM.editableInputDiv) { 
                 DOM.editableInputDiv.addEventListener('paste', e => { 
                     e.preventDefault(); 
+                    if (DOM.editableInputDiv.contentEditable !== 'true') return; // Respect non-editable state
                     const text = (e.clipboardData || window.clipboardData).getData('text/plain'); 
                     document.execCommand('insertText', false, text.replace(/\r?\n|\r/g, ' ')); 
                 }); 
