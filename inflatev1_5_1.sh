@@ -366,4 +366,4 @@ echo " find / -name '\*.txt' -exec grep -i 'OopisOS' {} \;"
 echo " grep -R 'duck' /"
 echo " cat /docs/manuals/dev_guide.md"
 echo "Have fun exploring the verbosity!"
-rm -f ./inflatev4_1.sh
+rm -f ./inflatev1_5_1.sh

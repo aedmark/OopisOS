@@ -6210,6 +6210,93 @@ Copies <source_path> to <destination_path>, or one or more <source_path>(s) to <
       description: "Manually saves the current user's file system state.",
       helpText: "Usage: savefs\n\n...",
     },
+	    clearfs: {
+      handler: async (args, options) => {
+        const validationResult = Utils.validateArguments(args, { exact: 0 });
+        if (!validationResult.isValid) {
+          return {
+            success: false,
+            error: `clearfs: ${validationResult.errorDetail}`,
+          };
+        }
+
+        const currentUser = UserManager.getCurrentUser();
+        if (!options.isInteractive) {
+          return { success: false, error: "clearfs: Can only be run in interactive mode." };
+        }
+
+        const confirmed = await new Promise((resolve) =>
+          ConfirmationManager.request(
+            [
+              `WARNING: This will permanently erase ALL files and directories for the current user '${currentUser.name}'.`,
+              "This action cannot be undone.",
+              "Are you sure you want to clear your file system?",
+            ],
+            null,
+            () => resolve(true),
+            () => resolve(false),
+          ),
+        );
+
+        if (!confirmed) {
+          return {
+            success: true, // Command itself didn't fail, user cancelled
+            output: `File system clear for '${currentUser.name}' cancelled. ${Config.MESSAGES.NO_ACTION_TAKEN}`,
+            messageType: Config.CSS_CLASSES.CONSOLE_LOG_MSG,
+          };
+        }
+
+        let operationSuccess = true;
+        let finalMessage = "";
+
+        try {
+          // Delete the existing FS for the user from IndexedDB
+          // While initialize + save would overwrite, explicit delete is cleaner.
+          await FileSystemManager.deleteUserFS(currentUser.name); //
+
+          // Initialize a new, empty FS in memory for the current user
+          await FileSystemManager.initialize(currentUser.name); //
+
+          // Save the new empty FS to IndexedDB
+          if (!(await FileSystemManager.save(currentUser.name))) { //
+            throw new Error("Failed to save the newly cleared file system to storage.");
+          }
+
+          // Reset current path in memory to root for the active session
+          FileSystemManager.setCurrentPath(Config.FILESYSTEM.ROOT_PATH); //
+
+          // Update UI elements
+          if (options.isInteractive) {
+            TerminalUI.updatePrompt();
+            OutputManager.clearOutput(); // Clear the terminal screen
+          }
+          finalMessage = `File system for user '${currentUser.name}' has been cleared and reset to default.`;
+          OutputManager.appendToOutput(finalMessage, { typeClass: Config.CSS_CLASSES.SUCCESS_MSG });
+
+        } catch (e) {
+          operationSuccess = false;
+          finalMessage = `Error clearing file system for '${currentUser.name}': ${e.message || "Unknown error"}`;
+          console.error("clearfs error:", e);
+          OutputManager.appendToOutput(finalMessage, { typeClass: Config.CSS_CLASSES.ERROR_MSG });
+        }
+
+        return {
+          success: operationSuccess,
+          // If successful, primary feedback is via OutputManager.appendToOutput directly.
+          // If error, the error message has also been outputted.
+          output: operationSuccess ? "" : finalMessage,
+          error: operationSuccess ? null : finalMessage,
+        };
+      },
+      description: "Clears the current user's file system to a default empty state.",
+      helpText: `Usage: clearfs
+
+WARNING: This command will permanently erase all files and directories for the
+current user. This action requires confirmation and cannot be undone.
+It resets only the file system, leaving other session data (like command
+history and user login) intact.
+`,
+    },
     savestate: {
       handler: async (args, options) => {
         const result = await SessionManager.saveManualState();
