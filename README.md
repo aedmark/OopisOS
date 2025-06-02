@@ -113,18 +113,7 @@ OopisOS offers a rich environment. Here are some areas to explore:
 * Editor Features: Open a .md file with edit test.md. Try toggling word wrap, changing view modes (Ctrl+P), and exporting the preview. Note the status bar information.  
 * Piping and Redirection: Try ls \-l / \> file\_list.txt or echo "Error log: " \>\> /system.log ; date \>\> /system.log.  
 * Background Processes: Execute a command with & at the end, e.g., delay 3000 &.  
-* Scripting: Create a simple script file (e.g., edit test.sh) with:  
-* Bash
-
-\#\!/oopis\_shell   
-\# My test script  
-echo "Script running with $\# arguments: $@"  
-echo "First argument: $1"  
-ls \-l /  
-delay 1000  
-echo "Script finished."
-
-*   
+* Scripting: Create a simple script file (e.g., edit test.sh)
 * Save it, chmod 70 test.sh (to make it executable for the owner), and then run it with run test.sh arg1 "second arg".
 
 ## **Developer Guide**
