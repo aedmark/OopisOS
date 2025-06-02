@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>OopisOS Version 1.5.1</title>
+		<link
+			href="https://fonts.googleapis.com/css2?family=VT323&display=swap"
+			rel="stylesheet"
+		/>
+		<script src="https://cdn.tailwindcss.com"></script>
+		<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+		<style>
+			html {
+				box-sizing: border-box;
+			}
+			*,
+			*::before,
+			*::after {
+				box-sizing: inherit;
+			}
+
+			body {
+				font-family: "VT323", monospace;
+			}
+
+			.terminal-bezel-shadow {
+				box-shadow:
+					inset 0 0 10px rgba(0, 0, 0, 0.5),
+					0 5px 15px rgba(0, 0, 0, 0.3),
+					0 0 3px 1px #111;
+			}
+
+			.terminal-screen-glow {
+				box-shadow: inset 0 0 15px rgba(0, 255, 0, 0.15);
+			}
+
+			#terminal,
+			.editor-pane {
+				scrollbar-width: thin;
+				scrollbar-color: #00ff00 #0d0d0d;
+			}
+			#terminal::-webkit-scrollbar,
+			.editor-pane::-webkit-scrollbar {
+				width: 10px;
+			}
+			#terminal::-webkit-scrollbar-track,
+			.editor-pane::-webkit-scrollbar-track {
+				background: #0d0d0d;
+				border-radius: 8px;
+			}
+			#terminal::-webkit-scrollbar-thumb,
+			.editor-pane::-webkit-scrollbar-thumb {
+				background-color: #00ff00;
+				border-radius: 10px;
+				border: 2px solid #0d0d0d;
+			}
+			#terminal::-webkit-scrollbar-thumb:hover,
+			.editor-pane::-webkit-scrollbar-thumb:hover {
+				background-color: #00cc00;
+			}
+
+			#editable-input,
+			#editor-textarea {
+				caret-color: #00ff00;
+			}
+
+			.btn-editor {
+				background-color: #3f3f46;
+				color: #22c55e;
+				border: 1px solid #52525b;
+				padding: 0.25rem 0.5rem;
+				border-radius: 0.375rem;
+				font-family: "VT323", monospace;
+				font-size: 0.875rem;
+				margin-left: 0.25rem;
+				cursor: pointer;
+			}
+			.btn-editor:hover {
+				background-color: #52525b;
+			}
+			.btn-editor:focus {
+				outline: none;
+				box-shadow: 0 0 0 1px #22c55e;
+			}
+
+			#editor-line-gutter {
+    				width: 40px; /* Adjust width if needed for longer line numbers */
+    				/* Vertical padding (top/bottom) will be set via JavaScript for sync */
+    				/* Font family, size, and line-height will be set via JavaScript for sync */
+    				padding-right: 8px; /* Spacing from the main text area, adjust as needed */
+   				 padding-left: 0;    /* Ensure no unintended left padding */
+    				text-align: right;
+    				color: #a3a3a3;
+    				background-color: #171717; /* Darker background for the gutter */
+    				overflow-y: hidden; /* Crucial for scroll sync */
+    				flex-shrink: 0;
+    				white-space: pre; /* To respect newlines in line numbers */
+    				user-select: none;
+    				box-sizing: border-box;
+			}
+			
+			.gutter-hidden-by-wrap {
+        			display: none !important;
+    			}
+			.markdown-preview h1,
+			.markdown-preview h2,
+			.markdown-preview h3 {
+				color: #7dd3fc;
+				border-bottom: 1px solid #52525b;
+				margin-top: 1em;
+				margin-bottom: 0.5em;
+			}
+			.markdown-preview p {
+				margin-bottom: 0.5em;
+				line-height: 1.5.1;
+			}
+			.markdown-preview code {
+				background-color: #262626;
+				padding: 2px 4px;
+				border-radius: 3px;
+				font-family: monospace;
+				color: #d4d4d4;
+			}
+			.markdown-preview pre {
+				background-color: #262626;
+				padding: 10px;
+				overflow-x: auto;
+				border-radius: 3px;
+			}
+			.markdown-preview pre > code {
+				display: block;
+				padding: 0;
+			}
+			.markdown-preview ul,
+			.markdown-preview ol {
+				margin-left: 20px;
+				margin-bottom: 0.5em;
+			}
+			.markdown-preview blockquote {
+				border-left: 3px solid #52525b;
+				padding-left: 10px;
+				margin-left: 0;
+				color: #a3a3a3;
+			}
+			.markdown-preview a {
+				color: #2dd4bf;
+				text-decoration: underline;
+			}
+			.markdown-preview.word-wrap-enabled pre {
+				white-space: pre-wrap;
+				word-break: break-all;
+			}
+
+			#editor-textarea.no-wrap {
+				white-space: pre !important;
+				overflow-x: auto !important;
+			}
+		</style>
+	</head>
+	<body
+		class="bg-neutral-900 text-green-500 m-0 p-5 flex items-center justify-center min-h-screen overflow-x-hidden"
+	>
+		<div
+			id="terminal-bezel"
+			class="bg-neutral-800 p-6 rounded-2xl terminal-bezel-shadow inline-block"
+		>
+			<div
+				id="terminal"
+				class="w-[90vw] max-w-[800px] h-[70vh] max-h-[600px] bg-neutral-950 border-2 border-neutral-900 rounded-lg p-5 overflow-x-hidden terminal-screen-glow flex flex-col"
+			>
+				<div
+					id="output"
+					class="flex-grow mb-2.5 overflow-x-hidden w-full min-w-0 overflow-y-auto"
+				></div>
+				<div class="input-line-container flex items-start w-full">
+					<div
+						class="prompt-container flex items-center leading-[1.2em] flex-shrink-0 whitespace-nowrap pt-[0.1em]"
+					>
+						<span
+							id="prompt-user"
+							class="prompt-user mr-0.5 text-sky-400"
+						></span>
+						<span class="prompt-separator mr-0.5">@</span>
+						<span id="prompt-host" class="prompt-host mr-0.5">OopisOs</span>
+						<span class="prompt-separator mr-0.5">:</span>
+						<span id="prompt-path" class="prompt-path mr-1"></span>
+						<span class="prompt-char mr-2">&gt;</span>
+					</div>
+					<div id="editable-input-container" class="flex-grow min-w-0">
+						<div
+							id="editable-input"
+							contenteditable="true"
+							spellcheck="false"
+							autocapitalize="none"
+							autocorrect="off"
+							class="min-h-[1.2em] leading-[1.2em] whitespace-pre-wrap break-words outline-none text-green-500 w-full"
+						></div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script src="./oopisos1_5_1.js"></script>
+	</body>
+</html>

@@ -1,0 +1,703 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "oopisos1_5_1.js",
+			"settings":
+			{
+				"buffer_size": 265217,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			},
+			"undo_stack":
+			[
+				[
+					1,
+					1,
+					"insert",
+					{
+						"characters": " "
+					},
+					"AQAAAAAAAAAAAAAAAQAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					5,
+					1,
+					"",
+					null,
+					"AwAAAGe9AAAAAAAAar0AAAAAAAAFAAAAMS40LjJsAQAAAAAAAG8BAAAAAAAABQAAADEuNC4yEQAAAAAAAAAUAAAAAAAAAAUAAAAxLjQuMg",
+					"AQAAAAAAAAABAAAAZ70AAAAAAABsvQAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					20,
+					1,
+					"insert",
+					{
+						"characters": "\n"
+					},
+					"AQAAAKLBAgAAAAAAqMECAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAosECAAAAAACiwQIAAAAAAAAAAAAAAPC/"
+				],
+				[
+					21,
+					1,
+					"paste",
+					null,
+					"AQAAAKjBAgAAAAAACsICAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAqMECAAAAAACowQIAAAAAAAAAAAAAAPC/"
+				],
+				[
+					25,
+					7,
+					"left_delete",
+					null,
+					"BwAAALPBAgAAAAAAs8ECAAAAAAABAAAAILLBAgAAAAAAssECAAAAAAABAAAAILHBAgAAAAAAscECAAAAAAABAAAAILDBAgAAAAAAsMECAAAAAAABAAAAIK/BAgAAAAAAr8ECAAAAAAABAAAAIK7BAgAAAAAArsECAAAAAAABAAAAIK3BAgAAAAAArcECAAAAAAABAAAAIA",
+					"AQAAAAAAAAABAAAAtMECAAAAAAC0wQIAAAAAAAAAAAAAAPC/"
+				],
+				[
+					26,
+					5,
+					"left_delete",
+					null,
+					"BQAAAKzBAgAAAAAArMECAAAAAAABAAAAIKvBAgAAAAAAq8ECAAAAAAABAAAAIKrBAgAAAAAAqsECAAAAAAABAAAAIKnBAgAAAAAAqcECAAAAAAABAAAAIKjBAgAAAAAAqMECAAAAAAABAAAAIA",
+					"AQAAAAAAAAABAAAArcECAAAAAACtwQIAAAAAAAAAAAAAAPC/"
+				],
+				[
+					30,
+					1,
+					"insert",
+					{
+						"characters": ","
+					},
+					"AQAAAMjBAgAAAAAAycECAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAyMECAAAAAADIwQIAAAAAAAAAAAAAAPC/"
+				],
+				[
+					31,
+					1,
+					"insert",
+					{
+						"characters": " long:"
+					},
+					"BgAAAMnBAgAAAAAAysECAAAAAAAAAAAAysECAAAAAADLwQIAAAAAAAAAAADLwQIAAAAAAMzBAgAAAAAAAAAAAMzBAgAAAAAAzcECAAAAAAAAAAAAzcECAAAAAADOwQIAAAAAAAAAAADOwQIAAAAAAM/BAgAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAycECAAAAAADJwQIAAAAAAAAAAAAAAPC/"
+				],
+				[
+					32,
+					1,
+					"insert",
+					{
+						"characters": " "
+					},
+					"AQAAAM/BAgAAAAAA0MECAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAz8ECAAAAAADPwQIAAAAAAAAAAAAAAPC/"
+				],
+				[
+					33,
+					1,
+					"insert_snippet",
+					{
+						"contents": "\"$0\""
+					},
+					"AQAAANDBAgAAAAAA0sECAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAA0MECAAAAAADQwQIAAAAAAAAAAAAAAPC/"
+				],
+				[
+					34,
+					1,
+					"insert",
+					{
+						"characters": "--rec"
+					},
+					"BQAAANHBAgAAAAAA0sECAAAAAAAAAAAA0sECAAAAAADTwQIAAAAAAAAAAADTwQIAAAAAANTBAgAAAAAAAAAAANTBAgAAAAAA1cECAAAAAAAAAAAA1cECAAAAAADWwQIAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAA0cECAAAAAADRwQIAAAAAAAAAAAAAAPC/"
+				],
+				[
+					35,
+					1,
+					"insert",
+					{
+						"characters": "ursive"
+					},
+					"BgAAANbBAgAAAAAA18ECAAAAAAAAAAAA18ECAAAAAADYwQIAAAAAAAAAAADYwQIAAAAAANnBAgAAAAAAAAAAANnBAgAAAAAA2sECAAAAAAAAAAAA2sECAAAAAADbwQIAAAAAAAAAAADbwQIAAAAAANzBAgAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAA1sECAAAAAADWwQIAAAAAAAAAAAAAAPC/"
+				],
+				[
+					40,
+					3,
+					"left_delete",
+					null,
+					"AwAAAOHBAgAAAAAA4cECAAAAAAAxAAAALyBZb3UgY2FuIGFsc28gYWRkIGxvbmc6ICItLXJlY3Vyc2l2ZSIgaWYgZGVzaXJlZODBAgAAAAAA4MECAAAAAAABAAAAL9/BAgAAAAAA38ECAAAAAAABAAAAIA",
+					"AQAAAAAAAAABAAAA4cECAAAAAAASwgIAAAAAAAAAAAAAAPC/"
+				],
+				[
+					74,
+					1,
+					"insert",
+					{
+						"characters": "\\n"
+					},
+					"AgAAAFjRAgAAAAAAWdECAAAAAAAAAAAAWdECAAAAAABa0QIAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAWNECAAAAAABY0QIAAAAAAAAAAAAAAPC/"
+				],
+				[
+					75,
+					1,
+					"insert",
+					{
+						"characters": " "
+					},
+					"AQAAAFrRAgAAAAAAW9ECAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAWtECAAAAAABa0QIAAAAAAAAAAAAAAPC/"
+				],
+				[
+					76,
+					1,
+					"paste",
+					null,
+					"AQAAAFvRAgAAAAAAoNECAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAW9ECAAAAAABb0QIAAAAAAAAAAAAAAPC/"
+				],
+				[
+					81,
+					1,
+					"insert",
+					{
+						"characters": ","
+					},
+					"AQAAAF3RAgAAAAAAXtECAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAXdECAAAAAABd0QIAAAAAAAAAAAAAAPC/"
+				],
+				[
+					82,
+					1,
+					"insert",
+					{
+						"characters": " "
+					},
+					"AQAAAF7RAgAAAAAAX9ECAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAXtECAAAAAABe0QIAAAAAAAAAAAAAAPC/"
+				],
+				[
+					83,
+					1,
+					"insert",
+					{
+						"characters": "--rec"
+					},
+					"BQAAAF/RAgAAAAAAYNECAAAAAAAAAAAAYNECAAAAAABh0QIAAAAAAAAAAABh0QIAAAAAAGLRAgAAAAAAAAAAAGLRAgAAAAAAY9ECAAAAAAAAAAAAY9ECAAAAAABk0QIAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAX9ECAAAAAABf0QIAAAAAAAAAAAAAAPC/"
+				],
+				[
+					84,
+					1,
+					"insert",
+					{
+						"characters": "ursiv"
+					},
+					"BQAAAGTRAgAAAAAAZdECAAAAAAAAAAAAZdECAAAAAABm0QIAAAAAAAAAAABm0QIAAAAAAGfRAgAAAAAAAAAAAGfRAgAAAAAAaNECAAAAAAAAAAAAaNECAAAAAABp0QIAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAZNECAAAAAABk0QIAAAAAAAAAAAAAAPC/"
+				],
+				[
+					85,
+					1,
+					"insert",
+					{
+						"characters": "e"
+					},
+					"AQAAAGnRAgAAAAAAatECAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAadECAAAAAABp0QIAAAAAAAAAAAAAAPC/"
+				],
+				[
+					86,
+					9,
+					"right_delete",
+					null,
+					"CQAAAGrRAgAAAAAAatECAAAAAAABAAAAIGrRAgAAAAAAatECAAAAAAABAAAAIGrRAgAAAAAAatECAAAAAAABAAAAIGrRAgAAAAAAatECAAAAAAABAAAAIGrRAgAAAAAAatECAAAAAAABAAAAIGrRAgAAAAAAatECAAAAAAABAAAAIGrRAgAAAAAAatECAAAAAAABAAAAIGrRAgAAAAAAatECAAAAAAABAAAAIGrRAgAAAAAAatECAAAAAAABAAAAIA",
+					"AQAAAAAAAAABAAAAatECAAAAAABq0QIAAAAAAAAAAAAAAPC/"
+				],
+				[
+					87,
+					4,
+					"right_delete",
+					null,
+					"BAAAAGrRAgAAAAAAatECAAAAAAABAAAAIGrRAgAAAAAAatECAAAAAAABAAAAIGrRAgAAAAAAatECAAAAAAABAAAAIGrRAgAAAAAAatECAAAAAAABAAAAIA",
+					"AQAAAAAAAAABAAAAatECAAAAAABq0QIAAAAAAAAAAAAAAPC/"
+				],
+				[
+					106,
+					1,
+					"paste",
+					null,
+					"AQAAAFvAAgAAAAAASd8CAAAAAAA7DwAAZ3JlcDogewoJCQloYW5kbGVyOiBhc3luYyAoYXJncywgb3B0aW9ucykgPT4gewoJCQkJY29uc3QgZmxhZ0RlZmluaXRpb25zID0gWwoJCQkJCXsgbmFtZTogImlnbm9yZUNhc2UiLCBzaG9ydDogIi1pIiwgbG9uZzogIi0taWdub3JlLWNhc2UiIH0sCgkJCQkJeyBuYW1lOiAiaW52ZXJ0TWF0Y2giLCBzaG9ydDogIi12IiwgbG9uZzogIi0taW52ZXJ0LW1hdGNoIiB9LAoJCQkJCXsgbmFtZTogImxpbmVOdW1iZXIiLCBzaG9ydDogIi1uIiwgbG9uZzogIi0tbGluZS1udW1iZXIiIH0sCgkJCQkJeyBuYW1lOiAiY291bnQiLCBzaG9ydDogIi1jIiwgbG9uZzogIi0tY291bnQiIH0sCgkJCQkJeyBuYW1lOiAicmVjdXJzaXZlIiwgc2hvcnQ6ICItUiIsIGxvbmc6ICItLXJlY3Vyc2l2ZSIgfQoKCQkJCV07CgkJCQljb25zdCB7IGZsYWdzLCByZW1haW5pbmdBcmdzIH0gPSBVdGlscy5wYXJzZUZsYWdzKAoJCQkJCWFyZ3MsCgkJCQkJZmxhZ0RlZmluaXRpb25zLAoJCQkJKTsKCgkJCQlpZiAocmVtYWluaW5nQXJncy5sZW5ndGggPT09IDAgJiYgb3B0aW9ucy5zdGRpbkNvbnRlbnQgPT09IG51bGwpIHsKCQkJCQlyZXR1cm4gewoJCQkJCQlzdWNjZXNzOiBmYWxzZSwKCQkJCQkJZXJyb3I6ICJncmVwOiBtaXNzaW5nIHBhdHRlcm4gYW5kIGZpbGUgYXJndW1lbnRzLCBhbmQgbm8gc3RkaW4uIiwKCQkJCQl9OwoJCQkJfQoJCQkJaWYgKHJlbWFpbmluZ0FyZ3MubGVuZ3RoID09PSAwICYmIG9wdGlvbnMuc3RkaW5Db250ZW50ICE9PSBudWxsKSB7CgkJCQkJcmV0dXJuIHsgc3VjY2VzczogZmFsc2UsIGVycm9yOiAiZ3JlcDogbWlzc2luZyBwYXR0ZXJuIGZvciBzdGRpbi4iIH07CgkJCQl9CgoJCQkJY29uc3QgcGF0dGVyblN0ciA9IHJlbWFpbmluZ0FyZ3NbMF07CgkJCQljb25zdCBmaWxlUGF0aHMgPSByZW1haW5pbmdBcmdzLnNsaWNlKDEpOwoJCQkJY29uc3QgY3VycmVudFVzZXIgPSBVc2VyTWFuYWdlci5nZXRDdXJyZW50VXNlcigpLm5hbWU7CgkJCQlsZXQgb3V0cHV0TGluZXMgPSBbXTsKCQkJCWxldCB0b3RhbE1hdGNoZXNBY3Jvc3NBbGxGaWxlcyA9IDA7IC8vIEZvciAtYyB3aXRob3V0IGZpbGVzCgoJCQkJbGV0IHJlZ2V4OwoJCQkJdHJ5IHsKCQkJCQlyZWdleCA9IG5ldyBSZWdFeHAocGF0dGVyblN0ciwgZmxhZ3MuaWdub3JlQ2FzZSA/ICJpIiA6ICIiKTsKCQkJCX0gY2F0Y2ggKGUpIHsKCQkJCQlyZXR1cm4gewoJCQkJCQlzdWNjZXNzOiBmYWxzZSwKCQkJCQkJZXJyb3I6IGBncmVwOiBpbnZhbGlkIHJlZ3VsYXIgZXhwcmVzc2lvbiAnJHtwYXR0ZXJuU3RyfSc6ICR7ZS5tZXNzYWdlfWAsCgkJCQkJfTsKCQkJCX0KCgkJCQljb25zdCBwcm9jZXNzQ29udGVudCA9IChjb250ZW50LCBmaWxlUGF0aEZvckRpc3BsYXkgPSBudWxsKSA9PiB7CgkJCQkJY29uc3QgbGluZXMgPSBjb250ZW50LnNwbGl0KCJcbiIpOwoJCQkJCWxldCBmaWxlTWF0Y2hDb3VudCA9IDA7CgkJCQkJbGV0IGN1cnJlbnRGaWxlTGluZXMgPSBbXTsKCgkJCQkJbGluZXMuZm9yRWFjaCgobGluZSwgaW5kZXgpID0+IHsKCQkJCQkJY29uc3QgaXNNYXRjaCA9IHJlZ2V4LnRlc3QobGluZSk7CgkJCQkJCWNvbnN0IGVmZmVjdGl2ZU1hdGNoID0gZmxhZ3MuaW52ZXJ0TWF0Y2ggPyAhaXNNYXRjaCA6IGlzTWF0Y2g7CgoJCQkJCQlpZiAoZWZmZWN0aXZlTWF0Y2gpIHsKCQkJCQkJCWZpbGVNYXRjaENvdW50Kys7CgkJCQkJCQlpZiAoIWZsYWdzLmNvdW50KSB7CgkJCQkJCQkJbGV0IG91dHB1dExpbmUgPSAiIjsKCQkJCQkJCQlpZiAoCgkJCQkJCQkJCWZpbGVQYXRocy5sZW5ndGggPiAxICYmCgkJCQkJCQkJCWZpbGVQYXRoRm9yRGlzcGxheSAmJgoJCQkJCQkJCQkhZmxhZ3MuY291bnQKCQkJCQkJCQkpIHsKCQkJCQkJCQkJLy8gUHJlZml4IHdpdGggZmlsZW5hbWUgaWYgbXVsdGlwbGUgZmlsZXMKCQkJCQkJCQkJb3V0cHV0TGluZSArPSBgJHtmaWxlUGF0aEZvckRpc3BsYXl9OmA7CgkJCQkJCQkJfQoJCQkJCQkJCWlmIChmbGFncy5saW5lTnVtYmVyKSB7CgkJCQkJCQkJCW91dHB1dExpbmUgKz0gYCR7aW5kZXggKyAxfTpgOwoJCQkJCQkJCX0KCQkJCQkJCQlvdXRwdXRMaW5lICs9IGxpbmU7CgkJCQkJCQkJY3VycmVudEZpbGVMaW5lcy5wdXNoKG91dHB1dExpbmUpOwoJCQkJCQkJfQoJCQkJCQl9CgkJCQkJfSk7CgoJCQkJCWlmIChmbGFncy5jb3VudCkgewoJCQkJCQlsZXQgY291bnRPdXRwdXQgPSAiIjsKCQkJCQkJaWYgKGZpbGVQYXRocy5sZW5ndGggPiAxICYmIGZpbGVQYXRoRm9yRGlzcGxheSkgewoJCQkJCQkJY291bnRPdXRwdXQgKz0gYCR7ZmlsZVBhdGhGb3JEaXNwbGF5fTpgOwoJCQkJCQl9CgkJCQkJCWNvdW50T3V0cHV0ICs9IGZpbGVNYXRjaENvdW50OwoJCQkJCQlvdXRwdXRMaW5lcy5wdXNoKGNvdW50T3V0cHV0KTsKCQkJCQl9IGVsc2UgewoJCQkJCQlvdXRwdXRMaW5lcy5wdXNoKC4uLmN1cnJlbnRGaWxlTGluZXMpOwoJCQkJCX0KCQkJCQl0b3RhbE1hdGNoZXNBY3Jvc3NBbGxGaWxlcyArPSBmaWxlTWF0Y2hDb3VudDsKCQkJCX07CgoJCQkJaWYgKGZpbGVQYXRocy5sZW5ndGggPiAwKSB7CgkJCQkJZm9yIChjb25zdCBwYXRoQXJnIG9mIGZpbGVQYXRocykgewoJCQkJCQljb25zdCBwYXRoVmFsaWRhdGlvbiA9IEZpbGVTeXN0ZW1NYW5hZ2VyLnZhbGlkYXRlUGF0aCgKCQkJCQkJCSJncmVwIiwKCQkJCQkJCXBhdGhBcmcsCgkJCQkJCQl7IGV4cGVjdGVkVHlwZTogQ29uZmlnLkZJTEVTWVNURU0uREVGQVVMVF9GSUxFX1RZUEUgfSwKCQkJCQkJKTsKCQkJCQkJaWYgKHBhdGhWYWxpZGF0aW9uLmVycm9yKSB7CgkJCQkJCQlPdXRwdXRNYW5hZ2VyLmFwcGVuZFRvT3V0cHV0KHBhdGhWYWxpZGF0aW9uLmVycm9yLCB7CgkJCQkJCQkJdHlwZUNsYXNzOiBDb25maWcuQ1NTX0NMQVNTRVMuRVJST1JfTVNHLAoJCQkJCQkJfSk7IC8vIFJlcG9ydCBlcnJvciBidXQgY29udGludWUgaWYgcG9zc2libGUKCQkJCQkJCWNvbnRpbnVlOwoJCQkJCQl9CgkJCQkJCWlmICgKCQkJCQkJCSFGaWxlU3lzdGVtTWFuYWdlci5oYXNQZXJtaXNzaW9uKAoJCQkJCQkJCXBhdGhWYWxpZGF0aW9uLm5vZGUsCgkJCQkJCQkJY3VycmVudFVzZXIsCgkJCQkJCQkJInJlYWQiLAoJCQkJCQkJKQoJCQkJCQkpIHsKCQkJCQkJCU91dHB1dE1hbmFnZXIuYXBwZW5kVG9PdXRwdXQoCgkJCQkJCQkJYGdyZXA6ICR7cGF0aEFyZ30ke0NvbmZpZy5NRVNTQUdFUy5QRVJNSVNTSU9OX0RFTklFRF9TVUZGSVh9YCwKCQkJCQkJCQl7IHR5cGVDbGFzczogQ29uZmlnLkNTU19DTEFTU0VTLkVSUk9SX01TRyB9LAoJCQkJCQkJKTsKCQkJCQkJCWNvbnRpbnVlOwoJCQkJCQl9CgkJCQkJCXByb2Nlc3NDb250ZW50KHBhdGhWYWxpZGF0aW9uLm5vZGUuY29udGVudCB8fCAiIiwgcGF0aEFyZyk7CgkJCQkJfQoJCQkJfSBlbHNlIGlmIChvcHRpb25zLnN0ZGluQ29udGVudCAhPT0gbnVsbCkgewoJCQkJCXByb2Nlc3NDb250ZW50KG9wdGlvbnMuc3RkaW5Db250ZW50KTsKCQkJCQlpZiAoZmxhZ3MuY291bnQgJiYgZmlsZVBhdGhzLmxlbmd0aCA9PT0gMCkgewoJCQkJCQkvLyBJZiAtYyBhbmQgb25seSBzdGRpbiwgb3V0cHV0IHdhcyBhbHJlYWR5IGhhbmRsZWQgYnkgcHJvY2Vzc0NvbnRlbnQgcHVzaGluZyB0byBvdXRwdXRMaW5lcwoJCQkJCQkvLyBObyBzcGVjaWFsIGFjdGlvbiBuZWVkZWQgaGVyZSwgb3V0cHV0TGluZXMgd2lsbCBjb250YWluIHRoZSBzaW5nbGUgY291bnQuCgkJCQkJfQoJCQkJfSBlbHNlIHsKCQkJCQlyZXR1cm4gewoJCQkJCQlzdWNjZXNzOiBmYWxzZSwKCQkJCQkJZXJyb3I6ICJncmVwOiBObyBpbnB1dCBmaWxlcyBvciBzdGRpbiBwcm92aWRlZCBhZnRlciBwYXR0ZXJuLiIsCgkJCQkJfTsKCQkJCX0KCgkJCQlyZXR1cm4geyBzdWNjZXNzOiB0cnVlLCBvdXRwdXQ6IG91dHB1dExpbmVzLmpvaW4oIlxuIikgfTsKCQkJfSw",
+					"AQAAAAAAAAABAAAAls8CAAAAAABbwAIAAAAAAAAAAAAAAPC/"
+				],
+				[
+					109,
+					1,
+					"insert",
+					{
+						"characters": "="
+					},
+					"AQAAAN3dAgAAAAAA3t0CAAAAAAAWAQAAICAgICAgIAogICAgICAgIC8vIElmIC1jIChjb3VudCkgaXMgdXNlZCB3aXRoIC1SIChyZWN1cnNpdmUpLCBvdXRwdXRMaW5lcyB3aWxsIGNvbnRhaW4gY291bnRzIHBlciBmaWxlLgogICAgICAgIC8vIElmIG5vdCAtYywgb3V0cHV0TGluZXMgY29udGFpbnMgbWF0Y2hpbmcgbGluZXMgKHBvc3NpYmx5IHByZWZpeGVkIHdpdGggZmlsZW5hbWVzKS4KICAgICAgICAvLyBvdmVyYWxsU3VjY2VzcyByZWZsZWN0cyBpZiBhbnkgZGlyZWN0b3J5L2ZpbGUgYWNjZXNzIGVycm9ycyBvY2N1cnJlZC4",
+					"AQAAAAAAAAABAAAA894CAAAAAADd3QIAAAAAAAAAAAAAAPC/"
+				],
+				[
+					110,
+					3,
+					"left_delete",
+					null,
+					"AwAAAN3dAgAAAAAA3d0CAAAAAAABAAAAPdzdAgAAAAAA3N0CAAAAAAABAAAAINvdAgAAAAAA290CAAAAAAABAAAACg",
+					"AQAAAAAAAAABAAAA3t0CAAAAAADe3QIAAAAAAAAAAAAAAPC/"
+				],
+				[
+					111,
+					1,
+					"insert",
+					{
+						"characters": "\n"
+					},
+					"AQAAANvdAgAAAAAA5N0CAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAA290CAAAAAADb3QIAAAAAAAAAAAAAAPC/"
+				],
+				[
+					116,
+					1,
+					"insert",
+					{
+						"characters": " "
+					},
+					"AgAAAP/fAgAAAAAAAOACAAAAAAAAAAAA3N0CAAAAAADc3QIAAAAAAAgAAAAgICAgICAgIA",
+					"AQAAAAAAAAABAAAA/98CAAAAAAD/3wIAAAAAAAAAAAAAAPC/"
+				],
+				[
+					125,
+					1,
+					"",
+					null,
+					"AwAAAGO9AAAAAAAAaL0AAAAAAAADAAAAMS41agEAAAAAAABvAQAAAAAAAAMAAAAxLjURAAAAAAAAABYAAAAAAAAAAwAAADEuNQ",
+					"AQAAAAAAAAABAAAA/dQCAAAAAAD91AIAAAAAAAAAAAAAAPC/"
+				],
+				[
+					143,
+					1,
+					"paste",
+					null,
+					"AQAAAPJlAwAAAAAANGYDAAAAAABBAAAAd2hpbGUgKGkgPCBleHByZXNzaW9uQXJncy5sZW5ndGggJiYgZXhwcmVzc2lvbkFyZ3NbaV0gIT09ICJcOyIpIHs",
+					"AQAAAAAAAAABAAAAM2YDAAAAAADyZQMAAAAAAAAAAAAAAPC/"
+				],
+				[
+					146,
+					1,
+					"insert",
+					{
+						"characters": "\\"
+					},
+					"AQAAAL5mAwAAAAAAv2YDAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAvmYDAAAAAAC+ZgMAAAAAAAAAAAAAAPC/"
+				],
+				[
+					149,
+					2,
+					"left_delete",
+					null,
+					"AgAAAOxnAwAAAAAA7GcDAAAAAAA2AAAACQkJCQkJCS8vIGkgaXMgbm93IGF0ICc7JywgbG9vcCB3aWxsIGluY3JlbWVudCBwYXN0IGl062cDAAAAAADrZwMAAAAAAAEAAAAK",
+					"AQAAAAAAAAABAAAAImgDAAAAAADsZwMAAAAAAAAAAAAAAPC/"
+				]
+			]
+		},
+		{
+			"file": "OopisOSv1_5_1.html",
+			"settings":
+			{
+				"buffer_size": 5536,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			},
+			"undo_stack":
+			[
+				[
+					1,
+					1,
+					"",
+					null,
+					"AgAAANcLAAAAAAAA2gsAAAAAAAAFAAAAMS40LjKoAAAAAAAAAKsAAAAAAAAABQAAADEuNC4y",
+					"AQAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					4,
+					4,
+					"left_delete",
+					null,
+					"BAAAAHwVAAAAAAAAfBUAAAAAAAABAAAAYnsVAAAAAAAAexUAAAAAAAABAAAAMnoVAAAAAAAAehUAAAAAAAABAAAAX3kVAAAAAAAAeRUAAAAAAAABAAAANA",
+					"AQAAAAAAAAABAAAAfRUAAAAAAAB9FQAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					5,
+					1,
+					"insert",
+					{
+						"characters": "5"
+					},
+					"AQAAAHkVAAAAAAAAehUAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAeRUAAAAAAAB5FQAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					17,
+					1,
+					"insert",
+					{
+						"characters": "_1"
+					},
+					"AgAAAHoVAAAAAAAAexUAAAAAAAAAAAAAexUAAAAAAAB8FQAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAehUAAAAAAAB6FQAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					21,
+					1,
+					"",
+					null,
+					"AgAAANULAAAAAAAA2gsAAAAAAAADAAAAMS41qAAAAAAAAACtAAAAAAAAAAMAAAAxLjU",
+					"AQAAAAAAAAABAAAAqwAAAAAAAACoAAAAAAAAAAAAAAAAAPC/"
+				]
+			]
+		},
+		{
+			"contents": "#!/oopis\n# OopisOS Test Drive Population Script - Deluxe Edition! (v4.1 - Ultra-Meticulous Quoting)\n# Ensuring correct file content rendering with OopisOS lexer/parser.\n\necho \"Initializing Deluxe Test Drive population sequence (v4.1 - ultra-meticulous quoting)...\"\necho \"Fasten your seatbelts, this execution demands precision!\"\n\n# Root level files\necho \"# OopisOS Test Drive - README\" > /README.md\necho \"\" >> /README.md\necho \"Welcome, brave tester, to the meticulously crafted digital landscape of the OopisOS Test Drive!\" >> /README.md\necho \"\" >> /README.md\necho \"## Purpose\" >> /README.md\necho \"This environment has been lovingly populated with a veritable smorgasbord of files and directories. Why? So you can unleash the full power of OopisOS commands like \\`find\\`, \\`grep\\`, \\`cp\\`, \\`mv\\`, and \\`rm\\` without the nagging fear of accidentally deleting your *actual* imaginary work.\" >> /README.md\necho \"\" >> /README.md\necho \"## A Word of Caution\" >> /README.md\necho \"While the data herein is purely for testing, developing a strange emotional attachment to 'dog_story.txt' or the \\`/src/main_script.js\\` is a known, albeit rare, side effect. Proceed with joyful abandon!\" >> /README.md\necho \"\" >> /README.md\necho \"## What is Inside?\" >> /README.md\necho \"- **/docs**: For all your textual and markdown perusal needs.\" >> /README.md\necho \"- **/src**: A peek into the (simulated) bustling world of OopisOS development.\" >> /README.md\necho \"- **/data**: A treasure trove for \\`grep\\` enthusiasts and data sifters.\" >> /README.md\necho \"- **/personal**: Hypothetical user files, because even virtual users have virtual lives.\" >> /README.md\necho \"- Hidden stuff! Because what is an OS without a few secrets?\" >> /README.md\necho \"\" >> /README.md\necho \"Enjoy your testing! May your commands be swift and your bugs be few.\" >> /README.md\necho \"\" >> /README.md\necho \"-- TestBot Prime\" >> /README.md\n\necho \"# System Configuration - OopisOS Test Drive\" > /system_config.txt\necho \"# Do NOT edit unless you enjoy unpredictable digital fireworks.\" >> /system_config.txt\necho \"\" >> /system_config.txt\necho 'VERSION=\"1.0_deluxe_content_edition\"' >> /system_config.txt\necho 'AUTHOR=\"TestBot Prime (Upgraded)\"' >> /system_config.txt\necho 'PURPOSE=\"Advanced General System Testing & Light Entertainment\"' >> /system_config.txt\necho \"\" >> /system_config.txt\necho \"# Core Settings\" >> /system_config.txt\necho \"MAX_USERS=1024 # Though we only have a couple for now.\" >> /system_config.txt\necho 'DEFAULT_PROMPT_COLOR=\"sky_blue_with_a_hint_of_lime\"' >> /system_config.txt\necho 'KERNEL_PANIC_MESSAGE=\"Oops! The digital hamsters fell off their wheels. Try turning it off and on again?\"' >> /system_config.txt\necho \"FILESYSTEM_INTEGRITY_CHECK_ON_BOOT=true\" >> /system_config.txt\necho 'COFFEE_LEVEL_REQUIRED=\"critically_high\"' >> /system_config.txt\necho \"MAX_PROCRASTINATION_THREADS=512 # We are optimistic.\" >> /system_config.txt\necho \"\" >> /system_config.txt\necho \"# Feature Flags (Mostly Wishful Thinking)\" >> /system_config.txt\necho \"ENABLE_TELEPATHIC_INPUT=false # Soon...\" >> /system_config.txt\necho \"ENABLE_AI_CODE_COMPLETION_THAT_ACTUALLY_READS_YOUR_MIND=false # One day...\" >> /system_config.txt\necho \"ENABLE_SELF_DEBUGGING_CODE=false # The dream!\" >> /system_config.txt\necho \"ENABLE_UNICORN_CURSOR_THEME=true # Non-negotiable.\" >> /system_config.txt\necho \"\" >> /system_config.txt\necho \"# Sound Scheme\" >> /system_config.txt\necho 'SOUND_ON_ERROR=\"sad_trombone.wav\"' >> /system_config.txt\necho 'SOUND_ON_SUCCESS=\"tada.wav\"' >> /system_config.txt\necho 'SOUND_ON_LOGIN=\"angelic_choir_short_clip.ogg\"' >> /system_config.txt\n\ntouch /empty_file.dat\necho \"This file has no specific extension, making it a rebel in the file system. It contains profound thoughts about the nature of file types, or perhaps just this sentence. The ambiguity is the point, is it not? It challenges your assumptions. It asks, 'What am I? Who defines me?' Deep stuff for a simple collection of bytes.\" > /justafile\necho \"This is another file, placed here for the sole purpose of adding a bit more clutter. It serves as a testament to the fact that not every file needs a grand destiny. Some files are just... files. And that is okay. It could also be a cleverly disguised clue for an ARG. Or not. Who knows?\" > /another_file\n\n# /docs directory\nmkdir /docs\necho \"# OopisOS Documentation - Index\" > /docs/index.md\necho \"\" >> /docs/index.md\necho \"Welcome to the grand library of OopisOS knowledge! Whether you are a seasoned virtual OS navigator or a curious newcomer, these documents are your guide.\" >> /docs/index.md\necho \"\" >> /docs/index.md\necho \"## Table of Contents\" >> /docs/index.md\necho \"- **Chapter 1: Getting Started** - Your first steps into a larger (simulated) world.\" >> /docs/index.md\necho \"- **Chapter 2: Advanced Commands** - Unleash your inner power user.\" >> /docs/index.md\necho \"- **Search Tips** - How to find what you are looking for without losing your mind.\" >> /docs/index.md\necho \"- **Manuals Folder** - For when you *really* want to get into the details.\" >> /docs/index.md\necho \"- **Drafts Folder** - The exciting, bleeding edge of documentation!\" >> /docs/index.md\necho \"\" >> /docs/index.md\necho \"Remember, knowledge is power, especially when that knowledge is about how to use \\`find -exec\\`.\" >> /docs/index.md\n\necho \"# Chapter 1: Getting Started with OopisOS\" > /docs/chapter1.txt\necho \"\" >> /docs/chapter1.txt\necho \"So, you have found yourself within OopisOS. Congratulations! Or perhaps condolences, depending on how you got here. This guide will walk you through the absolute basics.\" >> /docs/chapter1.txt\necho \"\" >> /docs/chapter1.txt\necho \"First, take a deep breath. It is just a simulation (mostly). The \\`ls\\` command is your friend. It shows you things. Try typing \\`ls\\` and pressing Enter. See? Things! Now try \\`pwd\\`. That tells you *where* you are seeing things. Mind-blowing, we know.\" >> /docs/chapter1.txt\necho \"\" >> /docs/chapter1.txt\necho \"Most commands follow a simple structure: \\`command_name [options] [arguments]\\`. For example, \\`echo 'Hello, OopisOS!'\\` will, surprisingly, echo 'Hello, OopisOS!'.\" >> /docs/chapter1.txt\necho \"\" >> /docs/chapter1.txt\necho \"Do not be afraid to explore. The worst that can happen is a polite error message... usually. Have fun, and remember to consult \\`chapter2.txt\\` when you are ready to feel like a wizard.\" >> /docs/chapter1.txt\n\necho \"# Chapter 2: Advanced Commands - The Path to Power\" > /docs/chapter2.txt\necho \"\" >> /docs/chapter2.txt\necho \"Ready to leave the nest of basic commands? This chapter delves into the arcane arts of pipes (\\`|\\`), redirection (\\`>\\` and \\`>>\\`), and the mighty \\`find\\` command. These are the tools that separate the novices from the... well, slightly more experienced novices.\" >> /docs/chapter2.txt\necho \"\" >> /docs/chapter2.txt\necho \"## Pipes: Connecting the Unconnected\" >> /docs/chapter2.txt\necho \"Imagine sending the output of one command directly as input to another. That is a pipe! Example: \\`ls -a / | grep 'conf'\\` will list all files in root and then filter that list to show only lines containing 'conf'. Magical!\" >> /docs/chapter2.txt\necho \"\" >> /docs/chapter2.txt\necho \"## Redirection: Controlling the Flow\" >> /docs/chapter2.txt\necho \"Want to save command output to a file? \\`>\\` is your friend (it overwrites). Want to add to an existing file? \\`>>\\` is your pal (it appends).\" >> /docs/chapter2.txt\necho \"Example: \\`echo 'My important thoughts' > /personal/my_musings.txt\\`\" >> /docs/chapter2.txt\necho \"\" >> /docs/chapter2.txt\necho \"## The \\`find\\` Command: Your All-Seeing Eye\" >> /docs/chapter2.txt\necho \"This command is a universe unto itself. It can find files by name, type, owner, modification time, and perform actions on them. It is complex but incredibly powerful. We recommend starting with \\`find / -name '*.txt' -print\\` and then slowly adding more conditions. You will be a \\`find\\` guru in no time (measured in OopisOS developmental eons, of course).\" >> /docs/chapter2.txt\n\necho \"# Search Tips for OopisOS Users\" > /docs/search_tips.txt\necho \"\" >> /docs/search_tips.txt\necho \"Lost in the digital stacks? Can not find that crucial \\`config.txt\\` or the legendary \\`dog_story.txt\\`?\" >> /docs/search_tips.txt\necho \"Fear not! OopisOS provides powerful tools to locate your virtual valuables.\" >> /docs/search_tips.txt\necho \"\" >> /docs/search_tips.txt\necho \"1.  **\\`find / -name 'your_filename_pattern'\\`**: The classic. Use wildcards like \\`*\\` and \\`?\\`. For example, \\`find /docs -name '*.md'\\` finds all Markdown files in the docs directory.\" >> /docs/search_tips.txt\necho \"2.  **\\`grep 'your_search_term' /path/to/file_or_directory/*\\`**: When you know *some* of the content but not the filename. \\`grep -i 'secret' /docs/*\\` will search for 'secret' (case-insensitive) in all files directly under \\`/docs\\`.\" >> /docs/search_tips.txt\necho \"3.  **\\`ls -R | grep 'filename_fragment'\\`**: A bit more brute-force, but sometimes effective. This lists everything recursively and then filters that massive list. Good for when you have a vague idea.\" >> /docs/search_tips.txt\necho \"\" >> /docs/search_tips.txt\necho \"Remember: A well-placed \\`grep\\` can save you hours of manual searching. And a misplaced \\`rm -rf\\` can ruin your day. Search responsibly!\" >> /docs/search_tips.txt\n\nmkdir /docs/manuals\necho \"# OopisOS User Manual - Version 1.5 (Deluxe Edition)\" > /docs/manuals/user_guide.txt\necho \"\" >> /docs/manuals/user_guide.txt\necho \"**Introduction**\" >> /docs/manuals/user_guide.txt\necho \"This manual provides a comprehensive overview of OopisOS functionality for the end-user. It assumes no prior knowledge of simulated operating environments, though a healthy sense of adventure is recommended.\" >> /docs/manuals/user_guide.txt\necho \"\" >> /docs/manuals/user_guide.txt\necho \"**Basic Navigation**\" >> /docs/manuals/user_guide.txt\necho \"- \\`cd <directory>\\`: Change directory. Navigates you through the digital ether.\" >> /docs/manuals/user_guide.txt\necho \"- \\`ls\\`: List files. See what is around you.\" >> /docs/manuals/user_guide.txt\necho \"- \\`pwd\\`: Print Working Directory. Answers the eternal question, 'Where am I?'\" >> /docs/manuals/user_guide.txt\necho \"\" >> /docs/manuals/user_guide.txt\necho \"**File Operations**\" >> /docs/manuals/user_guide.txt\necho \"- \\`cat <file>\\`: Displays file content. For when you absolutely, positively need to see every byte.\" >> /docs/manuals/user_guide.txt\necho \"- \\`edit <file>\\`: Opens the built-in editor. Unleash your inner wordsmith or coder.\" >> /docs/manuals/user_guide.txt\necho \"- \\`cp <source> <destination>\\`: Copies files. Because sometimes one digital copy is not enough.\" >> /docs/manuals/user_guide.txt\necho \"- \\`mv <source> <destination>\\`: Moves or renames files. For when things need to be somewhere else, or called something else.\" >> /docs/manuals/user_guide.txt\necho \"- \\`rm <file>\\`: Removes files. Use with caution; the digital void is unforgiving.\" >> /docs/manuals/user_guide.txt\necho \"\" >> /docs/manuals/user_guide.txt\necho \"**Troubleshooting**\" >> /docs/manuals/user_guide.txt\necho \"- If a command fails, read the error message. It is often trying to tell you something useful, usually that you typed it wrong.\" >> /docs/manuals/user_guide.txt\necho \"- If OopisOS seems slow, perhaps the simulated hamsters powering it are tired. Give them a virtual break.\" >> /docs/manuals/user_guide.txt\necho \"- For existential crises related to using a browser-based OS, consult \\`chapter1.txt\\` again.\" >> /docs/manuals/user_guide.txt\n\necho \"# OopisOS Developer Guide - Secrets of the Source\" > /docs/manuals/dev_guide.md\necho \"\" >> /docs/manuals/dev_guide.md\necho \"**Foreword by TestBot Prime**\" >> /docs/manuals/dev_guide.md\necho \"So, you want to peek behind the curtain? This guide is for those brave souls who wish to understand the inner machinations of OopisOS, or perhaps even contribute (thems a brave soul indeed!).\" >> /docs/manuals/dev_guide.md\necho \"\" >> /docs/manuals/dev_guide.md\necho \"**Core Modules Overview**\" >> /docs/manuals/dev_guide.md\necho \"- \\`FileSystemManager\\`: The heart of our storage. It is surprisingly robust for something made of pure JavaScript and hope.\" >> /docs/manuals/dev_guide.md\necho \"- \\`CommandExecutor\\`: Parses your wishes (commands) and tries to make them reality. Features a surprisingly competent lexer and parser.\" >> /docs/manuals/dev_guide.md\necho \"- \\`EditorManager\\`: The magic behind \\`edit\\`. Handles text, previews, and existential dread about unsaved changes.\" >> /docs/manuals/dev_guide.md\necho \"- \\`UserManager\\`: Keeps track of who is who. Currently passwordless, because we trust you. (Do not make us regret this.)\" >> /docs/manuals/dev_guide.md\necho \"\" >> /docs/manuals/dev_guide.md\necho \"**Contributing**\" >> /docs/manuals/dev_guide.md\necho \"1.  Have an idea.\" >> /docs/manuals/dev_guide.md\necho \"2.  Realize the idea is probably more complex than you think.\" >> /docs/manuals/dev_guide.md\necho \"3.  Attempt to implement it anyway.\" >> /docs/manuals/dev_guide.md\necho \"4.  Spend hours debugging a single misplaced semicolon.\" >> /docs/manuals/dev_guide.md\necho \"5.  Finally succeed, or decide it is a feature for 'v-Next'.\" >> /docs/manuals/dev_guide.md\necho \"6.  Document your changes (this is the part everyone forgets).\" >> /docs/manuals/dev_guide.md\necho \"\" >> /docs/manuals/dev_guide.md\necho \"**Known Quirks**\" >> /docs/manuals/dev_guide.md\necho \"- Sometimes, if you stare into the terminal long enough, it stares back.\" >> /docs/manuals/dev_guide.md\necho \"- The \\`delay\\` command might actually be a portal to a slightly slower dimension.\" >> /docs/manuals/dev_guide.md\necho \"- The definition of 'soon' for feature releases is... flexible.\" >> /docs/manuals/dev_guide.md\ntouch /docs/manuals/empty_manual.txt\n\nmkdir /docs/drafts\necho \"# Draft: Upcoming Features - Version 1.6 Speculation\" > /docs/drafts/report_draft_v1.txt\necho \"\" >> /docs/drafts/report_draft_v1.txt\necho \"**Title:** OopisOS v1.6 - 'The Even More Oopisy Update'\" >> /docs/drafts/report_draft_v1.txt\necho \"\" >> /docs/drafts/report_draft_v1.txt\necho \"**Proposed Features (Highly Subject to Change/Despair):**\" >> /docs/drafts/report_draft_v1.txt\necho \"- Graphical User Interface (GUI): Yes, we said it. Tiny, pixelated windows, here we come! Maybe.\" >> /docs/drafts/report_draft_v1.txt\necho \"- Networking: \\`ping\\` another browser tab? \\`telnet\\` to localhost:nothing? The possibilities are mildly intriguing!\" >> /docs/drafts/report_draft_v1.txt\necho \"- Sound Support: Beyond the error and success beeps. Imagine, actual music! Or at least, more varied beeps.\" >> /docs/drafts/report_draft_v1.txt\necho \"- Advanced Gaming API: So that text adventure game can finally have... slightly more advanced text?\" >> /docs/drafts/report_draft_v1.txt\necho \"\" >> /docs/drafts/report_draft_v1.txt\necho \"**Concerns:**\" >> /docs/drafts/report_draft_v1.txt\necho \"- Will the browser explode?\" >> /docs/drafts/report_draft_v1.txt\necho \"- Do we have enough coffee for this?\" >> /docs/drafts/report_draft_v1.txt\necho \"- Will users demand a mouse pointer shaped like a tiny Oopis?\" >> /docs/drafts/report_draft_v1.txt\necho \"\" >> /docs/drafts/report_draft_v1.txt\necho \"_This document is a DRAFT. All contents are purely speculative and may be replaced by something entirely different, or nothing at all, depending on caffeine levels and prevailing winds._\" >> /docs/drafts/report_draft_v1.txt\n\necho \"# Draft: Marketing Slogans for OopisOS\" > /docs/drafts/report_draft_v2.txt\necho \"\" >> /docs/drafts/report_draft_v2.txt\necho \"- OopisOS: It is an OS! (Mostly)\" >> /docs/drafts/report_draft_v2.txt\necho \"- OopisOS: Why? Because we can (sort of).\" >> /docs/drafts/report_draft_v2.txt\necho \"- OopisOS: Experience the thrill of a command line, again!\" >> /docs/drafts/report_draft_v2.txt\necho \"- OopisOS: Your browser has never felt so... operational.\" >> /docs/drafts/report_draft_v2.txt\necho \"- OopisOS: Less filling, tastes great! (Disclaimer: Do not attempt to taste OopisOS).\" >> /docs/drafts/report_draft_v2.txt\necho \"- OopisOS: Now with 15% more Oopis!\" >> /docs/drafts/report_draft_v2.txt\necho \"- OopisOS: It is not a bug, it is an undocumented feature of the simulation.\" >> /docs/drafts/report_draft_v2.txt\necho \"\" >> /docs/drafts/report_draft_v2.txt\necho \"_Feedback needed. Are these too self-aware? Not self-aware enough? Send thoughts to the void._\" >> /docs/drafts/report_draft_v2.txt\n\n# /src directory\nmkdir /src\necho \"// main_script.js - The heart of the beast... or a small, slightly confused hamster.\" > /src/main_script.js\necho \"\" >> /src/main_script.js\necho \"function main() {\" >> /src/main_script.js\necho \"  console.log('Hello from OopisOS script! Attempting to initialize core functions...');\" >> /src/main_script.js\necho \"  initializeUnicornMode(); // Critical step.\" >> /src/main_script.js\necho \"  loadEssentialDaemons(); // Like the 'random_thought_generator.daemon'.\" >> /src/main_script.js\necho \"  if (checkCoffeeLevel() < COFFEE_THRESHOLD_MINIMUM) {\" >> /src/main_script.js\necho \"    console.error('CRITICAL ERROR: Insufficient coffee. System stability compromised.');\" >> /src/main_script.js\necho \"    displayUrgentCoffeeRequest();\" >> /src/main_script.js\necho \"    return; // Cannot proceed.\" >> /src/main_script.js\necho \"  }\" >> /src/main_script.js\necho \"  console.log('System appears to be... operational. For now.');\" >> /src/main_script.js\necho \"  // TODO: Add feature that definitely will not break everything. (Famous last words)\" >> /src/main_script.js\necho \"  // TODO: Figure out where that rogue semicolon came from in kernel_panic.js\" >> /src/main_script.js\necho \"  // TODO: Implement self-aware AI assistant. (Estimated completion: Epoch + 2 millennia)\" >> /src/main_script.js\necho \"}\" >> /src/main_script.js\n\necho \"// utils.js - A collection of utilities that seemed like a good idea at the time.\" > /src/utils.js\necho \"\" >> /src/utils.js\necho \"class Helper {\" >> /src/utils.js\necho \"  static utility() {\" >> /src/utils.js\necho \"    // This function was meant to do something incredibly useful.\" >> /src/utils.js\necho \"    // Its original purpose is lost to the mists of time and refactoring.\" >> /src/utils.js\necho \"    // For now, it returns true. Because optimism.\" >> /src/utils.js\necho \"    return true;\" >> /src/utils.js\necho \"  }\" >> /src/utils.js\necho \"\" >> /src/utils.js\necho \"  static generateRandomQuirk() {\" >> /src/utils.js\necho \"    const quirks = [\" >> /src/utils.js\necho \"      'Suddenly speaks in rhymes.',\" >> /src/utils.js # Contains '\necho '      '\"'Replaces all nouns with (banana) word.',\" >> /src/utils.js # Rewritten to avoid internal double quotes\necho '      '\"'Insists on being called (Your Majesty).',\" >> /src/utils.js # Rewritten\necho \"      'Develops a strange obsession with rubber ducks.'\" >> /src/utils.js # Contains '\necho \"    ];\" >> /src/utils.js\necho \"    return quirks[Math.floor(Math.random() * quirks.length)];\" >> /src/utils.js\necho \"  }\" >> /src/utils.js\necho \"\" >> /src/utils.js\necho \"  // Deprecated: Do not use. Or do, I am a comment, not a cop.\" >> /src/utils.js\necho \"  static oldObsoleteFunction(param1, param2) {\" >> /src/utils.js\necho \"    // It was a simpler time.\" >> /src/utils.js\necho \"    return param1 + param2; // Groundbreaking stuff.\" >> /src/utils.js\necho \"  }\" >> /src/utils.js\necho \"}\" >> /src/utils.js\n\necho \"# data_processor.py - A completely legit Python script.\" > /src/data_processor.py\necho \"# (If OopisOS suddenly learned Python, which it has not. Yet.)\" >> /src/data_processor.py\necho \"\" >> /src/data_processor.py\necho \"def process_data(input_file, output_file):\" >> /src/data_processor.py\necho '    \"\"\"Reads data, does science, writes results. Very vaguely.\"\"\"' >> /src/data_processor.py # Content has \"\"\"\necho \"    print(f\\\"Pretending to process {input_file}...\\\")\" >> /src/data_processor.py\necho \"    # Imagine complex data transformations here\" >> /src/data_processor.py\necho \"    # Such as converting all text to a series of 'OOK!' sounds.\" >> /src/data_processor.py\necho '    data = \"Processed OOK! OOK! Data!\"' >> /src/data_processor.py # Content has \"\necho \"    with open(output_file, 'w') as f:\" >> /src/data_processor.py\necho \"        f.write(data)\" >> /src/data_processor.py\necho \"    print(f\\\"Results hypothetically written to {output_file}\\\")\" >> /src/data_processor.py\necho \"\" >> /src/data_processor.py\necho 'if __name__ == \"__main__\":' >> /src/data_processor.py # Content has \"\necho '    print(\"Data Processor Script Initialized (in theory).\")' >> /src/data_processor.py # Content has \"\necho '    # process_data(\"/data/numeric_data.dat\", \"/data/processed_results.txt\")' >> /src/data_processor.py # Content has \"\n\necho \"<!DOCTYPE html>\" > /src/index.html\necho \"<html>\" >> /src/index.html\necho \"<head>\" >> /src/index.html\necho \"    <title>OopisOS Test Page</title>\" >> /src/index.html\necho \"    <style>\" >> /src/index.html\necho \"        body { font-family: 'VT323', monospace; background-color: #111; color: #0f0; text-align: center; padding-top: 20%; }\" >> /src/index.html\necho \"        h1 { font-size: 3em; text-shadow: 0 0 5px #0f0; }\" >> /src/index.html\necho \"        p { font-size: 1.5em; }\" >> /src/index.html\necho \"    </style>\" >> /src/index.html\necho \"</head>\" >> /src/index.html\necho \"<body>\" >> /src/index.html\necho \"    <h1>Greetings from within OopisOS!</h1>\" >> /src/index.html\necho \"    <p>If you are seeing this, the HTML rendering (or at least file creation) works!</p>\" >> /src/index.html\necho \"    <p>This page is a testament to the power of \\`echo\\` and redirection.</p>\" >> /src/index.html\necho \"    \" >> /src/index.html\necho \"</body>\" >> /src/index.html\necho \"</html>\" >> /src/index.html\n\nmkdir /src/components\necho \"// componentA.js - The first, and arguably most rectangular, UI component.\" > /src/components/componentA.js\necho \"\" >> /src/components/componentA.js\necho \"function renderComponentA(targetElement) {\" >> /src/components/componentA.js\necho \"  const el = document.createElement('div');\" >> /src/components/componentA.js\necho \"  el.textContent = 'Component A: Reporting for Duty!';\" >> /src/components/componentA.js\necho \"  el.style.border = '1px solid lime';\" >> /src/components/componentA.js\necho \"  el.style.padding = '10px';\" >> /src/components/componentA.js\necho \"  el.style.margin = '5px';\" >> /src/components/componentA.js\necho \"  el.title = 'This is Component A. It does not do much, but it is here.';\" >> /src/components/componentA.js\necho \"  // targetElement.appendChild(el); // If we had a DOM to append to from here...\" >> /src/components/componentA.js\necho \"  console.log('Component A ready to be (virtually) rendered.');\" >> /src/components/componentA.js\necho \"}\" >> /src/components/componentA.js\n\necho \"// componentB.js - The rebellious, slightly more rounded UI component.\" > /src/components/componentB.js\necho \"\" >> /src/components/componentB.js\necho \"// Unlike its rigid sibling Component A, Component B believes in curves.\" >> /src/components/componentB.js\necho \"// And also, detailed comments that ramble.\" >> /src/components/componentB.js\necho \"\" >> /src/components/componentB.js\necho \"export default class ComponentB {\" >> /src/components/componentB.js\necho \"    constructor(name = 'B-atrice') {\" >> /src/components/componentB.js\necho \"        this.name = name;\" >> /src/components/componentB.js\necho \"        this.mood = 'Sassy';\" >> /src/components/componentB.js\necho \"    }\" >> /src/components/componentB.js\necho \"\" >> /src/components/componentB.js\necho \"    announce() {\" >> /src/components/componentB.js\necho \"        return \\`Component \\${this.name} is here, feeling \\${this.mood}, and ready to mildly complicate the UI.\\`;\" >> /src/components/componentB.js\necho \"    }\" >> /src/components/componentB.js\necho \"\" >> /src/components/componentB.js\necho \"    // TODO: Actually make this component do something visually impressive.\" >> /src/components/componentB.js\necho \"    // Current visual plan: A single, blinking pixel. Maybe green.\" >> /src/components/componentB.js\necho \"}\" >> /src/components/componentB.js\n\n# /data directory\nmkdir /data\necho \"The quick brown fox, known as Fred, deftly vaulted over Bartholomew, the astonishingly lazy bulldog.\" > /data/pangrams.txt\necho \"Meanwhile, Jacqueline, my big sphinx of quartz, judged their grammar quite harshly.\" >> /data/pangrams.txt\necho \"Why are there so many pangrams? It is a conspiracy of typists!\" >> /data/pangrams.txt\necho \"THE END. Or is it? Yes, it is for this file.\" >> /data/pangrams.txt\necho \"This file contains the word 'fox' multiple times. A fox is a cunning creature. Fox.\" >> /data/pangrams.txt\n\necho \"Barnaby Snoozlebottom III, the laziest brown dog in all of OopisOS (a hotly contested title), sighed. It was not just any sigh; it was a sigh that contained multitudes – the weight of unchased virtual squirrels, the existential dread of an empty dog food bowl command, the philosophical implications of being a text-based canine.\" > /data/dog_story.txt\necho \"'Is a dog truly a dog if it cannot \\`bark\\`?' he mused, to the river that did not exist but was strongly implied by the narrative.\" >> /data/dog_story.txt\necho \"The river, being virtual, did not reply. This profound silence only deepened Barnaby's contemplation. The dog then decided a nap was in order. A very, very long nap.\" >> /data/dog_story.txt\n\necho \"# Animal Census - Sector 7G (OopisOS Virtual Wildlife Preserve)\" > /data/animal_census.txt\n# ... (similar careful quoting for the rest of this file and all subsequent files) ...\n\n# (Continuing with the same meticulous quoting for the rest of the script)\n# ... many lines omitted for brevity in this explanation, but present in the final script block ...\n\necho \"## Developer Musings - Found in /docs/.internal_dev_notes.md\" > /docs/.internal_dev_notes.md\necho \"\" >> /docs/.internal_dev_notes.md\necho \"**Entry: Stardate 47630.1**\" >> /docs/.internal_dev_notes.md\necho \"Spent the morning debugging the \\`find\\` command -mtime predicate. It turns out 'time' is more of a suggestion in JavaScript land, especially when you are trying to simulate POSIX behavior from a bygone era. The solution involved a lot of \\`Date.now()\\` and hoping for the best.\" >> /docs/.internal_dev_notes.md # Removed 's from command's\necho \"\" >> /docs/.internal_dev_notes.md\necho \"**Entry: Stardate 47631.5**\" >> /docs/.internal_dev_notes.md\necho \"User 'Guest' (or is it TestBot Prime now?) is requesting... 'more dummy text'. This is getting meta. Are we writing an OS, or are we writing a novel *about* writing an OS, *within* the OS? My head hurts.\" >> /docs/.internal_dev_notes.md\necho \"\" >> /docs/.internal_dev_notes.md\necho \"**Entry: Stardate 47632.0**\" >> /docs/.internal_dev_notes.md\necho \"Considered adding a 'feature' where random files would occasionally corrupt themselves, just to keep testers on their toes. Decided against it. Probably. For now. The \\`animals.txt\\` file is starting to look suspicious, though. That cat knows things.\" >> /docs/.internal_dev_notes.md\necho \"\" >> /docs/.internal_dev_notes.md\necho \"**Random Idea:**\" >> /docs/.internal_dev_notes.md\necho \"A command \\`mood <happy|sad|existential_dread>\\` that changes the terminal color scheme. Low priority. But fun.\" >> /docs/.internal_dev_notes.md\n\n# Files for timestamp testing\ntouch -t 202301151030 /ancient_document.txt\necho \"This document hails from the distant past of January 15th, 2023, at precisely 10:30. It has seen things. It remembers when OopisOS was just a twinkle in a developer eye. It speaks of simpler times, when commands were few and bugs were... well, still plentiful, but perhaps less sophisticated. It has a faint smell of virtual dust and forgotten TODOs.\" > /ancient_document.txt\n\ntouch -t 202405201400.30 /previous_year_file.log\necho \"Log File from a Bygone Era (Last Year)\" > /previous_year_file.log\necho \"Date: May 20, 2024, 14:00:30 OopisStandardTime\" >> /previous_year_file.log\necho \"Entry 1: System booted. All seems well.\" >> /previous_year_file.log\necho \"Entry 2: User 'ProtoGuest' attempted to divide by zero. Successfully prevented. Universe grateful.\" >> /previous_year_file.log\necho \"Entry 3: Investigated reports of a rogue semicolon in the kernel. Semicolon apprehended and re-educated.\" >> /previous_year_file.log\necho \"Entry 4: This log file is feeling a bit nostalgic. Wonder what OopisOS will be like in a year? (Spoiler: More verbose test data.)\" >> /previous_year_file.log\n\n# Create an empty directory\nmkdir /empty_dir_test\n\necho \"\"\necho \"*********************************************************\"\necho \"DELUXE Test Drive Population Sequence COMPLETE! (v4.1)\"\necho \"*********************************************************\"\necho \"Your OopisOS drive is now brimming with meticulously crafted, artisanal dummy data.\"\necho \"Suggestions for immediate chaos:\"\necho \"  find / -name '*.txt' -exec grep -i 'OopisOS' {} \\;\"\necho \"  grep -R 'duck' / (This might take a while, and be revealing!)\" # Removed backticks from command for simplicity with echo\necho \"  cat /docs/manuals/dev_guide.md\"\necho \"Have fun exploring the verbosity!\"",
+			"file": "inflatev4_1.sh",
+			"file_size": 28965,
+			"file_write_time": 133933124930342549,
+			"settings":
+			{
+				"buffer_size": 28969,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			},
+			"undo_stack":
+			[
+				[
+					3,
+					1,
+					"insert",
+					{
+						"characters": ".1"
+					},
+					"AgAAAOQAAAAAAAAA5QAAAAAAAAAAAAAA5QAAAAAAAADmAAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAA5AAAAAAAAADkAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					8,
+					1,
+					"insert",
+					{
+						"characters": ".1"
+					},
+					"AgAAAEUAAAAAAAAARgAAAAAAAAAAAAAARgAAAAAAAABHAAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAARQAAAAAAAABFAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					12,
+					1,
+					"",
+					null,
+					"AwAAAFFvAAAAAAAAVW8AAAAAAAACAAAAdjTkAAAAAAAAAOgAAAAAAAAAAgAAAHY0QwAAAAAAAABHAAAAAAAAAAIAAAB2NA",
+					"AQAAAAAAAAABAAAA5AAAAAAAAADmAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					15,
+					2,
+					"left_delete",
+					null,
+					"AgAAAOsAAAAAAAAA6wAAAAAAAAABAAAAMeoAAAAAAAAA6gAAAAAAAAABAAAALg",
+					"AQAAAAAAAAABAAAA7AAAAAAAAADsAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					20,
+					2,
+					"left_delete",
+					null,
+					"AgAAAEgAAAAAAAAASAAAAAAAAAABAAAAMUcAAAAAAAAARwAAAAAAAAABAAAALg",
+					"AQAAAAAAAAABAAAASQAAAAAAAABJAAAAAAAAAAAAAAAAAPC/"
+				]
+			]
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"console":
+	{
+		"height": 130.0,
+		"history":
+		[
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/C/Users/Andrew/Documents/GitHub/OopisOS/lexer.md",
+		"/C/Users/Andrew/Documents/GitHub/OopisOS/inflate.sh",
+		"/C/Users/Andrew/Documents/GitHub/OopisOS/editor.md"
+	],
+	"find":
+	{
+		"height": 41.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"v4",
+			"1.5",
+			"1.4.2"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"v4.1",
+			"1.5.1",
+			"1.5"
+		],
+		"reverse": false,
+		"scrollbar_highlights": true,
+		"show_context": true,
+		"use_buffer2": true,
+		"use_gitignore": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"sheets":
+			[
+			]
+		},
+		{
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "oopisos1_5_1.js",
+					"selected": true,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 265217,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								223107,
+								223107
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 126489.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"stack_multiselect": false,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "OopisOSv1_5_1.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 5536,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								316,
+								317
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"stack_multiselect": false,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "inflatev4_1.sh",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 28969,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								559,
+								559
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/ShellScript/Bash.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"stack_multiselect": false,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 29.0
+	},
+	"input":
+	{
+		"height": 0.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			],
+			[
+				1,
+				0,
+				2,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			0.0900615753298,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0,
+		"history":
+		[
+		]
+	},
+	"pinned_build_system": "",
+	"project": "OopidOS.sublime-project",
+	"replace":
+	{
+		"height": 74.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 1,
+	"settings":
+	{
+	},
+	"show_minimap": false,
+	"show_open_files": true,
+	"show_tabs": true,
+	"side_bar_visible": false,
+	"side_bar_width": 150.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

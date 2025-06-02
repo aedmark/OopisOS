@@ -116,7 +116,7 @@ const Config = (() => {
 			SESSION_LOADED_MSG: "Session loaded from manual save.",
 			LOAD_STATE_CANCELLED: "Load state cancelled.",
 			NO_MANUAL_SAVE_FOUND_PREFIX: "No manually saved state found for ",
-			WELCOME_PREFIX: "Welcome, ",
+			WELCOME_PREFIX: "Greetings and Salutations, ",
 			WELCOME_SUFFIX: "! Type 'help' for commands.",
 			EXPORTING_PREFIX: "Exporting '",
 			EXPORTING_SUFFIX: "'... Check your browser downloads.",
@@ -7083,151 +7083,228 @@ Example: find . -name "*.js" -not -user Guest -o -type d -print
 			return { success: false, error: `${segment.command}: command not found` };
 		return { success: true, output: "" };
 	}
-	async function _executePipeline(pipeline, isInteractive) {
+async function _executePipeline(pipeline, isInteractive) {
 		let currentStdin = null,
 			lastResult = { success: true, output: "" };
-		const user = UserManager.getCurrentUser().name;
+		const user = UserManager.getCurrentUser().name; // Assuming UserManager is accessible
 		const nowISO = new Date().toISOString(); // For mtime updates in redirection
+
 		for (let i = 0; i < pipeline.segments.length; i++) {
 			lastResult = await _executeCommandHandler(
 				pipeline.segments[i],
-				{ isInteractive },
+				{ isInteractive }, // Pass the options object including isInteractive
 				currentStdin,
 			);
 			if (!lastResult.success) {
 				const err = `${Config.MESSAGES.PIPELINE_ERROR_PREFIX}'${pipeline.segments[i].command}': ${lastResult.error || "Unknown"}`;
-				if (!pipeline.isBackground)
+				if (!pipeline.isBackground) {
 					await OutputManager.appendToOutput(err, {
 						typeClass: Config.CSS_CLASSES.ERROR_MSG,
 					});
-				else console.log(`BG pipe err: ${err}`);
+                } else {
+					console.log(`BG pipe err: ${err}`); // Log background errors to console
+                }
 				return { success: false, error: err, output: lastResult.output };
 			}
 			currentStdin = lastResult.output;
 		}
+
 		if (pipeline.redirection && lastResult.success) {
 			const { type: redirType, file: redirFile } = pipeline.redirection;
-			const outputToRedir = lastResult.output || "";
+			const outputToRedir = lastResult.output || ""; // Ensure it's a string
+
 			const redirVal = FileSystemManager.validatePath(
-				"redirection",
+				"redirection", // commandName for error messages from validatePath
 				redirFile,
 				{
-					allowMissing: true,
-					disallowRoot: true,
-					defaultToCurrentIfEmpty: false,
+					allowMissing: true, // Important for redirection, file might not exist
+					disallowRoot: true,  // Typically don't want to redirect to root itself
+					defaultToCurrentIfEmpty: false, // Filename must be provided
 				},
 			);
-			if (
-				redirVal.error &&
-				!(redirVal.optionsUsed.allowMissing && !redirVal.node)
-			) {
-				if (!pipeline.isBackground)
-					await OutputManager.appendToOutput(redirVal.error, {
+
+            // DEBUG: Log absRedirPath (which is redirVal.resolvedPath)
+            console.log("[DEBUG] Redirection: absRedirPath (from redirVal.resolvedPath) =", redirVal.resolvedPath);
+
+			// Check if validatePath itself returned an error that isn't "allowMissing" related for a new file
+			if (redirVal.error && !(redirVal.optionsUsed.allowMissing && !redirVal.node)) {
+				if (!pipeline.isBackground) {
+					await OutputManager.appendToOutput(redirVal.error, { // Use error from validatePath
 						typeClass: Config.CSS_CLASSES.ERROR_MSG,
 					});
+                }
+                // DEBUG: Log error from validatePath
+                console.log("[DEBUG] Redirection: validatePath failed with error:", redirVal.error);
 				return { success: false, error: redirVal.error };
 			}
+
 			const absRedirPath = redirVal.resolvedPath;
-			let targetNode = redirVal.node;
-			if (targetNode) {
+			let targetNode = redirVal.node; // This is the node AT the redirection target path, if it exists
+
+			const pDirRes = FileSystemManager.createParentDirectoriesIfNeeded(absRedirPath);
+            // DEBUG: Log pDirRes
+            console.log("[DEBUG] Redirection: pDirRes (result from createParentDirectoriesIfNeeded) =", Utils.deepCopyNode(pDirRes));
+
+			if (pDirRes.error) {
+				if (!pipeline.isBackground) {
+					await OutputManager.appendToOutput(`Redir err: ${pDirRes.error}`, {
+						typeClass: Config.CSS_CLASSES.ERROR_MSG,
+					});
+                }
+                // DEBUG: Log that createParentDirectoriesIfNeeded reported an error
+                console.log("[DEBUG] Redirection: createParentDirectoriesIfNeeded failed with error:", pDirRes.error);
+				return { success: false, error: pDirRes.error };
+			}
+			// pDirRes.parentNode is the directory *containing* the target redirection file,
+            // or the directory itself if it was the last part created.
+            // For file redirection, we are interested in the parent of absRedirPath.
+
+			if (targetNode) { // If the target file itself already exists
 				if (targetNode.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE) {
-					if (!pipeline.isBackground)
+					if (!pipeline.isBackground) {
 						await OutputManager.appendToOutput(
 							`Redir err: '${redirFile}' is dir.`,
 							{ typeClass: Config.CSS_CLASSES.ERROR_MSG },
 						);
+                    }
+                    // DEBUG: Log if trying to redirect to an existing directory
+                    console.log("[DEBUG] Redirection: Target file path is an existing directory. Path:", absRedirPath);
 					return { success: false, error: `'${redirFile}' is dir.` };
 				}
 				if (!FileSystemManager.hasPermission(targetNode, user, "write")) {
-					if (!pipeline.isBackground)
+					if (!pipeline.isBackground) {
 						await OutputManager.appendToOutput(
 							`Redir err: no write to '${redirFile}'${Config.MESSAGES.PERMISSION_DENIED_SUFFIX}`,
 							{ typeClass: Config.CSS_CLASSES.ERROR_MSG },
 						);
+                    }
+                    // DEBUG: Log permission denial on existing target file
+                    console.log("[DEBUG] Redirection: Permission denied to write to existing target file. Path:", absRedirPath, "Node:", Utils.deepCopyNode(targetNode));
 					return { success: false, error: `no write to '${redirFile}'` };
 				}
-			} else {
-				const parentP =
-					absRedirPath.substring(
-						0,
-						absRedirPath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR),
-					) || Config.FILESYSTEM.ROOT_PATH;
+			} else { // Target file does not exist, check parent directory permissions
+				const parentP = absRedirPath.substring(0, absRedirPath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR)) || Config.FILESYSTEM.ROOT_PATH;
+                // DEBUG: Log parentP
+                console.log("[DEBUG] Redirection: parentP (path to directory for new file) =", parentP);
+
 				const parentN = FileSystemManager.getNodeByPath(parentP);
-				if (
-					!parentN ||
-					!FileSystemManager.hasPermission(parentN, user, "write")
-				) {
-					if (!pipeline.isBackground)
+                // DEBUG: Log parentN (the node for parentP)
+                console.log("[DEBUG] Redirection: parentN (node for parentP after potential creation by createParentDirectoriesIfNeeded) =", Utils.deepCopyNode(parentN));
+                if (parentN === null) {
+                    console.log("[DEBUG] Redirection: parentN is NULL. getNodeByPath failed to find:", parentP);
+                }
+
+				if (!parentN || !FileSystemManager.hasPermission(parentN, user, "write")) {
+                    // DEBUG: Log details if permission check on parentN fails
+                    if (parentN) { // If parentN exists but permission is denied
+                        console.log("[DEBUG] Redirection: Permission DENIED to create file in parentN. User:", user, "Path for parentN:", parentP);
+                        console.log("[DEBUG] Redirection: parentN.owner =", parentN.owner, "parentN.mode =", parentN.mode.toString(8)); // Log mode in octal
+                        console.log("[DEBUG] Redirection: hasPermission(parentN, user, 'write') result =", FileSystemManager.hasPermission(parentN, user, "write"));
+                    } else { // If parentN is null (means getNodeByPath failed to find the parent dir where file should be created)
+                        console.log("[DEBUG] Redirection: Cannot create file in parentN because parentN is null. Path for parentN:", parentP);
+                    }
+
+					if (!pipeline.isBackground) {
 						await OutputManager.appendToOutput(
 							`Redir err: no create in '${parentP}'${Config.MESSAGES.PERMISSION_DENIED_SUFFIX}`,
 							{ typeClass: Config.CSS_CLASSES.ERROR_MSG },
 						);
+                    }
 					return { success: false, error: `no create in '${parentP}'` };
 				}
+                // DEBUG: Log if permission to create in parentN is granted
+                console.log("[DEBUG] Redirection: Permission GRANTED to create file in parentN. Path for parentN:", parentP);
+                if (parentN) { // Should not be null if we reached here
+                    console.log("[DEBUG] Redirection: parentN.owner =", parentN.owner, "parentN.mode =", parentN.mode.toString(8));
+                    console.log("[DEBUG] Redirection: hasPermission(parentN, user, 'write') result for parentN =", FileSystemManager.hasPermission(parentN, user, "write"));
+                }
 			}
-			const pDirRes =
-				FileSystemManager.createParentDirectoriesIfNeeded(absRedirPath);
-			if (pDirRes.error) {
-				if (!pipeline.isBackground)
-					await OutputManager.appendToOutput(`Redir err: ${pDirRes.error}`, {
-						typeClass: Config.CSS_CLASSES.ERROR_MSG,
-					});
-				return { success: false, error: pDirRes.error };
-			}
-			const pNode = pDirRes.parentNode;
-			const fName = absRedirPath.substring(
-				absRedirPath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR) + 1,
-			);
+
+            // At this point, permissions are fine, and parent directories exist.
+            // The actual parent node for the file is pDirRes.parentNode if the file is at the leaf of creation,
+            // or more generally, the directory part of absRedirPath.
+            const finalParentDirPath = absRedirPath.substring(0, absRedirPath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR)) || Config.FILESYSTEM.ROOT_PATH;
+            const finalParentNodeForFile = FileSystemManager.getNodeByPath(finalParentDirPath);
+
+            if (!finalParentNodeForFile) {
+                // This would be a very unexpected internal error if createParentDirectoriesIfNeeded succeeded
+                // and the subsequent permission checks on parentN also passed.
+                console.error("[DEBUG] Redirection: CRITICAL - finalParentNodeForFile is null. Path:", finalParentDirPath);
+                if(!pipeline.isBackground) {
+                    await OutputManager.appendToOutput(
+                        `Redir err: critical internal error, parent dir '${finalParentDirPath}' for file write not found.`,
+                        { typeClass: Config.CSS_CLASSES.ERROR_MSG }
+                    );
+                }
+                return { success: false, error: `parent dir '${finalParentDirPath}' for file write not found (internal)`};
+            }
+
+
+			const fName = absRedirPath.substring(absRedirPath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR) + 1);
 			let exContent = "";
 			if (
 				redirType === "append" &&
-				pNode.children[fName]?.type === Config.FILESYSTEM.DEFAULT_FILE_TYPE
+				finalParentNodeForFile.children[fName]?.type === Config.FILESYSTEM.DEFAULT_FILE_TYPE // Check on the correct parent
 			) {
-				exContent = pNode.children[fName].content || "";
-				if (exContent && !exContent.endsWith("\n") && outputToRedir)
+				exContent = finalParentNodeForFile.children[fName].content || "";
+				if (exContent && !exContent.endsWith("\n") && outputToRedir) { // Only add newline if exContent exists and outputToRedir is not empty
 					exContent += "\n";
+                }
 			}
-			const owner = pNode.children[fName]?.owner || user;
-			const mode =
-				pNode.children[fName]?.mode || Config.FILESYSTEM.DEFAULT_FILE_MODE;
-			pNode.children[fName] = {
+
+            // Determine owner and mode for the file being written
+            // If file exists (targetNode is not null), preserve its owner and mode.
+            // If file is new, it inherits ownership from 'user' and default file mode.
+			const owner = targetNode ? targetNode.owner : user;
+			const mode = targetNode ? targetNode.mode : Config.FILESYSTEM.DEFAULT_FILE_MODE;
+
+			finalParentNodeForFile.children[fName] = { // Write to the correct parent
 				type: Config.FILESYSTEM.DEFAULT_FILE_TYPE,
 				content: exContent + outputToRedir,
-				owner,
-				mode,
+				owner: owner,
+				mode: mode,
 				mtime: nowISO, // Set mtime for redirected file
 			};
-			FileSystemManager._updateNodeAndParentMtime(absRedirPath, nowISO); // Update parent's mtime
+			// Update mtime of the parent directory where the file was written/created
+			FileSystemManager._updateNodeAndParentMtime(finalParentDirPath, nowISO); // This already updates parent, no need for the one below if path is dir
+            // FileSystemManager._updateNodeAndParentMtime(absRedirPath, nowISO); // This updates the file itself and its parent.
 
 			if (!(await FileSystemManager.save(user))) {
-				if (!pipeline.isBackground)
+				if (!pipeline.isBackground) {
 					await OutputManager.appendToOutput(
 						`Failed to save redir to '${redirFile}'.`,
 						{ typeClass: Config.CSS_CLASSES.ERROR_MSG },
 					);
+                }
 				return { success: false, error: `save redir fail` };
 			}
-			lastResult.output = null;
+			// If redirection happened, the output that was redirected should not also be printed to terminal.
+			lastResult.output = null; // Clear output as it has been redirected
 		}
+
+		// Output handling if not redirected and not background with suppressed output
 		if (
-			!pipeline.redirection &&
+			!pipeline.redirection && // ensure no redirection occurred
 			lastResult.success &&
 			lastResult.output !== null &&
-			lastResult.output !== undefined
+			lastResult.output !== undefined // Check for actual output
 		) {
 			if (!pipeline.isBackground) {
-				if (lastResult.output)
+				if (lastResult.output) { // Only append if there's something to output
 					await OutputManager.appendToOutput(lastResult.output, {
 						typeClass: lastResult.messageType || null,
 					});
-			} else if (lastResult.output)
+                }
+			} else if (lastResult.output && pipeline.isBackground) { // Only show suppressed message if there *was* output
 				await OutputManager.appendToOutput(
 					`${Config.MESSAGES.BACKGROUND_PROCESS_OUTPUT_SUPPRESSED} (Job ${pipeline.jobId})`,
 					{ typeClass: Config.CSS_CLASSES.CONSOLE_LOG_MSG, isBackground: true },
 				);
+            }
 		}
 		return lastResult;
 	}
+	
 	async function _finalizeInteractiveModeUI(originalCommandText) {
 		TerminalUI.clearInput();
 		TerminalUI.updatePrompt();
@@ -7488,7 +7565,7 @@ window.onload = async () => {
 		SessionManager.loadAutomaticState(UserManager.getDefaultUser());
 		initializeTerminalEventListeners();
 		TerminalUI.focusInput();
-		console.log(`${Config.OS.NAME} v.${Config.OS.VERSION} loaded. Welcome!`);
+		console.log(`${Config.OS.NAME} v.${Config.OS.VERSION} loaded. ...You're Welcome :-)`);
 	} catch (error) {
 		console.error(
 			"Failed to initialize OopisOs on load (main try-catch):",
