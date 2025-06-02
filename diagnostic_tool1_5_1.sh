@@ -1,7 +1,7 @@
 # OopisOS Comprehensive Test Script
-# Script Version for OopisOS v1.5
+# Script Version for OopisOS v1.5.1
 
-echo "===== OopisOS Test Suite Initializing (Testing OopisOS v1.5) ====="
+echo "===== OopisOS Test Suite Initializing (Testing OopisOS v1.5.1) ====="
 echo "IMPORTANT: This script will create/delete files/dirs and manage users."
 echo "Script assumes it starts as the default 'Guest' user or a clean initial state."
 echo ""
@@ -939,7 +939,7 @@ delay 600
 echo "------------------------------------------------------"
 
 echo ""
-echo "===== OopisOS Test Suite Complete (v1.5) ====="
+echo "===== OopisOS Test Suite Complete (v1.5.1) ====="
 # --- Success Animation ---
 echo " "
 delay 600
@@ -947,7 +947,7 @@ echo "  ======================================================"
 delay 200
 echo "  ==                                                  =="
 delay 200
-echo "  ==         OopisOS Diagnostics - v1.5            =="
+echo "  ==         OopisOS Diagnostics - v1.5.1            =="
 delay 200
 echo "  ==                ALL SYSTEMS GO!                   =="
 delay 200

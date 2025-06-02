@@ -1,10 +1,10 @@
 #!/oopis
 
-# OopisOS Test Drive Population Script - Deluxe Edition! (v4.1 - Ultra-Meticulous Quoting)
+# OopisOS Test Drive Population Script - Deluxe Edition! (v1.5.1 - Ultra-Meticulous Quoting)
 
 # Ensuring correct file content rendering with OopisOS lexer/parser.
 
-echo "Initializing Deluxe Test Drive population sequence (v4.1 - ultra-meticulous quoting)..."
+echo "Initializing Deluxe Test Drive population sequence (v1.5.1 - ultra-meticulous quoting)..."
 echo "Fasten your seatbelts, this execution demands precision!"
 
 # Root level files
@@ -358,7 +358,7 @@ mkdir /empty_dir_test
 
 echo ""
 echo "****************************\*****************************"
-echo "DELUXE Test Drive Population Sequence COMPLETE! (v4.1)"
+echo "DELUXE Test Drive Population Sequence COMPLETE! (v1.5.1)"
 echo "****************************\*****************************"
 echo "Your OopisOS drive is now brimming with meticulously crafted, artisanal dummy data."
 echo "Suggestions for immediate chaos:"
