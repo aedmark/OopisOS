@@ -1,9 +1,3 @@
-/**
- * OopisOS v1.5.1 - A Persistent, Self-Contained Browser OS!
- * Copyright (c) 2025 Andrew Edmark and Gemini Pro 2.5. (MIT Licensed)
- * https://github.com/aedmark/OopisOS
- */
-
 const Config = (() => {
   "use strict";
   return {
@@ -14,7 +8,7 @@ const Config = (() => {
     },
     OS: {
       NAME: "OopisOs",
-      VERSION: "1.5.1", // Version updated for EditorUI and EditorUtils
+      VERSION: "1.5.1",
       DEFAULT_HOST_NAME: "OopisOs",
     },
     USER: {
@@ -43,8 +37,7 @@ const Config = (() => {
       EDITOR_MSG: "text-sky-400",
       DIR_ITEM: "text-sky-400 font-semibold",
       FILE_ITEM: "text-green-500",
-      OUTPUT_LINE:
-        "whitespace-pre-wrap break-words overflow-x-hidden min-h-[1.2em] leading-[1.2em]",
+      OUTPUT_LINE: "whitespace-pre-wrap break-words overflow-x-hidden min-h-[1.2em] leading-[1.2em]",
       HIDDEN: "hidden",
     },
     EDITOR: {
@@ -89,8 +82,7 @@ const Config = (() => {
     },
     MESSAGES: {
       PERMISSION_DENIED_SUFFIX: ": Permission denied",
-      CONFIRMATION_PROMPT:
-        "Type 'YES' (all caps) to confirm, or any other input to cancel.",
+      CONFIRMATION_PROMPT: "Type 'YES' (all caps) to confirm, or any other input to cancel.",
       OPERATION_CANCELLED: "Operation cancelled.",
       ALREADY_LOGGED_IN_AS_PREFIX: "Already logged in as '",
       ALREADY_LOGGED_IN_AS_SUFFIX: "'.",
@@ -128,20 +120,17 @@ const Config = (() => {
       RESTORE_SUCCESS_SUFFIX: "'.",
       UPLOAD_NO_FILE: "Upload cancelled: No file selected.",
       UPLOAD_INVALID_TYPE_PREFIX: "Error: Invalid file type '",
-      UPLOAD_INVALID_TYPE_SUFFIX:
-        "'. Only .txt, .md, .html, .sh, .js, .css files are allowed.",
+      UPLOAD_INVALID_TYPE_SUFFIX: "'. Only .txt, .md, .html, .sh, .js, .css files are allowed.",
       UPLOAD_SUCCESS_PREFIX: "File '",
       UPLOAD_SUCCESS_MIDDLE: "' uploaded successfully to '",
       UPLOAD_SUCCESS_SUFFIX: "'.",
       UPLOAD_READ_ERROR_PREFIX: "Error reading file '",
       UPLOAD_READ_ERROR_SUFFIX: "'.",
       NO_COMMANDS_IN_HISTORY: "No commands in history.",
-      EDITOR_DISCARD_CONFIRM:
-        "You have unsaved changes. Discard them and exit?",
+      EDITOR_DISCARD_CONFIRM: "You have unsaved changes. Discard them and exit?",
       BACKGROUND_PROCESS_STARTED_PREFIX: "[",
       BACKGROUND_PROCESS_STARTED_SUFFIX: "] Backgrounded.",
-      BACKGROUND_PROCESS_OUTPUT_SUPPRESSED:
-        "[Output suppressed for background process]",
+      BACKGROUND_PROCESS_OUTPUT_SUPPRESSED: "[Output suppressed for background process]",
       PIPELINE_ERROR_PREFIX: "Pipeline error in command: ",
     },
     INTERNAL_ERRORS: {
@@ -161,18 +150,21 @@ let DOM = {};
 
 const Utils = (() => {
   "use strict";
+
   function formatConsoleArgs(args) {
     return Array.from(args)
       .map((arg) =>
-        typeof arg === "object" && arg !== null
-          ? JSON.stringify(arg)
-          : String(arg),
+        typeof arg === "object" && arg !== null ?
+        JSON.stringify(arg) :
+        String(arg),
       )
       .join(" ");
   }
+
   function deepCopyNode(node) {
     return node ? JSON.parse(JSON.stringify(node)) : null;
   }
+
   function formatBytes(bytes, decimals = 2) {
     if (bytes === 0) return "0 B";
     const k = 1024;
@@ -181,6 +173,7 @@ const Utils = (() => {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
   }
+
   function getFileExtension(filePath) {
     if (!filePath || typeof filePath !== "string") return "";
     const name = filePath.substring(
@@ -192,6 +185,7 @@ const Utils = (() => {
     }
     return name.substring(lastDot + 1).toLowerCase();
   }
+
   function createElement(tag, attributes = {}, ...childrenArgs) {
     const element = document.createElement(tag);
     for (const key in attributes) {
@@ -234,9 +228,9 @@ const Utils = (() => {
       }
     }
     const childrenToProcess =
-      childrenArgs.length === 1 && Array.isArray(childrenArgs[0])
-        ? childrenArgs[0]
-        : childrenArgs;
+      childrenArgs.length === 1 && Array.isArray(childrenArgs[0]) ?
+      childrenArgs[0] :
+      childrenArgs;
     childrenToProcess.forEach((child) => {
       if (child instanceof Node) {
         element.appendChild(child);
@@ -252,7 +246,6 @@ const Utils = (() => {
     return element;
   }
 
-  // Ensure these functions are defined WITHIN the Utils IIFE
   function validateArguments(argsArray, config = {}) {
     const argCount = argsArray.length;
     if (typeof config.exact === "number") {
@@ -276,31 +269,58 @@ const Utils = (() => {
         };
       }
     }
-    return { isValid: true };
+    return {
+      isValid: true
+    };
   }
+
   function parseNumericArg(argString, options = {}) {
-    const { allowFloat = false, allowNegative = false, min, max } = options;
+    const {
+      allowFloat = false, allowNegative = false, min, max
+    } = options;
     const num = allowFloat ? parseFloat(argString) : parseInt(argString, 10);
     if (isNaN(num)) {
-      return { value: null, error: "is not a valid number" };
+      return {
+        value: null,
+        error: "is not a valid number"
+      };
     }
     if (!allowNegative && num < 0) {
-      return { value: null, error: "must be a non-negative number" };
+      return {
+        value: null,
+        error: "must be a non-negative number"
+      };
     }
     if (min !== undefined && num < min) {
-      return { value: null, error: `must be at least ${min}` };
+      return {
+        value: null,
+        error: `must be at least ${min}`
+      };
     }
     if (max !== undefined && num > max) {
-      return { value: null, error: `must be at most ${max}` };
+      return {
+        value: null,
+        error: `must be at most ${max}`
+      };
     }
-    return { value: num, error: null };
+    return {
+      value: num,
+      error: null
+    };
   }
+
   function validateUsernameFormat(username) {
     if (!username || typeof username !== "string" || username.trim() === "") {
-      return { isValid: false, error: "Username cannot be empty." };
+      return {
+        isValid: false,
+        error: "Username cannot be empty."
+      };
     }
     if (username.includes(" ")) {
-      return { isValid: false, error: "Username cannot contain spaces." };
+      return {
+        isValid: false,
+        error: "Username cannot contain spaces."
+      };
     }
     if (Config.USER.RESERVED_USERNAMES.includes(username.toLowerCase())) {
       return {
@@ -320,21 +340,19 @@ const Utils = (() => {
         error: `Username cannot exceed ${Config.USER.MAX_USERNAME_LENGTH} characters.`,
       };
     }
-    return { isValid: true, error: null };
+    return {
+      isValid: true,
+      error: null
+    };
   }
+
   function parseFlags(argsArray, flagDefinitions) {
     const flags = {};
     const remainingArgs = [];
-    // const definedFlags = new Set(); // Not strictly needed here if not used
-    // const flagsWithValues = {};  // Not strictly needed here if not used
+
     flagDefinitions.forEach((def) => {
       flags[def.name] = def.takesValue ? null : false;
-      // if(def.short) definedFlags.add(def.short);
-      // if(def.long) definedFlags.add(def.long);
-      // if(def.takesValue) {
-      //     if(def.short) flagsWithValues[def.short] = def.name;
-      //     if(def.long) flagsWithValues[def.long] = def.name;
-      // }
+
     });
     for (let i = 0; i < argsArray.length; i++) {
       const arg = argsArray[i];
@@ -362,8 +380,12 @@ const Utils = (() => {
         remainingArgs.push(arg);
       }
     }
-    return { flags, remainingArgs };
+    return {
+      flags,
+      remainingArgs
+    };
   }
+
   function globToRegex(glob) {
     let regexStr = "^";
     for (let i = 0; i < glob.length; i++) {
@@ -430,35 +452,29 @@ const Utils = (() => {
   }
 
   return {
-    // Ensure ALL Utils functions are exported here
+
     formatConsoleArgs,
     deepCopyNode,
     formatBytes,
     getFileExtension,
     createElement,
-    validateArguments, // Restored
-    parseNumericArg, // Restored
-    validateUsernameFormat, // Restored
-    parseFlags, // Restored
-    globToRegex, // Was correctly added
+    validateArguments,
+    parseNumericArg,
+    validateUsernameFormat,
+    parseFlags,
+    globToRegex,
   };
-})(); // Single, correct closing for Utils IIFE
+})();
 const TimestampParser = (() => {
   "use strict";
 
-  /**
-   * Parses a STAMP string into an ISO 8601 timestamp string.
-   * STAMP format: [[CC]YY]MMDDhhmm[.ss]
-   * @param {string} stampStr - The STAMP string.
-   * @returns {string|null} ISO string if valid, otherwise null.
-   */
   function parseStampToISO(stampStr) {
     let year,
       monthVal,
       day,
       hours,
       minutes,
-      seconds = 0; // monthVal is 1-12
+      seconds = 0;
     const currentDate = new Date();
     let s = stampStr;
 
@@ -469,7 +485,7 @@ const TimestampParser = (() => {
         parts[1].length !== 2 ||
         isNaN(parseInt(parts[1], 10))
       ) {
-        return null; // Must be .ss and numeric
+        return null;
       }
       seconds = parseInt(parts[1], 10);
       if (seconds < 0 || seconds > 59) return null;
@@ -477,30 +493,30 @@ const TimestampParser = (() => {
     }
 
     if (s.length === 12) {
-      // CCYYMMDDhhmm
+
       year = parseInt(s.substring(0, 4), 10);
       monthVal = parseInt(s.substring(4, 6), 10);
       day = parseInt(s.substring(6, 8), 10);
       hours = parseInt(s.substring(8, 10), 10);
       minutes = parseInt(s.substring(10, 12), 10);
     } else if (s.length === 10) {
-      // YYMMDDhhmm
+
       const YY = parseInt(s.substring(0, 2), 10);
       if (isNaN(YY)) return null;
-      year = YY < 69 ? 2000 + YY : 1900 + YY; // POSIX-like heuristic
+      year = YY < 69 ? 2000 + YY : 1900 + YY;
       monthVal = parseInt(s.substring(2, 4), 10);
       day = parseInt(s.substring(4, 6), 10);
       hours = parseInt(s.substring(6, 8), 10);
       minutes = parseInt(s.substring(8, 10), 10);
     } else if (s.length === 8) {
-      // MMDDhhmm (current year)
+
       year = currentDate.getFullYear();
       monthVal = parseInt(s.substring(0, 2), 10);
       day = parseInt(s.substring(2, 4), 10);
       hours = parseInt(s.substring(4, 6), 10);
       minutes = parseInt(s.substring(6, 8), 10);
     } else {
-      return null; // Invalid length
+      return null;
     }
 
     if (
@@ -523,12 +539,10 @@ const TimestampParser = (() => {
     )
       return null;
 
-    // Construct date in UTC to avoid timezone shifts during component validation
     const dateObj = new Date(
       Date.UTC(year, monthVal - 1, day, hours, minutes, seconds),
     );
 
-    // Validate that the components didn't roll over due to invalid values (e.g., Feb 30)
     if (
       dateObj.getUTCFullYear() !== year ||
       dateObj.getUTCMonth() !== monthVal - 1 ||
@@ -542,16 +556,6 @@ const TimestampParser = (() => {
     return dateObj.toISOString();
   }
 
-  /**
-   * Resolves a timestamp from command flags (-d or -t).
-   * If neither is provided, defaults to the current time.
-   * @param {object} flags - The parsed flags object from Utils.parseFlags.
-   * Expected to contain `flags.dateString` and `flags.stamp`.
-   * @param {string} commandName - The name of the command calling this function (for error messages).
-   * @returns {{timestampISO: string|null, error: string|null}}
-   * `timestampISO` is the ISO string or null on error.
-   * `error` is an error message string or null on success.
-   */
   function resolveTimestampFromCommandFlags(flags, commandName) {
     const nowActualISO = new Date().toISOString();
 
@@ -570,7 +574,10 @@ const TimestampParser = (() => {
           error: `${commandName}: invalid date string '${flags.dateString}'`,
         };
       }
-      return { timestampISO: d.toISOString(), error: null };
+      return {
+        timestampISO: d.toISOString(),
+        error: null
+      };
     }
 
     if (flags.stamp) {
@@ -581,16 +588,21 @@ const TimestampParser = (() => {
           error: `${commandName}: invalid stamp format '${flags.stamp}'`,
         };
       }
-      return { timestampISO: parsedISO, error: null };
+      return {
+        timestampISO: parsedISO,
+        error: null
+      };
     }
 
-    // Default to current time if no specific timestamp flags are given
-    return { timestampISO: nowActualISO, error: null };
+    return {
+      timestampISO: nowActualISO,
+      error: null
+    };
   }
 
   return {
     resolveTimestampFromCommandFlags,
-    // parseStampToISO could also be exposed if needed directly elsewhere, but typically resolveTimestampFromCommandFlags would be used.
+
   };
 })();
 const OutputManager = (() => {
@@ -620,7 +632,9 @@ const OutputManager = (() => {
       return;
     }
 
-    const { typeClass = null, isBackground = false } = options;
+    const {
+      typeClass = null, isBackground = false
+    } = options;
     if (
       isBackground &&
       !DOM.inputLineContainerDiv.classList.contains(Config.CSS_CLASSES.HIDDEN)
@@ -678,6 +692,7 @@ const OutputManager = (() => {
     }
     originalConsoleLog.apply(console, args);
   }
+
   function _consoleWarnOverride(...args) {
     if (
       DOM.outputDiv &&
@@ -690,6 +705,7 @@ const OutputManager = (() => {
     }
     originalConsoleWarn.apply(console, args);
   }
+
   function _consoleErrorOverride(...args) {
     if (
       DOM.outputDiv &&
@@ -728,6 +744,7 @@ const OutputManager = (() => {
 
 const StorageManager = (() => {
   "use strict";
+
   function loadItem(key, itemName, defaultValue = null) {
     try {
       const storedValue = localStorage.getItem(key);
@@ -747,8 +764,9 @@ const StorageManager = (() => {
         typeof OutputManager.appendToOutput === "function"
       ) {
         OutputManager.appendToOutput(
-          `Warning: ${itemName} for '${key}' corrupted. Using default.`,
-          { typeClass: Config.CSS_CLASSES.WARNING_MSG },
+          `Warning: ${itemName} for '${key}' corrupted. Using default.`, {
+            typeClass: Config.CSS_CLASSES.WARNING_MSG
+          },
         );
       } else {
         console.warn(
@@ -758,12 +776,13 @@ const StorageManager = (() => {
     }
     return defaultValue;
   }
+
   function saveItem(key, data, itemName) {
     try {
       const valueToStore =
-        typeof data === "object" && data !== null
-          ? JSON.stringify(data)
-          : String(data);
+        typeof data === "object" && data !== null ?
+        JSON.stringify(data) :
+        String(data);
       localStorage.setItem(key, valueToStore);
       return true;
     } catch (e) {
@@ -772,8 +791,9 @@ const StorageManager = (() => {
         typeof OutputManager.appendToOutput === "function"
       ) {
         OutputManager.appendToOutput(
-          `Error saving ${itemName} for '${key}'. Data may be lost.`,
-          { typeClass: Config.CSS_CLASSES.ERROR_MSG },
+          `Error saving ${itemName} for '${key}'. Data may be lost.`, {
+            typeClass: Config.CSS_CLASSES.ERROR_MSG
+          },
         );
       } else {
         console.error(
@@ -783,9 +803,11 @@ const StorageManager = (() => {
     }
     return false;
   }
+
   function removeItem(key) {
     localStorage.removeItem(key);
   }
+
   function getAllLocalStorageKeys() {
     const keys = [];
     for (let i = 0; i < localStorage.length; i++) {
@@ -793,7 +815,12 @@ const StorageManager = (() => {
     }
     return keys;
   }
-  return { loadItem, saveItem, removeItem, getAllLocalStorageKeys };
+  return {
+    loadItem,
+    saveItem,
+    removeItem,
+    getAllLocalStorageKeys
+  };
 })();
 
 const IndexedDBManager = (() => {
@@ -856,6 +883,7 @@ const IndexedDBManager = (() => {
       };
     });
   }
+
   function getDbInstance() {
     if (!dbInstance) {
       const errorMsg =
@@ -874,7 +902,10 @@ const IndexedDBManager = (() => {
     }
     return dbInstance;
   }
-  return { init, getDbInstance };
+  return {
+    init,
+    getDbInstance
+  };
 })();
 
 const FileSystemManager = (() => {
@@ -893,7 +924,7 @@ const FileSystemManager = (() => {
         children: {},
         owner: user,
         mode: Config.FILESYSTEM.DEFAULT_DIR_MODE,
-        mtime: new Date().toISOString(), // Added mtime for root
+        mtime: new Date().toISOString(),
       },
     };
   }
@@ -901,8 +932,9 @@ const FileSystemManager = (() => {
     const db = IndexedDBManager.getDbInstance();
     if (!db) {
       OutputManager.appendToOutput(
-        "Error: File system storage not available for saving. Changes may not be persisted.",
-        { typeClass: Config.CSS_CLASSES.ERROR_MSG },
+        "Error: File system storage not available for saving. Changes may not be persisted.", {
+          typeClass: Config.CSS_CLASSES.ERROR_MSG
+        },
       );
       return Promise.reject(Config.INTERNAL_ERRORS.DB_NOT_INITIALIZED_FS_SAVE);
     }
@@ -919,7 +951,7 @@ const FileSystemManager = (() => {
           typeof dataToSave !== "object" ||
           !dataToSave[Config.FILESYSTEM.ROOT_PATH] ||
           dataToSave[Config.FILESYSTEM.ROOT_PATH].type !==
-            Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE
+          Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE
         ) {
           console.error(
             "Attempted to save invalid fsData structure for user:",
@@ -927,8 +959,9 @@ const FileSystemManager = (() => {
             dataToSave,
           );
           OutputManager.appendToOutput(
-            `Error: Corrupted file system data for ${user} before saving. Save aborted.`,
-            { typeClass: Config.CSS_CLASSES.ERROR_MSG },
+            `Error: Corrupted file system data for ${user} before saving. Save aborted.`, {
+              typeClass: Config.CSS_CLASSES.ERROR_MSG
+            },
           );
           return reject(
             new Error(Config.INTERNAL_ERRORS.CORRUPTED_FS_DATA_PRE_SAVE),
@@ -942,16 +975,18 @@ const FileSystemManager = (() => {
         request.onerror = (event) => {
           console.error(`Error saving FS for ${user}:`, event.target.error);
           OutputManager.appendToOutput(
-            `Error: OopisOs failed to save your file system data for user '${user}'. This could be due to a storage issue. Please try again later or consider backing up your data if possible.`,
-            { typeClass: Config.CSS_CLASSES.ERROR_MSG },
+            `Error: OopisOs failed to save your file system data for user '${user}'. This could be due to a storage issue. Please try again later or consider backing up your data if possible.`, {
+              typeClass: Config.CSS_CLASSES.ERROR_MSG
+            },
           );
           reject(event.target.error);
         };
       } catch (e) {
         console.error(`Error initiating save transaction for ${user}:`, e);
         OutputManager.appendToOutput(
-          `Error: OopisOs failed to save your file system data for user '${user}' (transaction error). Please try again later.`,
-          { typeClass: Config.CSS_CLASSES.ERROR_MSG },
+          `Error: OopisOs failed to save your file system data for user '${user}' (transaction error). Please try again later.`, {
+            typeClass: Config.CSS_CLASSES.ERROR_MSG
+          },
         );
         reject(e);
       }
@@ -961,8 +996,9 @@ const FileSystemManager = (() => {
     const db = IndexedDBManager.getDbInstance();
     if (!db) {
       OutputManager.appendToOutput(
-        "Error: File system storage not available for loading. Using temporary session.",
-        { typeClass: Config.CSS_CLASSES.ERROR_MSG },
+        "Error: File system storage not available for loading. Using temporary session.", {
+          typeClass: Config.CSS_CLASSES.ERROR_MSG
+        },
       );
       await initialize(user);
       return Promise.reject(Config.INTERNAL_ERRORS.DB_NOT_INITIALIZED_FS_LOAD);
@@ -981,22 +1017,24 @@ const FileSystemManager = (() => {
             result &&
             result.data &&
             result.data[Config.FILESYSTEM.ROOT_PATH]?.type ===
-              Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE
+            Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE
           ) {
             fsData = result.data;
             _ensurePermissionsAndMtimeRecursive(
               fsData[Config.FILESYSTEM.ROOT_PATH],
               user,
               Config.FILESYSTEM.DEFAULT_DIR_MODE,
-            ); // Updated function name
+            );
           } else {
-            const message = result
-              ? `Warning: File system for '${user}' appears invalid or corrupted. Reinitializing.`
-              : `No file system found for '${user}'. Initializing new one.`;
-            const messageType = result
-              ? Config.CSS_CLASSES.WARNING_MSG
-              : Config.CSS_CLASSES.CONSOLE_LOG_MSG;
-            OutputManager.appendToOutput(message, { typeClass: messageType });
+            const message = result ?
+              `Warning: File system for '${user}' appears invalid or corrupted. Reinitializing.` :
+              `No file system found for '${user}'. Initializing new one.`;
+            const messageType = result ?
+              Config.CSS_CLASSES.WARNING_MSG :
+              Config.CSS_CLASSES.CONSOLE_LOG_MSG;
+            OutputManager.appendToOutput(message, {
+              typeClass: messageType
+            });
             await initialize(user);
             await save(user);
           }
@@ -1005,8 +1043,9 @@ const FileSystemManager = (() => {
         request.onerror = async (event) => {
           console.error(`Error loading FS for ${user}:`, event.target.error);
           OutputManager.appendToOutput(
-            `Warning: Could not load file system for '${user}'. Initializing a new one. This might be due to a storage issue.`,
-            { typeClass: Config.CSS_CLASSES.WARNING_MSG },
+            `Warning: Could not load file system for '${user}'. Initializing a new one. This might be due to a storage issue.`, {
+              typeClass: Config.CSS_CLASSES.WARNING_MSG
+            },
           );
           await initialize(user);
           await save(user);
@@ -1015,8 +1054,9 @@ const FileSystemManager = (() => {
       } catch (e) {
         console.error(`Error initiating load transaction for ${user}:`, e);
         OutputManager.appendToOutput(
-          `Warning: Could not load file system for '${user}' (transaction error). Initializing a new one.`,
-          { typeClass: Config.CSS_CLASSES.WARNING_MSG },
+          `Warning: Could not load file system for '${user}' (transaction error). Initializing a new one.`, {
+            typeClass: Config.CSS_CLASSES.WARNING_MSG
+          },
         );
         await initialize(user);
         await save(user);
@@ -1028,18 +1068,18 @@ const FileSystemManager = (() => {
   function _ensurePermissionsAndMtimeRecursive(
     node,
     defaultOwner,
-    defaultMode, // This parameter is passed but not directly used for setting mode if undefined
+    defaultMode,
   ) {
     if (!node) return;
     if (typeof node.owner === "undefined") node.owner = defaultOwner;
     if (typeof node.mode === "undefined") {
       node.mode =
-        node.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE
-          ? Config.FILESYSTEM.DEFAULT_DIR_MODE
-          : Config.FILESYSTEM.DEFAULT_FILE_MODE;
+        node.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE ?
+        Config.FILESYSTEM.DEFAULT_DIR_MODE :
+        Config.FILESYSTEM.DEFAULT_FILE_MODE;
     }
     if (typeof node.mtime === "undefined") {
-      // Ensure mtime exists
+
       node.mtime = new Date().toISOString();
     }
     if (
@@ -1048,10 +1088,10 @@ const FileSystemManager = (() => {
     ) {
       for (const childName in node.children) {
         _ensurePermissionsAndMtimeRecursive(
-          // Recursive call
+
           node.children[childName],
           defaultOwner,
-          defaultMode, // Pass it down
+          defaultMode,
         );
       }
     }
@@ -1082,8 +1122,9 @@ const FileSystemManager = (() => {
     const db = IndexedDBManager.getDbInstance();
     if (!db) {
       OutputManager.appendToOutput(
-        "Error: File system storage not available for clearing all data.",
-        { typeClass: Config.CSS_CLASSES.ERROR_MSG },
+        "Error: File system storage not available for clearing all data.", {
+          typeClass: Config.CSS_CLASSES.ERROR_MSG
+        },
       );
       return Promise.reject(Config.INTERNAL_ERRORS.DB_NOT_INITIALIZED_FS_CLEAR);
     }
@@ -1098,8 +1139,9 @@ const FileSystemManager = (() => {
       request.onerror = (event) => {
         console.error("Error clearing FileSystemsStore:", event.target.error);
         OutputManager.appendToOutput(
-          "Error: OopisOs could not clear all user file systems. Your data might still be present. Please try the operation again.",
-          { typeClass: Config.CSS_CLASSES.ERROR_MSG },
+          "Error: OopisOs could not clear all user file systems. Your data might still be present. Please try the operation again.", {
+            typeClass: Config.CSS_CLASSES.ERROR_MSG
+          },
         );
         reject(event.target.error);
       };
@@ -1109,12 +1151,15 @@ const FileSystemManager = (() => {
   function getCurrentPath() {
     return currentPath;
   }
+
   function setCurrentPath(path) {
     currentPath = path;
   }
+
   function getFsData() {
     return fsData;
   }
+
   function setFsData(newData) {
     fsData = newData;
   }
@@ -1126,12 +1171,12 @@ const FileSystemManager = (() => {
       effectiveBasePath = Config.FILESYSTEM.ROOT_PATH;
     }
     const baseSegments =
-      effectiveBasePath === Config.FILESYSTEM.ROOT_PATH
-        ? []
-        : effectiveBasePath
-            .substring(1)
-            .split(Config.FILESYSTEM.PATH_SEPARATOR)
-            .filter((s) => s && s !== Config.FILESYSTEM.CURRENT_DIR_SYMBOL);
+      effectiveBasePath === Config.FILESYSTEM.ROOT_PATH ?
+      [] :
+      effectiveBasePath
+      .substring(1)
+      .split(Config.FILESYSTEM.PATH_SEPARATOR)
+      .filter((s) => s && s !== Config.FILESYSTEM.CURRENT_DIR_SYMBOL);
     let resolvedSegments = [...baseSegments];
     const targetSegments = targetPath.split(Config.FILESYSTEM.PATH_SEPARATOR);
     for (const segment of targetSegments) {
@@ -1140,8 +1185,7 @@ const FileSystemManager = (() => {
           targetPath.startsWith(Config.FILESYSTEM.PATH_SEPARATOR) &&
           resolvedSegments.length === 0 &&
           segment === ""
-        ) {
-        }
+        ) {}
         continue;
       }
       if (segment === Config.FILESYSTEM.PARENT_DIR_SYMBOL) {
@@ -1156,6 +1200,7 @@ const FileSystemManager = (() => {
       resolvedSegments.join(Config.FILESYSTEM.PATH_SEPARATOR)
     );
   }
+
   function getNodeByPath(path) {
     const absolutePath = getAbsolutePath(path, currentPath);
     if (absolutePath === Config.FILESYSTEM.ROOT_PATH)
@@ -1193,7 +1238,7 @@ const FileSystemManager = (() => {
     }
     return 0;
   }
-  // Helper function to update mtime of a node and its parent
+
   function _updateNodeAndParentMtime(nodePath, nowISO) {
     if (!nodePath || !nowISO) return;
 
@@ -1220,7 +1265,7 @@ const FileSystemManager = (() => {
 
   function createParentDirectoriesIfNeeded(fullPath) {
     const currentUserForCPDIF = UserManager.getCurrentUser().name;
-    const nowISO = new Date().toISOString(); // For mtime updates
+    const nowISO = new Date().toISOString();
     if (fullPath === Config.FILESYSTEM.ROOT_PATH) {
       return {
         parentNode: null,
@@ -1231,9 +1276,9 @@ const FileSystemManager = (() => {
       Config.FILESYSTEM.PATH_SEPARATOR,
     );
     const parentPathForSegments =
-      lastSlashIndex === 0
-        ? Config.FILESYSTEM.ROOT_PATH
-        : fullPath.substring(0, lastSlashIndex);
+      lastSlashIndex === 0 ?
+      Config.FILESYSTEM.ROOT_PATH :
+      fullPath.substring(0, lastSlashIndex);
     const finalDirNameInPath = fullPath.substring(lastSlashIndex + 1);
 
     if (
@@ -1248,7 +1293,10 @@ const FileSystemManager = (() => {
     }
 
     if (parentPathForSegments === Config.FILESYSTEM.ROOT_PATH) {
-      return { parentNode: fsData[Config.FILESYSTEM.ROOT_PATH], error: null };
+      return {
+        parentNode: fsData[Config.FILESYSTEM.ROOT_PATH],
+        error: null
+      };
     }
 
     const segmentsToCreate = parentPathForSegments
@@ -1275,28 +1323,37 @@ const FileSystemManager = (() => {
         typeof currentParentNode.children !== "object"
       ) {
         const errorMsg = `Internal error: currentParentNode.children is not an object at path "${currentProcessedPath}" for segment "${segment}".`;
-        return { parentNode: null, error: errorMsg };
+        return {
+          parentNode: null,
+          error: errorMsg
+        };
       }
 
       if (!currentParentNode.children[segment]) {
         if (!hasPermission(currentParentNode, currentUserForCPDIF, "write")) {
           const errorMsg = `Cannot create directory '${segment}' in '${currentProcessedPath}'${Config.MESSAGES.PERMISSION_DENIED_SUFFIX}`;
-          return { parentNode: null, error: errorMsg };
+          return {
+            parentNode: null,
+            error: errorMsg
+          };
         }
         currentParentNode.children[segment] = {
           type: Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE,
           children: {},
           owner: currentUserForCPDIF,
           mode: Config.FILESYSTEM.DEFAULT_DIR_MODE,
-          mtime: nowISO, // Set mtime for newly created parent dir
+          mtime: nowISO,
         };
-        currentParentNode.mtime = nowISO; // Update mtime of the directory where this new dir was created
+        currentParentNode.mtime = nowISO;
       } else if (
         currentParentNode.children[segment].type !==
         Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE
       ) {
         const errorMsg = `Path component '${getAbsolutePath(segment, currentProcessedPath)}' is not a directory.`;
-        return { parentNode: null, error: errorMsg };
+        return {
+          parentNode: null,
+          error: errorMsg
+        };
       }
 
       currentParentNode = currentParentNode.children[segment];
@@ -1312,20 +1369,23 @@ const FileSystemManager = (() => {
         };
       }
     }
-    return { parentNode: currentParentNode, error: null };
+    return {
+      parentNode: currentParentNode,
+      error: null
+    };
   }
 
   function validatePath(commandName, pathArg, options = {}) {
     const {
       allowMissing = false,
-      expectedType = null,
-      disallowRoot = false,
-      defaultToCurrentIfEmpty = true,
+        expectedType = null,
+        disallowRoot = false,
+        defaultToCurrentIfEmpty = true,
     } = options;
     const effectivePathArg =
-      pathArg === "" && defaultToCurrentIfEmpty
-        ? Config.FILESYSTEM.CURRENT_DIR_SYMBOL
-        : pathArg;
+      pathArg === "" && defaultToCurrentIfEmpty ?
+      Config.FILESYSTEM.CURRENT_DIR_SYMBOL :
+      pathArg;
     const resolvedPath = getAbsolutePath(effectivePathArg, currentPath);
     const node = getNodeByPath(resolvedPath);
 
@@ -1339,7 +1399,12 @@ const FileSystemManager = (() => {
     }
     if (!node) {
       if (allowMissing)
-        return { error: null, node: null, resolvedPath, optionsUsed: options };
+        return {
+          error: null,
+          node: null,
+          resolvedPath,
+          optionsUsed: options
+        };
       return {
         error: `${commandName}: '${pathArg}' (resolved to '${resolvedPath}'): No such file or directory`,
         node: null,
@@ -1349,15 +1414,15 @@ const FileSystemManager = (() => {
     }
     if (expectedType && node.type !== expectedType) {
       const typeName =
-        expectedType === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE
-          ? "directory"
-          : "file";
+        expectedType === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE ?
+        "directory" :
+        "file";
       const actualTypeName =
-        node.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE
-          ? "directory"
-          : node.type === Config.FILESYSTEM.DEFAULT_FILE_TYPE
-            ? "file"
-            : "unknown type";
+        node.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE ?
+        "directory" :
+        node.type === Config.FILESYSTEM.DEFAULT_FILE_TYPE ?
+        "file" :
+        "unknown type";
       return {
         error: `${commandName}: '${pathArg}' (resolved to '${resolvedPath}') is not a ${typeName} (it's a ${actualTypeName})`,
         node,
@@ -1365,7 +1430,12 @@ const FileSystemManager = (() => {
         optionsUsed: options,
       };
     }
-    return { error: null, node, resolvedPath, optionsUsed: options };
+    return {
+      error: null,
+      node,
+      resolvedPath,
+      optionsUsed: options
+    };
   }
 
   function hasPermission(node, username, permissionType) {
@@ -1426,15 +1496,12 @@ const FileSystemManager = (() => {
     const x = Config.FILESYSTEM.PERMISSION_BIT_EXECUTE;
 
     let str = typeChar;
-    str += ownerPerms & r ? "r" : "-";
-    str += ownerPerms & w ? "w" : "-";
-    str += ownerPerms & x ? "x" : "-";
-    str += otherPerms & r ? "r" : "-";
-    str += otherPerms & w ? "w" : "-";
-    str += otherPerms & x ? "x" : "-";
-    str += otherPerms & r ? "r" : "-";
-    str += otherPerms & w ? "w" : "-";
-    str += otherPerms & x ? "x" : "-";
+    str += (ownerPerms & Config.FILESYSTEM.PERMISSION_BIT_READ) ? "r" : "-";
+    str += (ownerPerms & Config.FILESYSTEM.PERMISSION_BIT_WRITE) ? "w" : "-";
+    str += (ownerPerms & Config.FILESYSTEM.PERMISSION_BIT_EXECUTE) ? "x" : "-";
+    str += (otherPerms & Config.FILESYSTEM.PERMISSION_BIT_READ) ? "r" : "-";
+    str += (otherPerms & Config.FILESYSTEM.PERMISSION_BIT_WRITE) ? "w" : "-";
+    str += (otherPerms & Config.FILESYSTEM.PERMISSION_BIT_EXECUTE) ? "x" : "-";
 
     return str;
   }
@@ -1465,6 +1532,7 @@ const HistoryManager = (() => {
   "use strict";
   let commandHistory = [];
   let historyIndex = 0;
+
   function add(command) {
     const trimmedCommand = command.trim();
     if (
@@ -1479,6 +1547,7 @@ const HistoryManager = (() => {
     }
     historyIndex = commandHistory.length;
   }
+
   function getPrevious() {
     if (commandHistory.length > 0 && historyIndex > 0) {
       historyIndex--;
@@ -1486,6 +1555,7 @@ const HistoryManager = (() => {
     }
     return null;
   }
+
   function getNext() {
     if (historyIndex < commandHistory.length - 1) {
       historyIndex++;
@@ -1496,16 +1566,20 @@ const HistoryManager = (() => {
     }
     return null;
   }
+
   function resetIndex() {
     historyIndex = commandHistory.length;
   }
+
   function getFullHistory() {
     return [...commandHistory];
   }
+
   function clearHistory() {
     commandHistory = [];
     historyIndex = 0;
   }
+
   function setHistory(newHistory) {
     commandHistory = Array.isArray(newHistory) ? [...newHistory] : [];
     historyIndex = commandHistory.length;
@@ -1525,6 +1599,7 @@ const ConfirmationManager = (() => {
   "use strict";
   let awaitingConfirmation = false;
   let confirmationContext = null;
+
   function request(
     promptMessageLines,
     dataForAction,
@@ -1533,9 +1608,9 @@ const ConfirmationManager = (() => {
   ) {
     awaitingConfirmation = true;
     confirmationContext = {
-      promptMessageLines: Array.isArray(promptMessageLines)
-        ? promptMessageLines
-        : [promptMessageLines],
+      promptMessageLines: Array.isArray(promptMessageLines) ?
+        promptMessageLines :
+        [promptMessageLines],
       data: dataForAction,
       onConfirm: onConfirmCallback,
       onCancel: onCancelCallback,
@@ -1579,32 +1654,37 @@ const ConfirmationManager = (() => {
     confirmationContext = null;
     return processed;
   }
+
   function isAwaiting() {
     return awaitingConfirmation;
   }
-  return { request, handleConfirmation, isAwaiting };
+  return {
+    request,
+    handleConfirmation,
+    isAwaiting
+  };
 })();
 
 const EditorUtils = (() => {
   "use strict";
 
   function determineMode(filePath) {
-    const extension = Utils.getFileExtension(filePath); //
+    const extension = Utils.getFileExtension(filePath);
     return (
       Config.EDITOR.EXTENSIONS_MAP[extension] || Config.EDITOR.DEFAULT_MODE
-    ); //
+    );
   }
 
   function getPreviewStylingCSS(isHtmlMode = false) {
     let baseStyles = `
                     body { font-family: sans-serif; margin: 20px; line-height: 1.6; background-color: #fff; color: #333; }
                     pre { white-space: pre-wrap; word-break: break-word; }
-                `; //
+                `;
     if (isHtmlMode) {
-      // New, cleaner string with padding on the body and some text defaults:
+
       return (
         `html { height: 100%; width: 100%; margin: 0; padding: 0; box-sizing: border-box; background-color: #fff; } ` +
-        `body { height: 100%; width: 100%; margin: 0; padding: 15px; /* Adjust padding as needed */ box-sizing: border-box; overflow: auto; ` +
+        `body { height: 100%; width: 100%; margin: 0; padding: 15px;  box-sizing: border-box; overflow: auto; ` +
         `font-family: sans-serif; color: #333; line-height: 1.6; word-wrap: break-word; overflow-wrap: break-word; } ` +
         `pre { white-space: pre-wrap !important; word-break: break-all !important; overflow-wrap: break-word !important; }`
       );
@@ -1621,53 +1701,58 @@ const EditorUtils = (() => {
                     .markdown-preview blockquote { border-left: 3px solid #d1d5db; padding-left: 10px; margin-left: 0; color: #6b7280; }
                     .markdown-preview a { color: #0ea5e9; text-decoration: underline; }
                 `
-    ); // (styling for markdown)
+    );
   }
 
   function calculateStatusBarInfo(text, selectionStart) {
-    const lines = text.split("\n"); //
-    const lineCount = lines.length; //
-    const charCount = text.length; //
+    const lines = text.split("\n");
+    const lineCount = lines.length;
+    const charCount = text.length;
     const wordCount =
-      text.trim() === "" ? 0 : text.trim().split(/\s+/).filter(Boolean).length; //
+      text.trim() === "" ? 0 : text.trim().split(/\s+/).filter(Boolean).length;
 
-    let currentLineNum = 0; //
-    let currentColNum = 0; //
-    let charCounter = 0; //
+    let currentLineNum = 0;
+    let currentColNum = 0;
+    let charCounter = 0;
     for (let i = 0; i < lines.length; i++) {
-      const lineLengthWithNewline = lines[i].length + 1; //
+      const lineLengthWithNewline = lines[i].length + 1;
       if (
         selectionStart >= charCounter &&
         selectionStart < charCounter + lineLengthWithNewline
       ) {
-        //
-        currentLineNum = i; //
-        currentColNum = selectionStart - charCounter; //
-        break; //
+
+        currentLineNum = i;
+        currentColNum = selectionStart - charCounter;
+        break;
       }
-      charCounter += lineLengthWithNewline; //
+      charCounter += lineLengthWithNewline;
     }
     if (selectionStart === text.length && !text.endsWith("\n")) {
-      //
-      currentLineNum = lines.length - 1; //
-      currentColNum = lines[lines.length - 1].length; //
+
+      currentLineNum = lines.length - 1;
+      currentColNum = lines[lines.length - 1].length;
     } else if (selectionStart === text.length && text.endsWith("\n")) {
-      //
-      currentLineNum = lines.length - 1; // stay on the last line when cursor is at the very end of a file ending with newline
-      currentColNum = 0; // at the beginning of the (now empty) next line conceptually
+
+      currentLineNum = lines.length - 1;
+      currentColNum = 0;
     }
 
     return {
       lines: lineCount,
       words: wordCount,
       chars: charCount,
-      cursor: { line: currentLineNum + 1, col: currentColNum + 1 },
+      cursor: {
+        line: currentLineNum + 1,
+        col: currentColNum + 1
+      },
     };
   }
 
   function generateLineNumbersArray(text) {
-    const lines = text.split("\n").length; //
-    return Array.from({ length: lines }, (_, i) => i + 1); //
+    const lines = text.split("\n").length;
+    return Array.from({
+      length: lines
+    }, (_, i) => i + 1);
   }
 
   return {
@@ -1681,85 +1766,87 @@ const EditorUtils = (() => {
 const EditorUI = (() => {
   "use strict";
 
-  let elements = {}; // To store internal DOM element references
-  let eventCallbacks = {}; // To store callbacks from EditorManager
-  let previewDebounceTimer = null; // Debounce timer for preview updates
+  let elements = {};
+  let eventCallbacks = {};
+  let previewDebounceTimer = null;
   const GUTTER_WRAP_HIDDEN_CLASS = "gutter-hidden-by-wrap";
-  // Builds the entire editor layout and appends it to containerElement
-  function buildLayout(containerElement, callbacks) {
-    eventCallbacks = callbacks; // Store the provided callbacks
 
-    // Create editor elements (moved from EditorManager._setupEditorLayout)
+  function buildLayout(containerElement, callbacks) {
+    eventCallbacks = callbacks;
+
     elements.filenameDisplay = Utils.createElement("span", {
       id: "editor-filename-display",
       className: "text-neutral-400 text-sm",
-    }); //
+    });
     elements.viewToggleButton = Utils.createElement("button", {
       id: "editor-view-toggle",
       className: "btn-editor",
-      eventListeners: { click: eventCallbacks.onViewToggle },
-    }); //
+      eventListeners: {
+        click: eventCallbacks.onViewToggle
+      },
+    });
     elements.exportPreviewButton = Utils.createElement("button", {
       id: "editor-export-preview",
       className: "btn-editor",
       textContent: "Export HTML",
-      eventListeners: { click: eventCallbacks.onExportPreview },
-    }); //
+      eventListeners: {
+        click: eventCallbacks.onExportPreview
+      },
+    });
     elements.wordWrapToggleButton = Utils.createElement("button", {
       id: "editor-word-wrap-toggle",
       className: "btn-editor",
-      eventListeners: { click: eventCallbacks.onWordWrapToggle },
-    }); //
+      eventListeners: {
+        click: eventCallbacks.onWordWrapToggle
+      },
+    });
 
     const controlsRightGroup = Utils.createElement(
-      "div",
-      { className: "flex" },
+      "div", {
+        className: "flex"
+      },
       elements.wordWrapToggleButton,
       elements.viewToggleButton,
       elements.exportPreviewButton,
-    ); //
+    );
     elements.controlsDiv = Utils.createElement(
-      "div",
-      {
+      "div", {
         id: "editor-controls",
-        className:
-          "py-1 text-center flex justify-between items-center border-b border-neutral-700 mb-1",
+        className: "py-1 text-center flex justify-between items-center border-b border-neutral-700 mb-1",
       },
       elements.filenameDisplay,
       controlsRightGroup,
-    ); //
+    );
 
     elements.lineGutter = Utils.createElement("div", {
-      id: "editor-line-gutter", // ID used by the CSS rule in HTML
-      // className: "font-mono text-sm", // We'll set font via style for explicitness
+      id: "editor-line-gutter",
+
       style: {
-        fontFamily: '"VT323", monospace', // Match textarea's font
-        fontSize: "0.875rem", // Match textarea's font size (text-sm)
-        lineHeight: "1.35", // Match textarea's line height
-        paddingTop: "4px", // Match textarea's top padding
-        paddingBottom: "4px", // Match textarea's bottom padding
-        // Other styles like width, text-align, color, bg-color, etc.,
-        // will come from the #editor-line-gutter CSS rule in the HTML <style> tag.
+        fontFamily: '"VT323", monospace',
+        fontSize: "0.875rem",
+        lineHeight: "1.35",
+        paddingTop: "4px",
+        paddingBottom: "4px",
+
         boxSizing: "border-box",
       },
     });
     elements.textarea = Utils.createElement("textarea", {
       id: "editor-textarea",
-      // Removed font-mono, text-base, leading-tight from className to apply via style for better control
-      className:
-        "w-full h-full bg-neutral-950 text-green-400 border-none resize-none outline-none box-border pr-2.5",
+
+      className: "w-full h-full bg-neutral-950 text-green-400 border-none resize-none outline-none box-border pr-2.5",
       spellcheck: "false",
       style: {
-        // Added style attribute for precise control
-        fontFamily: '"VT323", monospace', // Explicit console font
-        fontSize: "0.875rem", // Tailwind's text-sm (14px if 1rem=16px)
-        lineHeight: "1.35", // Consistent line height
-        paddingTop: "4px", // Small top padding
-        paddingBottom: "4px", // Small bottom padding
-        boxSizing: "border-box", // Ensure padding is included correctly
+
+        fontFamily: '"VT323", monospace',
+        fontSize: "0.875rem",
+        lineHeight: "1.35",
+        paddingTop: "4px",
+        paddingBottom: "4px",
+        boxSizing: "border-box",
       },
       eventListeners: {
-        // Keep your existing event listeners
+
         input: eventCallbacks.onInput,
         scroll: eventCallbacks.onScroll,
         click: eventCallbacks.onSelectionChange,
@@ -1768,85 +1855,78 @@ const EditorUI = (() => {
       },
     });
     elements.textareaWrapper = Utils.createElement(
-      "div",
-      {
+      "div", {
         id: "editor-textarea-wrapper",
-        className:
-          "editor-pane flex-1 relative overflow-hidden border-r border-neutral-700 pl-0",
+        className: "editor-pane flex-1 relative overflow-hidden border-r border-neutral-700 pl-0",
       },
       elements.textarea,
-    ); //
+    );
 
     elements.previewPane = Utils.createElement("div", {
       id: "editor-preview-content",
       className: "p-2.5 flex-1 min-h-0",
     });
     elements.previewWrapper = Utils.createElement(
-      "div",
-      {
+      "div", {
         id: "editor-preview-wrapper",
-        className:
-          "editor-pane flex flex-col min-h-0 flex-1 relative overflow-y-auto bg-neutral-900 text-neutral-300",
+        className: "editor-pane flex flex-col min-h-0 flex-1 relative overflow-y-auto bg-neutral-900 text-neutral-300",
       },
       elements.previewPane,
-    ); //
+    );
 
     elements.mainArea = Utils.createElement(
-      "div",
-      {
+      "div", {
         id: "editor-main-area",
         className: "flex-grow flex w-full overflow-hidden relative",
       },
       elements.lineGutter,
       elements.textareaWrapper,
       elements.previewWrapper,
-    ); //
+    );
 
     elements.statusBarLineCount = Utils.createElement("span", {
       id: "status-lines",
-    }); //
+    });
     elements.statusBarWordCount = Utils.createElement("span", {
       id: "status-words",
-    }); //
+    });
     elements.statusBarCharCount = Utils.createElement("span", {
       id: "status-chars",
-    }); //
+    });
     elements.statusBarCursorPos = Utils.createElement("span", {
       id: "status-cursor",
-    }); //
+    });
     const statusBarLeft = Utils.createElement(
-      "div",
-      { className: "flex space-x-4" },
+      "div", {
+        className: "flex space-x-4"
+      },
       elements.statusBarCursorPos,
       elements.statusBarLineCount,
-    ); //
+    );
     const statusBarRight = Utils.createElement(
-      "div",
-      { className: "flex space-x-4" },
+      "div", {
+        className: "flex space-x-4"
+      },
       elements.statusBarWordCount,
       elements.statusBarCharCount,
-    ); //
+    );
     elements.statusBar = Utils.createElement(
-      "div",
-      {
+      "div", {
         id: "editor-status-bar",
-        className:
-          "px-2.5 py-1 text-xs text-neutral-500 border-t border-neutral-700 bg-neutral-900 flex-shrink-0 flex justify-between",
+        className: "px-2.5 py-1 text-xs text-neutral-500 border-t border-neutral-700 bg-neutral-900 flex-shrink-0 flex justify-between",
       },
       statusBarLeft,
       statusBarRight,
-    ); //
+    );
 
     elements.instructionsFooter = Utils.createElement("div", {
       id: "editor-instructions-footer",
-      className:
-        "pt-2 pb-0.5 text-sm text-center text-neutral-400 flex-shrink-0 border-t border-neutral-700 mt-1",
+      className: "pt-2 pb-0.5 text-sm text-center text-neutral-400 flex-shrink-0 border-t border-neutral-700 mt-1",
       textContent: `Ctrl+S: Save & Exit | Ctrl+O: Exit (confirm if unsaved) | Ctrl+P: Toggle Preview`,
-    }); //
+    });
 
     elements.editorContainer = Utils.createElement(
-      "div",
-      {
+      "div", {
         id: "editor-container",
         className: "flex-grow flex flex-col w-full h-full",
       },
@@ -1854,20 +1934,20 @@ const EditorUI = (() => {
       elements.mainArea,
       elements.statusBar,
       elements.instructionsFooter,
-    ); //
+    );
 
-    // Append the editor container to the provided DOM element
     if (containerElement && DOM.inputLineContainerDiv) {
       containerElement.insertBefore(
         elements.editorContainer,
         DOM.inputLineContainerDiv,
-      ); //
+      );
     } else {
       console.error(
         "EditorUI.buildLayout: ContainerElement or DOM.inputLineContainerDiv not found in DOM when trying to insert editor.",
       );
     }
   }
+
   function setGutterVisibility(visible) {
     if (elements.lineGutter) {
       if (visible) {
@@ -1877,26 +1957,26 @@ const EditorUI = (() => {
       }
     }
   }
-  // Removes the editor UI from the DOM and cleans up references
+
   function destroyLayout() {
     if (elements.editorContainer && elements.editorContainer.parentNode) {
-      elements.editorContainer.parentNode.removeChild(elements.editorContainer); //
+      elements.editorContainer.parentNode.removeChild(elements.editorContainer);
     }
-    if (previewDebounceTimer) clearTimeout(previewDebounceTimer); //
+    if (previewDebounceTimer) clearTimeout(previewDebounceTimer);
     previewDebounceTimer = null;
-    elements = {}; // Clear stored element references
-    eventCallbacks = {}; // Clear stored callbacks
+    elements = {};
+    eventCallbacks = {};
   }
 
   function updateFilenameDisplay(filePath, isDirty) {
     if (elements.filenameDisplay) {
-      elements.filenameDisplay.textContent = `File: ${filePath || "Untitled"}${isDirty ? "*" : ""}`; //
+      elements.filenameDisplay.textContent = `File: ${filePath || "Untitled"}${isDirty ? "*" : ""}`;
     }
   }
 
   function updateStatusBar(text, selectionStart) {
     if (!elements.textarea || !elements.statusBar) return;
-    // Use EditorUtils to calculate status bar info
+
     const stats = EditorUtils.calculateStatusBarInfo(text, selectionStart);
     if (elements.statusBarLineCount)
       elements.statusBarLineCount.textContent = `Lines: ${stats.lines}`;
@@ -1910,24 +1990,24 @@ const EditorUI = (() => {
 
   function updateLineNumbers(text) {
     if (!elements.textarea || !elements.lineGutter) return;
-    // Use EditorUtils to generate line numbers array
+
     const numbersArray = EditorUtils.generateLineNumbersArray(text);
-    elements.lineGutter.textContent = numbersArray.join("\n"); //
-    elements.lineGutter.scrollTop = elements.textarea.scrollTop; //
+    elements.lineGutter.textContent = numbersArray.join("\n");
+    elements.lineGutter.scrollTop = elements.textarea.scrollTop;
   }
 
   function syncLineGutterScroll() {
     if (elements.lineGutter && elements.textarea) {
-      elements.lineGutter.scrollTop = elements.textarea.scrollTop; //
+      elements.lineGutter.scrollTop = elements.textarea.scrollTop;
     }
   }
 
   function setTextareaContent(text) {
-    if (elements.textarea) elements.textarea.value = text; //
+    if (elements.textarea) elements.textarea.value = text;
   }
 
   function getTextareaContent() {
-    return elements.textarea ? elements.textarea.value : ""; //
+    return elements.textarea ? elements.textarea.value : "";
   }
 
   function setEditorFocus() {
@@ -1936,8 +2016,8 @@ const EditorUI = (() => {
       elements.textareaWrapper &&
       !elements.textareaWrapper.classList.contains(Config.CSS_CLASSES.HIDDEN)
     ) {
-      //
-      elements.textarea.focus(); //
+
+      elements.textarea.focus();
     }
   }
 
@@ -1946,60 +2026,63 @@ const EditorUI = (() => {
       return {
         start: elements.textarea.selectionStart,
         end: elements.textarea.selectionEnd,
-      }; //
+      };
     }
-    return { start: 0, end: 0 };
+    return {
+      start: 0,
+      end: 0
+    };
   }
 
   function setTextareaSelection(start, end) {
     if (elements.textarea) {
-      elements.textarea.selectionStart = start; //
-      elements.textarea.selectionEnd = end; //
+      elements.textarea.selectionStart = start;
+      elements.textarea.selectionEnd = end;
     }
   }
 
   function applyTextareaWordWrap(isWordWrapActive) {
     if (!elements.textarea) return;
     if (isWordWrapActive) {
-      //
-      elements.textarea.setAttribute("wrap", "soft"); //
-      elements.textarea.classList.remove("no-wrap"); //
+
+      elements.textarea.setAttribute("wrap", "soft");
+      elements.textarea.classList.remove("no-wrap");
     } else {
-      elements.textarea.setAttribute("wrap", "off"); //
-      elements.textarea.classList.add("no-wrap"); //
+      elements.textarea.setAttribute("wrap", "off");
+      elements.textarea.classList.add("no-wrap");
     }
   }
 
   function applyPreviewWordWrap(isWordWrapActive, currentFileMode) {
     if (!elements.previewPane) return;
     if (currentFileMode === Config.EDITOR.MODES.MARKDOWN) {
-      //
+
       elements.previewPane.classList.toggle(
         "word-wrap-enabled",
         isWordWrapActive,
-      ); //
+      );
     }
-    // For HTML mode, word wrap styles are injected directly in renderPreview
+
   }
 
   function updateWordWrapButtonText(isWordWrapActive) {
     if (elements.wordWrapToggleButton) {
-      elements.wordWrapToggleButton.textContent = isWordWrapActive
-        ? "Wrap: On"
-        : "Wrap: Off"; //
+      elements.wordWrapToggleButton.textContent = isWordWrapActive ?
+        "Wrap: On" :
+        "Wrap: Off";
     }
   }
 
   function getPreviewPaneHTML() {
     if (elements.previewPane) {
-      const iframe = elements.previewPane.querySelector("iframe"); //
+      const iframe = elements.previewPane.querySelector("iframe");
       if (iframe && iframe.srcdoc) {
-        //
-        const match = iframe.srcdoc.match(/<body>([\s\S]*)<\/body>/i); // Extract body content if possible
+
+        const match = iframe.srcdoc.match(/<body>([\s\S]*)<\/body>/i);
         if (match && match[1]) return match[1];
-        return iframe.srcdoc; // Fallback to full srcdoc
+        return iframe.srcdoc;
       }
-      return elements.previewPane.innerHTML; //
+      return elements.previewPane.innerHTML;
     }
     return "";
   }
@@ -2010,43 +2093,43 @@ const EditorUI = (() => {
       currentFileMode !== Config.EDITOR.MODES.MARKDOWN &&
       currentFileMode !== Config.EDITOR.MODES.HTML
     ) {
-      //
+
       elements.previewPane.innerHTML = "";
       return;
     }
 
-    if (previewDebounceTimer) clearTimeout(previewDebounceTimer); //
+    if (previewDebounceTimer) clearTimeout(previewDebounceTimer);
     previewDebounceTimer = setTimeout(() => {
-      //
+
       if (currentFileMode === Config.EDITOR.MODES.MARKDOWN) {
-        //
+
         if (typeof marked !== "undefined") {
-          //
-          elements.previewPane.innerHTML = marked.parse(content); //
+
+          elements.previewPane.innerHTML = marked.parse(content);
         } else {
           elements.previewPane.textContent =
-            "Markdown preview library (marked.js) not loaded."; //
+            "Markdown preview library (marked.js) not loaded.";
         }
         applyPreviewWordWrap(isWordWrapActive, currentFileMode);
       } else if (currentFileMode === Config.EDITOR.MODES.HTML) {
-        //
-        let iframe = elements.previewPane.querySelector("iframe"); //
+
+        let iframe = elements.previewPane.querySelector("iframe");
         if (!iframe) {
-          //
+
           iframe = Utils.createElement("iframe", {
             className: "w-full h-full border-none bg-white",
-          }); //
+          });
           elements.previewPane.innerHTML = "";
-          elements.previewPane.appendChild(iframe); //
+          elements.previewPane.appendChild(iframe);
         }
-        let injectedStyles = ""; //
+        let injectedStyles = "";
         if (isWordWrapActive) {
-          // // Style for <pre> tags within user HTML
-          injectedStyles = `<style> pre { white-space: pre-wrap !important; word-break: break-all !important; overflow-wrap: break-word !important; } body { word-wrap: break-word; overflow-wrap: break-word; } </style>`; //
+
+          injectedStyles = `<style> pre { white-space: pre-wrap !important; word-break: break-all !important; overflow-wrap: break-word !important; } body { word-wrap: break-word; overflow-wrap: break-word; } </style>`;
         }
-        iframe.srcdoc = `${injectedStyles}<style>${EditorUtils.getPreviewStylingCSS(true)}</style>${content}`; //
+        iframe.srcdoc = `${injectedStyles}<style>${EditorUtils.getPreviewStylingCSS(true)}</style>${content}`;
       }
-    }, Config.EDITOR.DEBOUNCE_DELAY_MS); //
+    }, Config.EDITOR.DEBOUNCE_DELAY_MS);
   }
 
   function setViewMode(
@@ -2067,65 +2150,64 @@ const EditorUI = (() => {
     elements.previewPane.classList.toggle(
       "markdown-preview",
       currentFileMode === Config.EDITOR.MODES.MARKDOWN,
-    ); //
+    );
     if (currentFileMode === Config.EDITOR.MODES.MARKDOWN) {
-      //
-      applyPreviewWordWrap(isWordWrapActive, currentFileMode); //
+
+      applyPreviewWordWrap(isWordWrapActive, currentFileMode);
     }
 
     elements.viewToggleButton.classList.toggle(
       Config.CSS_CLASSES.HIDDEN,
       !isPreviewable,
-    ); //
+    );
     elements.exportPreviewButton.classList.toggle(
       Config.CSS_CLASSES.HIDDEN,
       !isPreviewable,
-    ); //
+    );
 
     elements.textareaWrapper.style.borderRight =
-      isPreviewable && viewMode === Config.EDITOR.VIEW_MODES.SPLIT
-        ? "1px solid #404040"
-        : "none"; //
+      isPreviewable && viewMode === Config.EDITOR.VIEW_MODES.SPLIT ?
+      "1px solid #404040" :
+      "none";
 
     if (!isPreviewable) {
-      //
-      elements.lineGutter.classList.remove(Config.CSS_CLASSES.HIDDEN); //
-      elements.textareaWrapper.classList.remove(Config.CSS_CLASSES.HIDDEN); //
-      elements.textareaWrapper.style.flex = "1"; //
-      elements.previewWrapper.classList.add(Config.CSS_CLASSES.HIDDEN); //
-      elements.previewWrapper.style.flex = "0"; //
-      elements.viewToggleButton.textContent = "Split View"; // Default text if not previewable //
+
+      elements.lineGutter.classList.remove(Config.CSS_CLASSES.HIDDEN);
+      elements.textareaWrapper.classList.remove(Config.CSS_CLASSES.HIDDEN);
+      elements.textareaWrapper.style.flex = "1";
+      elements.previewWrapper.classList.add(Config.CSS_CLASSES.HIDDEN);
+      elements.previewWrapper.style.flex = "0";
+      elements.viewToggleButton.textContent = "Split View";
       return;
     }
 
     if (viewMode === Config.EDITOR.VIEW_MODES.SPLIT) {
-      //
-      elements.viewToggleButton.textContent = "Edit Only"; //
-      elements.lineGutter.classList.remove(Config.CSS_CLASSES.HIDDEN); //
-      elements.textareaWrapper.classList.remove(Config.CSS_CLASSES.HIDDEN); //
-      elements.textareaWrapper.style.flex = "1"; //
-      elements.previewWrapper.classList.remove(Config.CSS_CLASSES.HIDDEN); //
-      elements.previewWrapper.style.flex = "1"; //
+
+      elements.viewToggleButton.textContent = "Edit Only";
+      elements.lineGutter.classList.remove(Config.CSS_CLASSES.HIDDEN);
+      elements.textareaWrapper.classList.remove(Config.CSS_CLASSES.HIDDEN);
+      elements.textareaWrapper.style.flex = "1";
+      elements.previewWrapper.classList.remove(Config.CSS_CLASSES.HIDDEN);
+      elements.previewWrapper.style.flex = "1";
     } else if (viewMode === Config.EDITOR.VIEW_MODES.EDIT_ONLY) {
-      //
-      elements.viewToggleButton.textContent = "Preview Only"; //
-      elements.lineGutter.classList.remove(Config.CSS_CLASSES.HIDDEN); //
-      elements.textareaWrapper.classList.remove(Config.CSS_CLASSES.HIDDEN); //
-      elements.textareaWrapper.style.flex = "1"; //
-      elements.previewWrapper.classList.add(Config.CSS_CLASSES.HIDDEN); //
-      elements.previewWrapper.style.flex = "0"; //
+
+      elements.viewToggleButton.textContent = "Preview Only";
+      elements.lineGutter.classList.remove(Config.CSS_CLASSES.HIDDEN);
+      elements.textareaWrapper.classList.remove(Config.CSS_CLASSES.HIDDEN);
+      elements.textareaWrapper.style.flex = "1";
+      elements.previewWrapper.classList.add(Config.CSS_CLASSES.HIDDEN);
+      elements.previewWrapper.style.flex = "0";
     } else if (viewMode === Config.EDITOR.VIEW_MODES.PREVIEW_ONLY) {
-      //
-      elements.viewToggleButton.textContent = "Split View"; //
-      elements.lineGutter.classList.add(Config.CSS_CLASSES.HIDDEN); //
-      elements.textareaWrapper.classList.add(Config.CSS_CLASSES.HIDDEN); //
-      elements.textareaWrapper.style.flex = "0"; //
-      elements.previewWrapper.classList.remove(Config.CSS_CLASSES.HIDDEN); //
-      elements.previewWrapper.style.flex = "1"; //
+
+      elements.viewToggleButton.textContent = "Split View";
+      elements.lineGutter.classList.add(Config.CSS_CLASSES.HIDDEN);
+      elements.textareaWrapper.classList.add(Config.CSS_CLASSES.HIDDEN);
+      elements.textareaWrapper.style.flex = "0";
+      elements.previewWrapper.classList.remove(Config.CSS_CLASSES.HIDDEN);
+      elements.previewWrapper.style.flex = "1";
     }
   }
 
-  // Expose public methods
   return {
     buildLayout,
     destroyLayout,
@@ -2164,9 +2246,9 @@ const EditorManager = (() => {
       "Editor word wrap setting",
     );
     isWordWrapActive =
-      savedSetting !== null
-        ? savedSetting
-        : Config.EDITOR.WORD_WRAP_DEFAULT_ENABLED; //
+      savedSetting !== null ?
+      savedSetting :
+      Config.EDITOR.WORD_WRAP_DEFAULT_ENABLED;
   }
 
   function _saveWordWrapSetting() {
@@ -2174,123 +2256,127 @@ const EditorManager = (() => {
       Config.STORAGE_KEYS.EDITOR_WORD_WRAP_ENABLED,
       isWordWrapActive,
       "Editor word wrap setting",
-    ); //
+    );
   }
 
   function _toggleWordWrap() {
-    if (!isActiveState) return; // Ensure editor is active
+    if (!isActiveState) return;
     isWordWrapActive = !isWordWrapActive;
-    _saveWordWrapSetting(); //
-    EditorUI.applyTextareaWordWrap(isWordWrapActive); //
-    EditorUI.applyPreviewWordWrap(isWordWrapActive, currentFileMode); //
+    _saveWordWrapSetting();
+    EditorUI.applyTextareaWordWrap(isWordWrapActive);
+    EditorUI.applyPreviewWordWrap(isWordWrapActive, currentFileMode);
     if (currentFileMode === Config.EDITOR.MODES.HTML) {
-      // Re-render preview for HTML if word wrap changes for its specific style injection
+
       EditorUI.renderPreview(
         EditorUI.getTextareaContent(),
         currentFileMode,
         isWordWrapActive,
       );
     }
-    EditorUI.updateWordWrapButtonText(isWordWrapActive); //
-    EditorUI.setEditorFocus(); //
+    EditorUI.updateWordWrapButtonText(isWordWrapActive);
+    EditorUI.setEditorFocus();
     EditorUI.setGutterVisibility(!isWordWrapActive);
   }
 
   function _updateFullEditorUI() {
     if (!isActiveState) return;
-    EditorUI.updateFilenameDisplay(currentFilePath, isDirty); //
-    const textContent = EditorUI.getTextareaContent(); //
-    EditorUI.updateLineNumbers(textContent); //
-    const selection = EditorUI.getTextareaSelection(); //
-    EditorUI.updateStatusBar(textContent, selection.start); //
+    EditorUI.updateFilenameDisplay(currentFilePath, isDirty);
+    const textContent = EditorUI.getTextareaContent();
+    EditorUI.updateLineNumbers(textContent);
+    const selection = EditorUI.getTextareaSelection();
+    EditorUI.updateStatusBar(textContent, selection.start);
 
     if (
       currentFileMode === Config.EDITOR.MODES.MARKDOWN ||
       currentFileMode === Config.EDITOR.MODES.HTML
     ) {
-      //
-      EditorUI.renderPreview(textContent, currentFileMode, isWordWrapActive); //
+
+      EditorUI.renderPreview(textContent, currentFileMode, isWordWrapActive);
     }
   }
 
   function _handleEditorInput() {
     if (!isActiveState) return;
-    const currentContent = EditorUI.getTextareaContent(); //
-    isDirty = currentContent !== originalContent; //
+    const currentContent = EditorUI.getTextareaContent();
+    isDirty = currentContent !== originalContent;
     _updateFullEditorUI();
   }
 
   function _handleEditorScroll() {
     if (!isActiveState) return;
-    EditorUI.syncLineGutterScroll(); //
+    EditorUI.syncLineGutterScroll();
   }
 
   function _handleEditorSelectionChange() {
     if (!isActiveState) return;
-    // Update status bar based on selection
-    const textContent = EditorUI.getTextareaContent(); //
-    const selection = EditorUI.getTextareaSelection(); //
-    EditorUI.updateStatusBar(textContent, selection.start); //
+
+    const textContent = EditorUI.getTextareaContent();
+    const selection = EditorUI.getTextareaSelection();
+    EditorUI.updateStatusBar(textContent, selection.start);
   }
 
   async function exportPreviewAsHtml() {
-    //
+
     if (!isActiveState) return;
-    let contentToExport = ""; //
-    let baseFilename = "preview"; //
+    let contentToExport = "";
+    let baseFilename = "preview";
     if (currentFilePath) {
-      //
+
       baseFilename = currentFilePath.substring(
         currentFilePath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR) + 1,
-      ); //
-      const dotIndex = baseFilename.lastIndexOf("."); //
-      if (dotIndex > 0) baseFilename = baseFilename.substring(0, dotIndex); //
+      );
+      const dotIndex = baseFilename.lastIndexOf(".");
+      if (dotIndex > 0) baseFilename = baseFilename.substring(0, dotIndex);
     }
-    const downloadFilename = `${baseFilename}_preview.html`; //
+    const downloadFilename = `${baseFilename}_preview.html`;
 
     if (currentFileMode === Config.EDITOR.MODES.MARKDOWN) {
-      //
+
       contentToExport = EditorUI.getPreviewPaneHTML();
     } else if (currentFileMode === Config.EDITOR.MODES.HTML) {
-      //
+
       contentToExport = EditorUI.getTextareaContent();
     } else {
-      // For plain text or other modes
-      const textContent = EditorUI.getTextareaContent(); //
-      contentToExport = `<pre>${textContent.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</pre>`; //
+
+      const textContent = EditorUI.getTextareaContent();
+      contentToExport = `<pre>${textContent.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</pre>`;
     }
 
     const styles = EditorUtils.getPreviewStylingCSS(
       currentFileMode === Config.EDITOR.MODES.HTML,
-    ); //
-    let injectedWordWrapStyles = ""; //
+    );
+    let injectedWordWrapStyles = "";
     if (isWordWrapActive && currentFileMode === Config.EDITOR.MODES.HTML) {
-      //
-      injectedWordWrapStyles = `pre { white-space: pre-wrap !important; word-break: break-all !important; overflow-wrap: break-word !important; } body { word-wrap: break-word; overflow-wrap: break-word; }`; //
+
+      injectedWordWrapStyles = `pre { white-space: pre-wrap !important; word-break: break-all !important; overflow-wrap: break-word !important; } body { word-wrap: break-word; overflow-wrap: break-word; }`;
     }
 
-    const htmlDoc = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>OopisOS Editor Preview - ${currentFilePath || "Untitled"}</title><style>${styles}${injectedWordWrapStyles}</style></head><body><div class="${currentFileMode === Config.EDITOR.MODES.MARKDOWN ? "markdown-preview" : ""}">${contentToExport}</div></body></html>`; //
+    const htmlDoc = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>OopisOS Editor Preview - ${currentFilePath || "Untitled"}</title><style>${styles}${injectedWordWrapStyles}</style></head><body><div class="${currentFileMode === Config.EDITOR.MODES.MARKDOWN ? "markdown-preview" : ""}">${contentToExport}</div></body></html>`;
     try {
-      const blob = new Blob([htmlDoc], { type: "text/html" }); //
-      const url = URL.createObjectURL(blob); //
+      const blob = new Blob([htmlDoc], {
+        type: "text/html"
+      });
+      const url = URL.createObjectURL(blob);
       const a = Utils.createElement("a", {
         href: url,
         download: downloadFilename,
-      }); //
+      });
       document.body.appendChild(a);
       a.click();
-      document.body.removeChild(a); //
-      URL.revokeObjectURL(url); //
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
       OutputManager.appendToOutput(
-        `Preview exported as '${downloadFilename}'`,
-        { typeClass: Config.CSS_CLASSES.EDITOR_MSG },
-      ); //
+        `Preview exported as '${downloadFilename}'`, {
+          typeClass: Config.CSS_CLASSES.EDITOR_MSG
+        },
+      );
     } catch (error) {
-      console.error("Error exporting preview:", error); //
+      console.error("Error exporting preview:", error);
       OutputManager.appendToOutput(
-        `Error exporting preview: ${error.message}`,
-        { typeClass: Config.CSS_CLASSES.ERROR_MSG },
-      ); //
+        `Error exporting preview: ${error.message}`, {
+          typeClass: Config.CSS_CLASSES.ERROR_MSG
+        },
+      );
     }
   }
 
@@ -2298,13 +2384,13 @@ const EditorManager = (() => {
     if (!isActiveState) return;
     const isPreviewable =
       currentFileMode === Config.EDITOR.MODES.MARKDOWN ||
-      currentFileMode === Config.EDITOR.MODES.HTML; //
+      currentFileMode === Config.EDITOR.MODES.HTML;
     if (!isPreviewable) return;
 
     if (currentViewMode === Config.EDITOR.VIEW_MODES.SPLIT)
-      currentViewMode = Config.EDITOR.VIEW_MODES.EDIT_ONLY; //
+      currentViewMode = Config.EDITOR.VIEW_MODES.EDIT_ONLY;
     else if (currentViewMode === Config.EDITOR.VIEW_MODES.EDIT_ONLY)
-      currentViewMode = Config.EDITOR.VIEW_MODES.PREVIEW_ONLY; //
+      currentViewMode = Config.EDITOR.VIEW_MODES.PREVIEW_ONLY;
     else currentViewMode = Config.EDITOR.VIEW_MODES.SPLIT;
 
     EditorUI.setViewMode(
@@ -2320,7 +2406,7 @@ const EditorManager = (() => {
     if (isActiveState) {
       OutputManager.appendToOutput("Editor already active.", {
         typeClass: Config.CSS_CLASSES.EDITOR_MSG,
-      }); //
+      });
       return;
     }
     _loadWordWrapSetting();
@@ -2358,10 +2444,10 @@ const EditorManager = (() => {
 
     const isPreviewable =
       currentFileMode === Config.EDITOR.MODES.MARKDOWN ||
-      currentFileMode === Config.EDITOR.MODES.HTML; //
-    currentViewMode = isPreviewable
-      ? Config.EDITOR.VIEW_MODES.SPLIT
-      : Config.EDITOR.VIEW_MODES.EDIT_ONLY; //
+      currentFileMode === Config.EDITOR.MODES.HTML;
+    currentViewMode = isPreviewable ?
+      Config.EDITOR.VIEW_MODES.SPLIT :
+      Config.EDITOR.VIEW_MODES.EDIT_ONLY;
 
     console.log("[EditorManager.enter] Calling EditorUI.buildLayout.");
     EditorUI.buildLayout(DOM.terminalDiv, {
@@ -2374,7 +2460,7 @@ const EditorManager = (() => {
       onWordWrapToggle: _toggleWordWrap.bind(this),
     });
     console.log("[EditorManager.enter] EditorUI.buildLayout finished.");
-    EditorUI.setGutterVisibility(!isWordWrapActive); // Show gutter if word wrap is OFF
+    EditorUI.setGutterVisibility(!isWordWrapActive);
     EditorUI.setViewMode(
       currentViewMode,
       currentFileMode,
@@ -2384,7 +2470,7 @@ const EditorManager = (() => {
     EditorUI.applyTextareaWordWrap(isWordWrapActive);
     EditorUI.updateWordWrapButtonText(isWordWrapActive);
     EditorUI.setTextareaContent(content);
-    EditorUI.setTextareaSelection(0, 0); // Set cursor to start of file
+    EditorUI.setTextareaSelection(0, 0);
 
     _updateFullEditorUI();
     EditorUI.setEditorFocus();
@@ -2392,7 +2478,7 @@ const EditorManager = (() => {
   }
 
   async function _performExitActions() {
-    EditorUI.destroyLayout(); // Call EditorUI to destroy the layout
+    EditorUI.destroyLayout();
     isActiveState = false;
     OutputManager.setEditorActive(false);
     currentFilePath = null;
@@ -2416,191 +2502,205 @@ const EditorManager = (() => {
   }
 
   async function exit(saveChanges = false) {
-    //
-    let proceedToExit = true; //
-    const currentUser = UserManager.getCurrentUser().name; //
-    const nowISO = new Date().toISOString(); //
+
+    let proceedToExit = true;
+    const currentUser = UserManager.getCurrentUser().name;
+    const nowISO = new Date().toISOString();
 
     if (!saveChanges && isDirty) {
-      //
+
       const userConfirmedDiscard = await new Promise((resolveConfirmation) => {
-        //
+
         ConfirmationManager.request(
           [Config.MESSAGES.EDITOR_DISCARD_CONFIRM],
           null,
           () => resolveConfirmation(true),
           () => resolveConfirmation(false),
-        ); //
+        );
       });
       if (userConfirmedDiscard) {
-        //
+
         OutputManager.appendToOutput(
-          `Exited editor for '${currentFilePath || "Untitled"}' without saving. Discarded changes.`,
-          { typeClass: Config.CSS_CLASSES.CONSOLE_LOG_MSG },
-        ); //
+          `Exited editor for '${currentFilePath || "Untitled"}' without saving. Discarded changes.`, {
+            typeClass: Config.CSS_CLASSES.CONSOLE_LOG_MSG
+          },
+        );
       } else {
         OutputManager.appendToOutput("Exit cancelled. Continue editing.", {
           typeClass: Config.CSS_CLASSES.EDITOR_MSG,
-        }); //
-        EditorUI.setEditorFocus(); // Use EditorUI to set focus
-        proceedToExit = false; //
+        });
+        EditorUI.setEditorFocus();
+        proceedToExit = false;
       }
     }
-    if (!proceedToExit) return false; //
+    if (!proceedToExit) return false;
 
-    let saveSuccess = true; //
+    let saveSuccess = true;
     if (saveChanges && currentFilePath) {
-      // Check currentFilePath, not textarea existence //
-      const newContent = EditorUI.getTextareaContent(); // Get content via EditorUI
-      const existingNode = FileSystemManager.getNodeByPath(currentFilePath); //
-      // Permission checks and save logic remain largely the same as before, using newContent.
+
+      const newContent = EditorUI.getTextareaContent();
+      const existingNode = FileSystemManager.getNodeByPath(currentFilePath);
+
       if (existingNode) {
-        //
+
         if (
           !FileSystemManager.hasPermission(existingNode, currentUser, "write")
         ) {
-          //
+
           OutputManager.appendToOutput(
-            `Error saving '${currentFilePath}': Permission denied.`,
-            { typeClass: Config.CSS_CLASSES.ERROR_MSG },
-          ); //
-          saveSuccess = false; //
+            `Error saving '${currentFilePath}': Permission denied.`, {
+              typeClass: Config.CSS_CLASSES.ERROR_MSG
+            },
+          );
+          saveSuccess = false;
         }
       } else {
-        // File is new
+
         const parentPath =
           currentFilePath.substring(
             0,
             currentFilePath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR),
-          ) || Config.FILESYSTEM.ROOT_PATH; //
-        const parentNode = FileSystemManager.getNodeByPath(parentPath); //
+          ) || Config.FILESYSTEM.ROOT_PATH;
+        const parentNode = FileSystemManager.getNodeByPath(parentPath);
         if (
           !parentNode ||
           !FileSystemManager.hasPermission(parentNode, currentUser, "write")
         ) {
-          //
+
           OutputManager.appendToOutput(
-            `Error creating '${currentFilePath}': Permission denied in parent directory.`,
-            { typeClass: Config.CSS_CLASSES.ERROR_MSG },
-          ); //
-          saveSuccess = false; //
+            `Error creating '${currentFilePath}': Permission denied in parent directory.`, {
+              typeClass: Config.CSS_CLASSES.ERROR_MSG
+            },
+          );
+          saveSuccess = false;
         }
       }
 
       if (saveSuccess) {
-        //
+
         const parentDirResult =
-          FileSystemManager.createParentDirectoriesIfNeeded(currentFilePath); //
+          FileSystemManager.createParentDirectoriesIfNeeded(currentFilePath);
         if (parentDirResult.error) {
-          //
+
           OutputManager.appendToOutput(`edit: ${parentDirResult.error}`, {
             typeClass: Config.CSS_CLASSES.EDITOR_MSG,
-          }); //
-          saveSuccess = false; //
+          });
+          saveSuccess = false;
         } else {
-          const parentNode = parentDirResult.parentNode; //
+          const parentNode = parentDirResult.parentNode;
           if (parentNode) {
-            //
+
             const fileName = currentFilePath.substring(
               currentFilePath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR) + 1,
-            ); //
+            );
             parentNode.children[fileName] = {
-              //
-              type: Config.FILESYSTEM.DEFAULT_FILE_TYPE, //
-              content: newContent, //
-              owner: existingNode ? existingNode.owner : currentUser, //
-              mode: existingNode
-                ? existingNode.mode
-                : Config.FILESYSTEM.DEFAULT_FILE_MODE, //
-              mtime: nowISO, //
+
+              type: Config.FILESYSTEM.DEFAULT_FILE_TYPE,
+              content: newContent,
+              owner: existingNode ? existingNode.owner : currentUser,
+              mode: existingNode ?
+                existingNode.mode :
+                Config.FILESYSTEM.DEFAULT_FILE_MODE,
+              mtime: nowISO,
             };
             FileSystemManager._updateNodeAndParentMtime(
               currentFilePath,
               nowISO,
-            ); //
+            );
             if (!(await FileSystemManager.save(currentUser))) {
-              //
+
               OutputManager.appendToOutput(
-                `Error saving file '${currentFilePath}'. Changes might be lost.`,
-                { typeClass: Config.CSS_CLASSES.ERROR_MSG },
-              ); //
-              saveSuccess = false; //
+                `Error saving file '${currentFilePath}'. Changes might be lost.`, {
+                  typeClass: Config.CSS_CLASSES.ERROR_MSG
+                },
+              );
+              saveSuccess = false;
             } else {
               OutputManager.appendToOutput(`File '${currentFilePath}' saved.`, {
                 typeClass: Config.CSS_CLASSES.SUCCESS_MSG,
-              }); //
+              });
               originalContent = newContent;
-              isDirty = false; //
+              isDirty = false;
               EditorUI.updateFilenameDisplay(currentFilePath, isDirty);
             }
           } else {
             OutputManager.appendToOutput(
-              `Failed to save '${currentFilePath}'. Could not obtain parent directory.`,
-              { typeClass: Config.CSS_CLASSES.ERROR_MSG },
-            ); //
-            saveSuccess = false; //
+              `Failed to save '${currentFilePath}'. Could not obtain parent directory.`, {
+                typeClass: Config.CSS_CLASSES.ERROR_MSG
+              },
+            );
+            saveSuccess = false;
           }
         }
       }
     } else if (!saveChanges && !isDirty) {
-      //
+
       OutputManager.appendToOutput(
-        `Exited editor for '${currentFilePath || "Untitled"}' without saving. No changes made.`,
-        { typeClass: Config.CSS_CLASSES.CONSOLE_LOG_MSG },
-      ); //
+        `Exited editor for '${currentFilePath || "Untitled"}' without saving. No changes made.`, {
+          typeClass: Config.CSS_CLASSES.CONSOLE_LOG_MSG
+        },
+      );
     }
 
-    if (saveSuccess) await _performExitActions(); //
-    return saveSuccess; //
+    if (saveSuccess) await _performExitActions();
+    return saveSuccess;
   }
 
   async function handleKeyDown(event) {
-    //
+
     if (!isActiveState) return;
     if (event.key === "Tab") {
-      //
-      event.preventDefault(); //
-      const selection = EditorUI.getTextareaSelection(); // Get selection via EditorUI
-      const content = EditorUI.getTextareaContent(); // Get content via EditorUI
+
+      event.preventDefault();
+      const selection = EditorUI.getTextareaSelection();
+      const content = EditorUI.getTextareaContent();
       EditorUI.setTextareaContent(
         content.substring(0, selection.start) +
-          Config.EDITOR.TAB_REPLACEMENT +
-          content.substring(selection.end),
-      ); // Set content via EditorUI
+        Config.EDITOR.TAB_REPLACEMENT +
+        content.substring(selection.end),
+      );
       EditorUI.setTextareaSelection(
         selection.start + Config.EDITOR.TAB_REPLACEMENT.length,
         selection.start + Config.EDITOR.TAB_REPLACEMENT.length,
-      ); // Set selection via EditorUI
+      );
       _handleEditorInput();
       return;
     }
     if (event.ctrlKey) {
-      //
+
       switch (
-        event.key.toLowerCase() //
+        event.key.toLowerCase()
       ) {
         case "s":
           event.preventDefault();
           await exit(true);
-          break; //
+          break;
         case "o":
           event.preventDefault();
           await exit(false);
-          break; //
+          break;
         case "p":
           event.preventDefault();
           _toggleViewModeHandler();
-          break; //
+          break;
       }
     }
-    setTimeout(_handleEditorSelectionChange, 0); // Update status bar after key press (e.g., arrow keys)
+    setTimeout(_handleEditorSelectionChange, 0);
   }
-  return { isActive: () => isActiveState, enter, exit, exportPreviewAsHtml }; //
+  return {
+    isActive: () => isActiveState,
+    enter,
+    exit,
+    exportPreviewAsHtml
+  };
 })();
 
 const UserManager = (() => {
   "use strict";
-  let currentUser = { name: Config.USER.DEFAULT_NAME };
+  let currentUser = {
+    name: Config.USER.DEFAULT_NAME
+  };
+
   function getCurrentUser() {
     return currentUser;
   }
@@ -2608,16 +2708,21 @@ const UserManager = (() => {
   async function register(username) {
     const formatValidation = Utils.validateUsernameFormat(username);
     if (!formatValidation.isValid) {
-      return { success: false, error: formatValidation.error };
+      return {
+        success: false,
+        error: formatValidation.error
+      };
     }
 
     const users = StorageManager.loadItem(
       Config.STORAGE_KEYS.USER_CREDENTIALS,
-      "User list",
-      {},
+      "User list", {},
     );
     if (users[username]) {
-      return { success: false, error: `User '${username}' already exists.` };
+      return {
+        success: false,
+        error: `User '${username}' already exists.`
+      };
     }
 
     users[username] = {};
@@ -2656,7 +2761,10 @@ const UserManager = (() => {
         message: `User '${username}' registered. You can now login.`,
       };
     } else {
-      return { success: false, error: "Failed to save new user credentials." };
+      return {
+        success: false,
+        error: "Failed to save new user credentials."
+      };
     }
   }
 
@@ -2669,26 +2777,33 @@ const UserManager = (() => {
       };
     const users = StorageManager.loadItem(
       Config.STORAGE_KEYS.USER_CREDENTIALS,
-      "User list",
-      {},
+      "User list", {},
     );
     if (
       !users.hasOwnProperty(username) &&
       username !== Config.USER.DEFAULT_NAME
     ) {
-      return { success: false, error: "Invalid username." };
+      return {
+        success: false,
+        error: "Invalid username."
+      };
     }
     if (
       currentUser.name !== Config.USER.DEFAULT_NAME &&
       currentUser.name !== username
     )
       SessionManager.saveAutomaticState(currentUser.name);
-    currentUser = { name: username };
+    currentUser = {
+      name: username
+    };
     HistoryManager.clearHistory();
     await FileSystemManager.load(username);
     SessionManager.loadAutomaticState(username);
     TerminalUI.updatePrompt();
-    return { success: true, message: `Logged in as ${username}.` };
+    return {
+      success: true,
+      message: `Logged in as ${username}.`
+    };
   }
 
   async function logout() {
@@ -2700,7 +2815,9 @@ const UserManager = (() => {
       };
     SessionManager.saveAutomaticState(currentUser.name);
     const prevUserName = currentUser.name;
-    currentUser = { name: Config.USER.DEFAULT_NAME };
+    currentUser = {
+      name: Config.USER.DEFAULT_NAME
+    };
     HistoryManager.clearHistory();
     await FileSystemManager.load(Config.USER.DEFAULT_NAME);
     SessionManager.loadAutomaticState(Config.USER.DEFAULT_NAME);
@@ -2710,9 +2827,11 @@ const UserManager = (() => {
       message: `User ${prevUserName} logged out. Now logged in as ${Config.USER.DEFAULT_NAME}.`,
     };
   }
+
   function setCurrentUserObject(userObject) {
     currentUser = userObject;
   }
+
   function getDefaultUser() {
     return Config.USER.DEFAULT_NAME;
   }
@@ -2728,14 +2847,16 @@ const UserManager = (() => {
 
 const SessionManager = (() => {
   "use strict";
+
   function _getAutomaticSessionStateKey(user) {
     return `${Config.STORAGE_KEYS.USER_TERMINAL_STATE_PREFIX}${user}`;
   }
+
   function _getManualUserTerminalStateKey(user) {
     const userName =
-      typeof user === "object" && user !== null && user.name
-        ? user.name
-        : String(user);
+      typeof user === "object" && user !== null && user.name ?
+      user.name :
+      String(user);
     return `${Config.STORAGE_KEYS.MANUAL_TERMINAL_STATE_PREFIX}${userName}`;
   }
 
@@ -2753,6 +2874,7 @@ const SessionManager = (() => {
       `Auto session for ${username}`,
     );
   }
+
   function loadAutomaticState(username) {
     const autoState = StorageManager.loadItem(
       _getAutomaticSessionStateKey(username),
@@ -2804,7 +2926,10 @@ const SessionManager = (() => {
         success: true,
         message: `${Config.MESSAGES.SESSION_SAVED_FOR_PREFIX}${currentUser.name}.`,
       };
-    else return { success: false, error: "Failed to save session manually." };
+    else return {
+      success: false,
+      error: "Failed to save session manually."
+    };
   }
   async function loadManualState() {
     const currentUser = UserManager.getCurrentUser();
@@ -2815,41 +2940,44 @@ const SessionManager = (() => {
     if (manualStateData) {
       if (manualStateData.user && manualStateData.user !== currentUser.name)
         OutputManager.appendToOutput(
-          `Warning: Saved state is for user '${manualStateData.user}', but current user is '${currentUser.name}'. Loading anyway.`,
-          { typeClass: Config.CSS_CLASSES.WARNING_MSG },
+          `Warning: Saved state is for user '${manualStateData.user}', but current user is '${currentUser.name}'. Loading anyway.`, {
+            typeClass: Config.CSS_CLASSES.WARNING_MSG
+          },
         );
       ConfirmationManager.request(
         [
           `Load manually saved state for '${currentUser.name}'? This overwrites current session & filesystem.`,
-        ],
-        { pendingData: manualStateData, userNameToRestoreTo: currentUser.name },
+        ], {
+          pendingData: manualStateData,
+          userNameToRestoreTo: currentUser.name
+        },
         async (data) => {
-          FileSystemManager.setFsData(
-            Utils.deepCopyNode(data.pendingData.fsDataSnapshot) || {
-              [Config.FILESYSTEM.ROOT_PATH]: {
-                type: Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE,
-                children: {},
+            FileSystemManager.setFsData(
+              Utils.deepCopyNode(data.pendingData.fsDataSnapshot) || {
+                [Config.FILESYSTEM.ROOT_PATH]: {
+                  type: Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE,
+                  children: {},
+                },
               },
-            },
-          );
-          FileSystemManager.setCurrentPath(
-            data.pendingData.currentPath || Config.FILESYSTEM.ROOT_PATH,
-          );
-          DOM.outputDiv.innerHTML = data.pendingData.outputHTML || "";
-          TerminalUI.setCurrentInputValue(data.pendingData.currentInput || "");
-          HistoryManager.setHistory(data.pendingData.commandHistory || []);
-          await FileSystemManager.save(data.userNameToRestoreTo);
-          OutputManager.appendToOutput(Config.MESSAGES.SESSION_LOADED_MSG, {
-            typeClass: Config.CSS_CLASSES.SUCCESS_MSG,
-          });
-          TerminalUI.updatePrompt();
-          DOM.outputDiv.scrollTop = DOM.outputDiv.scrollHeight;
-        },
-        () => {
-          OutputManager.appendToOutput(Config.MESSAGES.LOAD_STATE_CANCELLED, {
-            typeClass: Config.CSS_CLASSES.CONSOLE_LOG_MSG,
-          });
-        },
+            );
+            FileSystemManager.setCurrentPath(
+              data.pendingData.currentPath || Config.FILESYSTEM.ROOT_PATH,
+            );
+            DOM.outputDiv.innerHTML = data.pendingData.outputHTML || "";
+            TerminalUI.setCurrentInputValue(data.pendingData.currentInput || "");
+            HistoryManager.setHistory(data.pendingData.commandHistory || []);
+            await FileSystemManager.save(data.userNameToRestoreTo);
+            OutputManager.appendToOutput(Config.MESSAGES.SESSION_LOADED_MSG, {
+              typeClass: Config.CSS_CLASSES.SUCCESS_MSG,
+            });
+            TerminalUI.updatePrompt();
+            DOM.outputDiv.scrollTop = DOM.outputDiv.scrollHeight;
+          },
+          () => {
+            OutputManager.appendToOutput(Config.MESSAGES.LOAD_STATE_CANCELLED, {
+              typeClass: Config.CSS_CLASSES.CONSOLE_LOG_MSG,
+            });
+          },
       );
       return {
         success: true,
@@ -2904,14 +3032,17 @@ const SessionManager = (() => {
       );
     } catch (error) {}
     HistoryManager.clearHistory();
-    const guestUser = { name: Config.USER.DEFAULT_NAME };
+    const guestUser = {
+      name: Config.USER.DEFAULT_NAME
+    };
     UserManager.setCurrentUserObject(guestUser);
     await FileSystemManager.initialize(Config.USER.DEFAULT_NAME);
     await FileSystemManager.save(Config.USER.DEFAULT_NAME);
     loadAutomaticState(Config.USER.DEFAULT_NAME);
     await OutputManager.appendToOutput(
-      "Terminal fully reset. All user data and states cleared.",
-      { typeClass: Config.CSS_CLASSES.SUCCESS_MSG },
+      "Terminal fully reset. All user data and states cleared.", {
+        typeClass: Config.CSS_CLASSES.SUCCESS_MSG
+      },
     );
     TerminalUI.updatePrompt();
   }
@@ -2928,27 +3059,31 @@ const SessionManager = (() => {
 const TerminalUI = (() => {
   "use strict";
   let isNavigatingHistory = false;
+
   function updatePrompt() {
     const user =
-      typeof UserManager !== "undefined"
-        ? UserManager.getCurrentUser()
-        : { name: Config.USER.DEFAULT_NAME };
-    DOM.promptUserSpan.textContent = user
-      ? user.name
-      : Config.USER.DEFAULT_NAME;
+      typeof UserManager !== "undefined" ?
+      UserManager.getCurrentUser() :
+      {
+        name: Config.USER.DEFAULT_NAME
+      };
+    DOM.promptUserSpan.textContent = user ?
+      user.name :
+      Config.USER.DEFAULT_NAME;
     DOM.promptUserSpan.className = "prompt-user mr-0.5 text-sky-400";
 
     DOM.promptHostSpan.textContent = Config.OS.DEFAULT_HOST_NAME;
     const currentPathDisplay =
-      typeof FileSystemManager !== "undefined"
-        ? FileSystemManager.getCurrentPath()
-        : Config.FILESYSTEM.ROOT_PATH;
+      typeof FileSystemManager !== "undefined" ?
+      FileSystemManager.getCurrentPath() :
+      Config.FILESYSTEM.ROOT_PATH;
     DOM.promptPathSpan.textContent =
       currentPathDisplay === Config.FILESYSTEM.ROOT_PATH &&
-      currentPathDisplay.length > 1
-        ? Config.FILESYSTEM.ROOT_PATH
-        : currentPathDisplay;
+      currentPathDisplay.length > 1 ?
+      Config.FILESYSTEM.ROOT_PATH :
+      currentPathDisplay;
   }
+
   function focusInput() {
     if (DOM.editableInputDiv) {
       DOM.editableInputDiv.focus();
@@ -2956,18 +3091,22 @@ const TerminalUI = (() => {
         setCaretToEnd(DOM.editableInputDiv);
     }
   }
+
   function clearInput() {
     if (DOM.editableInputDiv) DOM.editableInputDiv.textContent = "";
   }
+
   function getCurrentInputValue() {
     return DOM.editableInputDiv ? DOM.editableInputDiv.textContent : "";
   }
+
   function setCurrentInputValue(value, setAtEnd = true) {
     if (DOM.editableInputDiv) {
       DOM.editableInputDiv.textContent = value;
       if (setAtEnd) setCaretToEnd(DOM.editableInputDiv);
     }
   }
+
   function setCaretToEnd(element) {
     if (!element) return;
     const range = document.createRange();
@@ -2978,6 +3117,7 @@ const TerminalUI = (() => {
     sel.addRange(range);
     element.focus();
   }
+
   function setCaretPosition(element, position) {
     if (!element || typeof position !== "number") return;
     const range = document.createRange();
@@ -3029,8 +3169,7 @@ const TerminalUI = (() => {
     if (DOM.editableInputDiv) {
       DOM.editableInputDiv.contentEditable = isEditable ? "true" : "false";
       DOM.editableInputDiv.style.opacity = isEditable ? "1" : "0.5";
-      if (isEditable) {
-      } else {
+      if (isEditable) {} else {
         DOM.editableInputDiv.blur();
       }
     }
@@ -3039,6 +3178,7 @@ const TerminalUI = (() => {
   function setIsNavigatingHistory(status) {
     isNavigatingHistory = status;
   }
+
   function getIsNavigatingHistory() {
     return isNavigatingHistory;
   }
@@ -3076,7 +3216,8 @@ const TabCompletionManager = (() => {
     "chmod",
     "chown",
     "grep",
-  ]; // Added grep
+  ];
+
   function findLongestCommonPrefix(strs) {
     if (!strs || strs.length === 0) return "";
     if (strs.length === 1) return strs[0];
@@ -3089,6 +3230,7 @@ const TabCompletionManager = (() => {
     }
     return prefix;
   }
+
   function getSuggestions(fullInput, cursorPos) {
     const textBeforeCursor = fullInput.substring(0, cursorPos);
     const tokens = textBeforeCursor.trimStart().split(/\s+/);
@@ -3122,15 +3264,13 @@ const TabCompletionManager = (() => {
           .sort();
       }
     } else if (PATH_COMMANDS.includes(baseCommandForPath)) {
-      // For commands like grep, path completion should apply to arguments *after* the pattern.
-      // This logic might need refinement if the pattern itself could be mistaken for a path.
-      // For now, assume path completion is for file arguments.
+
       if (
         baseCommandForPath === "grep" &&
         tokens.length < (tokens[1]?.startsWith("-") ? 3 : 2) &&
         !lastCharIsSpace
       ) {
-        // Not enough arguments for file path completion yet for grep, or still typing options/pattern
+
       } else {
         let effectiveBasePath = FileSystemManager.getCurrentPath();
         let segmentToMatch = currentWordPrefix;
@@ -3170,7 +3310,10 @@ const TabCompletionManager = (() => {
     }
 
     if (suggestions.length === 0) {
-      return { textToInsert: null, newCursorPos: cursorPos };
+      return {
+        textToInsert: null,
+        newCursorPos: cursorPos
+      };
     }
 
     if (suggestions.length === 1) {
@@ -3182,7 +3325,10 @@ const TabCompletionManager = (() => {
         completedSegment +
         fullInput.substring(cursorPos);
       const newCursor = startOfWordIndex + completedSegment.length;
-      return { textToInsert: newFullInput, newCursorPos: newCursor };
+      return {
+        textToInsert: newFullInput,
+        newCursorPos: newCursor
+      };
     } else {
       const lcp = findLongestCommonPrefix(suggestions);
       if (lcp.length > currentWordPrefix.length) {
@@ -3194,7 +3340,10 @@ const TabCompletionManager = (() => {
           lcp +
           fullInput.substring(cursorPos);
         const newCursor = startOfWordIndex + lcp.length;
-        return { textToInsert: newFullInput, newCursorPos: newCursor };
+        return {
+          textToInsert: newFullInput,
+          newCursorPos: newCursor
+        };
       } else {
         const promptText = `${DOM.promptUserSpan.textContent}${Config.TERMINAL.PROMPT_AT}${DOM.promptHostSpan.textContent}${Config.TERMINAL.PROMPT_SEPARATOR}${DOM.promptPathSpan.textContent}${Config.TERMINAL.PROMPT_CHAR} `;
         OutputManager.appendToOutput(suggestions.join("    "), {
@@ -3205,11 +3354,16 @@ const TabCompletionManager = (() => {
           isCompletionSuggestion: true,
         });
         DOM.outputDiv.scrollTop = DOM.outputDiv.scrollHeight;
-        return { textToInsert: null, newCursorPos: cursorPos };
+        return {
+          textToInsert: null,
+          newCursorPos: cursorPos
+        };
       }
     }
   }
-  return { getSuggestions };
+  return {
+    getSuggestions
+  };
 })();
 
 const CommandExecutor = (() => {
@@ -3438,8 +3592,7 @@ const CommandExecutor = (() => {
             `Parser Error: Expected filename after redirection operator '${opToken.value}'.`,
           );
         this.pipeline.redirection = {
-          type:
-            opToken.type === TokenType.OPERATOR_GTGT ? "append" : "overwrite",
+          type: opToken.type === TokenType.OPERATOR_GTGT ? "append" : "overwrite",
           file: fileToken.value,
         };
       }
@@ -3479,79 +3632,120 @@ const CommandExecutor = (() => {
           else if (commands[cmdName])
             output = `No detailed help for '${cmdName}'.\nDesc: ${commands[cmdName].description || "N/A"}`;
           else
-            return { success: false, error: `help: '${args[0]}' not found.` };
+            return {
+              success: false,
+              error: `help: '${args[0]}' not found.`
+            };
         }
-        return { success: true, output: output };
+        return {
+          success: true,
+          output: output
+        };
       },
       description: "Displays help information.",
-      helpText:
-        "Usage: help [command]\n\nDisplays a list of commands or help for a specific [command].",
+      helpText: "Usage: help [command]\n\nDisplays a list of commands or help for a specific [command].",
     },
     echo: {
       handler: async (args, options) => {
-        return { success: true, output: args.join(" ") };
+        return {
+          success: true,
+          output: args.join(" ")
+        };
       },
       description: "Displays a line of text.",
-      helpText:
-        "Usage: echo [text...]\n\nPrints the specified [text] to the terminal.",
+      helpText: "Usage: echo [text...]\n\nPrints the specified [text] to the terminal.",
     },
     clear: {
       handler: async (args, options) => {
         if (options.isInteractive) OutputManager.clearOutput();
-        return { success: true, output: "" };
+        return {
+          success: true,
+          output: ""
+        };
       },
       description: "Clears the terminal screen.",
-      helpText:
-        "Usage: clear\n\nClears all previous output from the terminal screen.",
+      helpText: "Usage: clear\n\nClears all previous output from the terminal screen.",
     },
     date: {
       handler: async (args, options) => {
-        return { success: true, output: new Date().toString() };
+        return {
+          success: true,
+          output: new Date().toString()
+        };
       },
       description: "Displays the current date and time.",
       helpText: "Usage: date\n\nShows the current system date and time.",
     },
     pwd: {
       handler: async (args, options) => {
-        return { success: true, output: FileSystemManager.getCurrentPath() };
+        return {
+          success: true,
+          output: FileSystemManager.getCurrentPath()
+        };
       },
       description: "Prints the current working directory.",
-      helpText:
-        "Usage: pwd\n\nDisplays the full path of the current directory.",
+      helpText: "Usage: pwd\n\nDisplays the full path of the current directory.",
     },
     ls: {
       handler: async (args, options) => {
-        const flagDefinitions = [
-          { name: "long", short: "-l", long: "--long" },
-          { name: "all", short: "-a", long: "--all" },
-          { name: "recursive", short: "-R" },
-          { name: "reverseSort", short: "-r" },
-          { name: "sortByTime", short: "-t" },
-          { name: "sortBySize", short: "-S" },
-          { name: "sortByExtension", short: "-X" },
-          { name: "noSort", short: "-U" },
+        const flagDefinitions = [{
+            name: "long",
+            short: "-l",
+            long: "--long"
+          },
+          {
+            name: "all",
+            short: "-a",
+            long: "--all"
+          },
+          {
+            name: "recursive",
+            short: "-R"
+          },
+          {
+            name: "reverseSort",
+            short: "-r"
+          },
+          {
+            name: "sortByTime",
+            short: "-t"
+          },
+          {
+            name: "sortBySize",
+            short: "-S"
+          },
+          {
+            name: "sortByExtension",
+            short: "-X"
+          },
+          {
+            name: "noSort",
+            short: "-U"
+          },
         ];
-        const { flags, remainingArgs } = Utils.parseFlags(
+        const {
+          flags,
+          remainingArgs
+        } = Utils.parseFlags(
           args,
           flagDefinitions,
         );
 
         const pathsToList =
-          remainingArgs.length > 0
-            ? remainingArgs.map((p) =>
-                FileSystemManager.getAbsolutePath(
-                  p,
-                  FileSystemManager.getCurrentPath(),
-                ),
-              )
-            : [FileSystemManager.getCurrentPath()];
+          remainingArgs.length > 0 ?
+          remainingArgs.map((p) =>
+            FileSystemManager.getAbsolutePath(
+              p,
+              FileSystemManager.getCurrentPath(),
+            ),
+          ) :
+          [FileSystemManager.getCurrentPath()];
         const currentUser = UserManager.getCurrentUser().name;
         let outputBlocks = [];
-        let overallSuccess = true; // Initialize overall success tracker
+        let overallSuccess = true;
 
-        // Helper to get item details for sorting and formatting
         function getItemDetails(itemName, itemNode, itemPath) {
-          // ... (This function remains the same as in the previous good ls implementation)
+
           if (!itemNode) return null;
           const details = {
             name: itemName,
@@ -3568,9 +3762,8 @@ const CommandExecutor = (() => {
           return details;
         }
 
-        // Helper to format a single item for long listing
         function formatLongListItem(itemDetails) {
-          // ... (This function remains the same)
+
           const perms = FileSystemManager.formatModeToString(itemDetails.node);
           const owner = itemDetails.owner.padEnd(10);
           const size = Utils.formatBytes(itemDetails.size).padStart(8);
@@ -3598,17 +3791,16 @@ const CommandExecutor = (() => {
             dateStr = `${month.padEnd(3)} ${day.padStart(2, " ")} ${hours}:${minutes}`;
           }
           const nameSuffix =
-            itemDetails.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE
-              ? Config.FILESYSTEM.PATH_SEPARATOR
-              : "";
+            itemDetails.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE ?
+            Config.FILESYSTEM.PATH_SEPARATOR :
+            "";
           return `${perms}  ${String(itemDetails.linkCount).padStart(2)} ${owner} ${size} ${dateStr} ${itemDetails.name}${nameSuffix}`;
         }
 
-        // Sorting function
         function sortItems(items, currentFlags) {
           let sortedItems = [...items];
           if (currentFlags.noSort) {
-            /* No sort */
+
           } else if (currentFlags.sortByTime) {
             sortedItems.sort(
               (a, b) => b.mtime - a.mtime || a.name.localeCompare(b.name),
@@ -3632,10 +3824,8 @@ const CommandExecutor = (() => {
           return sortedItems;
         }
 
-        // Core function to list contents of a single directory path
-        // Returns { success: boolean, output: string, items?: ItemDetails[] }
         async function listSinglePathContents(targetPathArg, effectiveFlags) {
-          // Resolve the targetPathArg to an absolute path for validation
+
           const resolvedPath = FileSystemManager.getAbsolutePath(
             targetPathArg,
             FileSystemManager.getCurrentPath(),
@@ -3643,11 +3833,14 @@ const CommandExecutor = (() => {
           const pathValidation = FileSystemManager.validatePath(
             "ls",
             resolvedPath,
-          ); // Use resolvedPath for validation
+          );
 
           if (pathValidation.error) {
-            // pathValidation.error already includes the command name and path, e.g., "ls: '/nonexistent': No such file or directory"
-            return { success: false, output: pathValidation.error };
+
+            return {
+              success: false,
+              output: pathValidation.error
+            };
           }
 
           const targetNode = pathValidation.node;
@@ -3669,7 +3862,7 @@ const CommandExecutor = (() => {
             for (const name of childrenNames) {
               if (!effectiveFlags.all && name.startsWith(".")) continue;
               const childNode = targetNode.children[name];
-              // Pass resolvedPath (parent's path) for getAbsolutePath context
+
               const childFullPath = FileSystemManager.getAbsolutePath(
                 name,
                 resolvedPath,
@@ -3679,8 +3872,7 @@ const CommandExecutor = (() => {
             }
             itemDetailsList = sortItems(itemDetailsList, effectiveFlags);
           } else {
-            // It's a file
-            // For a file, pathArg itself is the file. Its name is the last segment.
+
             const fileName = resolvedPath.substring(
               resolvedPath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR) + 1,
             );
@@ -3690,7 +3882,7 @@ const CommandExecutor = (() => {
                 singleFileResultOutput = formatLongListItem(details);
               else singleFileResultOutput = details.name;
             } else {
-              // Should not happen if pathValidation succeeded
+
               return {
                 success: false,
                 output: `ls: cannot stat '${targetPathArg}': Error retrieving details`,
@@ -3704,7 +3896,7 @@ const CommandExecutor = (() => {
           } else if (
             targetNode.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE
           ) {
-            // Only add total if it's a directory
+
             if (effectiveFlags.long) {
               currentPathOutputLines.push(`total ${itemDetailsList.length}`);
             }
@@ -3713,9 +3905,9 @@ const CommandExecutor = (() => {
                 currentPathOutputLines.push(formatLongListItem(item));
               } else {
                 const nameSuffix =
-                  item.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE
-                    ? Config.FILESYSTEM.PATH_SEPARATOR
-                    : "";
+                  item.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE ?
+                  Config.FILESYSTEM.PATH_SEPARATOR :
+                  "";
                 currentPathOutputLines.push(`${item.name}${nameSuffix}`);
               }
             });
@@ -3727,8 +3919,6 @@ const CommandExecutor = (() => {
           };
         }
 
-        // Recursive display function
-        // Returns { outputs: string[], encounteredError: boolean }
         async function displayRecursive(currentPath, displayFlags, depth = 0) {
           let blockOutputs = [];
           let encounteredErrorInThisBranch = false;
@@ -3742,7 +3932,7 @@ const CommandExecutor = (() => {
           );
 
           if (!listResult.success) {
-            // listResult.output contains the error message from listSinglePathContents
+
             blockOutputs.push(listResult.output);
             encounteredErrorInThisBranch = true;
             return {
@@ -3751,27 +3941,25 @@ const CommandExecutor = (() => {
             };
           }
 
-          // Add the successful listing output for the current directory
           if (
             listResult.output ||
             (flags.long && listResult.items && listResult.items.length === 0)
           ) {
-            // ensure "total 0" for empty dirs with -l
+
             blockOutputs.push(listResult.output);
           }
 
           if (listResult.items) {
-            // Only recurse if items were found (i.e., it was a directory)
+
             const subdirectories = listResult.items.filter(
               (item) =>
-                item.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE &&
-                item.name !== "." &&
-                item.name !== "..",
+              item.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE &&
+              item.name !== "." &&
+              item.name !== "..",
             );
-            // Subdirectories are already sorted by listSinglePathContents if applicable
 
             for (const dirItem of subdirectories) {
-              // dirItem.path is the full resolved path of the subdirectory
+
               const subDirResult = await displayRecursive(
                 dirItem.path,
                 displayFlags,
@@ -3779,7 +3967,7 @@ const CommandExecutor = (() => {
               );
               blockOutputs = blockOutputs.concat(subDirResult.outputs);
               if (subDirResult.encounteredError) {
-                encounteredErrorInThisBranch = true; // Propagate error status
+                encounteredErrorInThisBranch = true;
               }
             }
           }
@@ -3789,7 +3977,6 @@ const CommandExecutor = (() => {
           };
         }
 
-        // Main execution logic
         if (flags.recursive) {
           for (let i = 0; i < pathsToList.length; i++) {
             const path = pathsToList[i];
@@ -3798,19 +3985,17 @@ const CommandExecutor = (() => {
             if (recursiveResult.encounteredError) {
               overallSuccess = false;
             }
-            // Add an extra newline if there are more top-level paths to list recursively,
-            // but not after the very last one.
+
             if (pathsToList.length > 1 && i < pathsToList.length - 1) {
               outputBlocks.push("");
             }
           }
         } else {
-          // Non-recursive
+
           for (let i = 0; i < pathsToList.length; i++) {
             const path = pathsToList[i];
             if (pathsToList.length > 1) {
-              // Add separator and header if not the first path, or always if it's the only one (for consistency with -R)
-              // No, only add separator if NOT the first. Header is always needed for multi-paths.
+
               if (i > 0) outputBlocks.push("");
               outputBlocks.push(`${path}:`);
             }
@@ -3818,16 +4003,14 @@ const CommandExecutor = (() => {
             const listResult = await listSinglePathContents(path, flags);
             if (!listResult.success) {
               overallSuccess = false;
-              // listResult.output should contain the error message
+
               outputBlocks.push(listResult.output);
             } else {
-              // Push output only if it's not empty (e.g. for empty dirs not in long mode)
-              // or if it's a single file listing which always has output.
-              // The "total 0" for empty -l dir handled by listSinglePathContents.
+
               if (
                 listResult.output ||
                 FileSystemManager.getNodeByPath(path)?.type ===
-                  Config.FILESYSTEM.DEFAULT_FILE_TYPE
+                Config.FILESYSTEM.DEFAULT_FILE_TYPE
               ) {
                 outputBlocks.push(listResult.output);
               }
@@ -3841,7 +4024,7 @@ const CommandExecutor = (() => {
 
         return {
           success: overallSuccess,
-          output: finalOutput, // No .trim() here, newlines are intentional between blocks
+          output: finalOutput,
         };
       },
       description: "Lists directory contents or file information.",
@@ -3862,7 +4045,9 @@ Options:
     },
     cd: {
       handler: async (args, options) => {
-        const validationResult = Utils.validateArguments(args, { exact: 1 });
+        const validationResult = Utils.validateArguments(args, {
+          exact: 1
+        });
         if (!validationResult.isValid)
           return {
             success: false,
@@ -3871,11 +4056,15 @@ Options:
         const targetPath = args[0];
         const pathValidation = FileSystemManager.validatePath(
           "cd",
-          targetPath,
-          { expectedType: Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE },
+          targetPath, {
+            expectedType: Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE
+          },
         );
         if (pathValidation.error)
-          return { success: false, error: pathValidation.error };
+          return {
+            success: false,
+            error: pathValidation.error
+          };
         const dirNode = pathValidation.node;
         const currentUser = UserManager.getCurrentUser().name;
         if (!FileSystemManager.hasPermission(dirNode, currentUser, "execute"))
@@ -3891,31 +4080,38 @@ Options:
           };
         FileSystemManager.setCurrentPath(pathValidation.resolvedPath);
         if (options.isInteractive) TerminalUI.updatePrompt();
-        return { success: true, output: "" };
+        return {
+          success: true,
+          output: ""
+        };
       },
       description: "Changes the current directory.",
-      helpText:
-        "Usage: cd <directory_path>\n\nChanges the current working directory to the specified <directory_path>.",
+      helpText: "Usage: cd <directory_path>\n\nChanges the current working directory to the specified <directory_path>.",
     },
     mkdir: {
       handler: async (args, options) => {
-        const { flags, remainingArgs } = Utils.parseFlags(args, [
-          { name: "parents", short: "-p", long: "--parents" },
-        ]);
+        const {
+          flags,
+          remainingArgs
+        } = Utils.parseFlags(args, [{
+          name: "parents",
+          short: "-p",
+          long: "--parents"
+        }, ]);
         const validationResult = Utils.validateArguments(remainingArgs, {
           min: 1,
         });
         if (!validationResult.isValid) {
           return {
             success: false,
-            // errorDetail from validateArguments already doesn't have "mkdir:"
+
             error: validationResult.errorDetail,
             messageType: Config.CSS_CLASSES.ERROR_MSG,
           };
         }
 
         let allSuccess = true;
-        const messages = []; // To store outcomes for each pathArg
+        const messages = [];
         let changesMade = false;
         const currentUser = UserManager.getCurrentUser().name;
         const nowISO = new Date().toISOString();
@@ -3935,7 +4131,7 @@ Options:
             dirName === Config.FILESYSTEM.CURRENT_DIR_SYMBOL ||
             dirName === Config.FILESYSTEM.PARENT_DIR_SYMBOL
           ) {
-            // Add specific error without "mkdir:" prefix
+
             messages.push(
               `cannot create directory '${pathArg}': Invalid path or name`,
             );
@@ -3948,9 +4144,7 @@ Options:
             const parentDirResult =
               FileSystemManager.createParentDirectoriesIfNeeded(resolvedPath);
             if (parentDirResult.error) {
-              // parentDirResult.error might already be prefixed or not,
-              // for consistency, we're aiming for command errors not to self-prefix.
-              // Assuming parentDirResult.error is the raw error detail.
+
               messages.push(parentDirResult.error);
               allSuccess = false;
               continue;
@@ -4004,7 +4198,7 @@ Options:
             const existingItem = parentNodeToCreateIn.children[dirName];
             if (existingItem.type === Config.FILESYSTEM.DEFAULT_FILE_TYPE) {
               messages.push(
-                // Specific message for file conflict
+
                 `cannot create directory '${pathArg}' because it conflicts with an existing file of the same name.`,
               );
               allSuccess = false;
@@ -4013,14 +4207,14 @@ Options:
               !flags.parents
             ) {
               messages.push(
-                // Specific message for directory conflict
+
                 `cannot create directory '${pathArg}': Directory already exists.`,
               );
               allSuccess = false;
             }
-            continue; // Skip to next argument
+            continue;
           } else {
-            // Create the directory
+
             parentNodeToCreateIn.children[dirName] = {
               type: Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE,
               children: {},
@@ -4029,56 +4223,68 @@ Options:
               mtime: nowISO,
             };
             parentNodeToCreateIn.mtime = nowISO;
-            messages.push(`created directory '${pathArg}'`); // Success message for this path
+            messages.push(`created directory '${pathArg}'`);
             changesMade = true;
           }
         }
 
         if (changesMade && !(await FileSystemManager.save(currentUser))) {
-          // This is a critical failure for the entire command.
-          allSuccess = false; // Mark overall operation as failed
-          // Add this critical error to the beginning of messages to ensure it's prominent.
+
+          allSuccess = false;
+
           messages.unshift("Failed to save file system changes.");
         }
 
         if (!allSuccess) {
-          // Filter messages to include only error/warning details if the overall operation failed.
+
           const errorDetailMessages = messages.filter(
-            (m) => !m.startsWith("created directory"), // Remove success messages
+            (m) => !m.startsWith("created directory"),
           );
           return {
             success: false,
-            error:
-              errorDetailMessages.join("\n") ||
-              "An unspecified error occurred.", // Join specific error details for the 'error' field
+            error: errorDetailMessages.join("\n") ||
+              "An unspecified error occurred.",
             messageType: Config.CSS_CLASSES.ERROR_MSG,
           };
         }
 
-        // If all operations were successful
         return {
           success: true,
-          output: messages.join("\n"), // Join all "created directory..." messages
+          output: messages.join("\n"),
           messageType: Config.CSS_CLASSES.SUCCESS_MSG,
         };
       },
       description: "Creates new directories.",
-      helpText:
-        "Usage: mkdir [-p] <directory_name>...\n\nCreates one or more new directories with the specified names.\n  -p, --parents   No error if existing, make parent directories as needed.",
+      helpText: "Usage: mkdir [-p] <directory_name>...\n\nCreates one or more new directories with the specified names.\n  -p, --parents   No error if existing, make parent directories as needed.",
     },
     tree: {
       handler: async (args, options) => {
-        const { flags, remainingArgs } = Utils.parseFlags(args, [
-          { name: "level", short: "-L", long: "--level", takesValue: true },
-          { name: "dirsOnly", short: "-d", long: "--dirs-only" },
+        const {
+          flags,
+          remainingArgs
+        } = Utils.parseFlags(args, [{
+            name: "level",
+            short: "-L",
+            long: "--level",
+            takesValue: true
+          },
+          {
+            name: "dirsOnly",
+            short: "-d",
+            long: "--dirs-only"
+          },
         ]);
         const pathArg =
-          remainingArgs.length > 0
-            ? remainingArgs[0]
-            : Config.FILESYSTEM.CURRENT_DIR_SYMBOL;
-        const maxDepth = flags.level
-          ? Utils.parseNumericArg(flags.level, { min: 0 })
-          : { value: Infinity };
+          remainingArgs.length > 0 ?
+          remainingArgs[0] :
+          Config.FILESYSTEM.CURRENT_DIR_SYMBOL;
+        const maxDepth = flags.level ?
+          Utils.parseNumericArg(flags.level, {
+            min: 0
+          }) :
+          {
+            value: Infinity
+          };
         if (flags.level && (maxDepth.error || maxDepth.value === null))
           return {
             success: false,
@@ -4088,7 +4294,10 @@ Options:
           expectedType: Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE,
         });
         if (pathValidation.error)
-          return { success: false, error: pathValidation.error };
+          return {
+            success: false,
+            error: pathValidation.error
+          };
         const startNode = pathValidation.node;
         const absStartPath = pathValidation.resolvedPath;
         const currentUser = UserManager.getCurrentUser().name;
@@ -4100,6 +4309,7 @@ Options:
         const outputLines = [absStartPath];
         let dirCount = 0;
         let fileCount = 0;
+
         function buildTreeRecursive(
           currentDirPath,
           currentDepth,
@@ -4129,9 +4339,9 @@ Options:
               dirCount++;
               outputLines.push(
                 indentPrefix +
-                  connector +
-                  childName +
-                  Config.FILESYSTEM.PATH_SEPARATOR,
+                connector +
+                childName +
+                Config.FILESYSTEM.PATH_SEPARATOR,
               );
               if (currentDepth < maxDepth.value)
                 buildTreeRecursive(
@@ -4151,19 +4361,37 @@ Options:
         if (!flags.dirsOnly)
           report += `, ${fileCount} file${fileCount === 1 ? "" : "s"}`;
         outputLines.push(report);
-        return { success: true, output: outputLines.join("\n") };
+        return {
+          success: true,
+          output: outputLines.join("\n")
+        };
       },
       description: "Lists contents of directories in a tree-like format.",
       helpText: "Usage: tree [-L level] [-d] [path]\n\n...",
     },
     touch: {
       handler: async (args, options) => {
-        const flagDefinitions = [
-          { name: "noCreate", short: "-c", long: "--no-create" },
-          { name: "dateString", short: "-d", long: "--date", takesValue: true },
-          { name: "stamp", short: "-t", takesValue: true },
+        const flagDefinitions = [{
+            name: "noCreate",
+            short: "-c",
+            long: "--no-create"
+          },
+          {
+            name: "dateString",
+            short: "-d",
+            long: "--date",
+            takesValue: true
+          },
+          {
+            name: "stamp",
+            short: "-t",
+            takesValue: true
+          },
         ];
-        const { flags, remainingArgs } = Utils.parseFlags(
+        const {
+          flags,
+          remainingArgs
+        } = Utils.parseFlags(
           args,
           flagDefinitions,
         );
@@ -4181,10 +4409,13 @@ Options:
         const timestampResult =
           TimestampParser.resolveTimestampFromCommandFlags(flags, "touch");
         if (timestampResult.error) {
-          return { success: false, error: timestampResult.error };
+          return {
+            success: false,
+            error: timestampResult.error
+          };
         }
         const timestampToUse = timestampResult.timestampISO;
-        const nowActualISO = new Date().toISOString(); // For parent dir mtime updates on creation
+        const nowActualISO = new Date().toISOString();
 
         let allSuccess = true;
         const messages = [];
@@ -4194,8 +4425,10 @@ Options:
         for (const pathArg of remainingArgs) {
           const pathValidation = FileSystemManager.validatePath(
             "touch",
-            pathArg,
-            { allowMissing: true, disallowRoot: true },
+            pathArg, {
+              allowMissing: true,
+              disallowRoot: true
+            },
           );
           const resolvedPath = pathValidation.resolvedPath;
 
@@ -4208,7 +4441,7 @@ Options:
           }
 
           if (pathValidation.node) {
-            // Item exists
+
             const node = pathValidation.node;
             if (!FileSystemManager.hasPermission(node, currentUser, "write")) {
               messages.push(
@@ -4218,7 +4451,7 @@ Options:
               continue;
             }
             node.mtime = timestampToUse;
-            // Parent directory's mtime is NOT changed when only updating an existing item's timestamp.
+
             changesMade = true;
             messages.push(
               `${Config.MESSAGES.TIMESTAMP_UPDATED_PREFIX}'${pathArg}'${node.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE ? " (directory)" : ""}${Config.MESSAGES.TIMESTAMP_UPDATED_SUFFIX}`,
@@ -4228,7 +4461,7 @@ Options:
             allSuccess = false;
             continue;
           } else {
-            // Item does not exist
+
             if (flags.noCreate) {
               continue;
             }
@@ -4284,7 +4517,7 @@ Options:
               mode: Config.FILESYSTEM.DEFAULT_FILE_MODE,
               mtime: timestampToUse,
             };
-            parentNode.mtime = nowActualISO; // Parent directory's mtime updates to ACTUAL current time.
+            parentNode.mtime = nowActualISO;
             changesMade = true;
             messages.push(`'${pathArg}'${Config.MESSAGES.FILE_CREATED_SUFFIX}`);
           }
@@ -4312,8 +4545,7 @@ Options:
         }
         return {
           success: true,
-          output:
-            outputMessage ||
+          output: outputMessage ||
             (changesMade ? "" : Config.MESSAGES.NO_ACTION_TAKEN),
           messageType: Config.CSS_CLASSES.SUCCESS_MSG,
         };
@@ -4341,11 +4573,19 @@ Options:
           args.length === 0 &&
           (options.stdinContent === null || options.stdinContent === undefined)
         )
-          return { success: true, output: "" };
+          return {
+            success: true,
+            output: ""
+          };
         if (args.length > 0) {
-          const valRes = Utils.validateArguments(args, { min: 1 });
+          const valRes = Utils.validateArguments(args, {
+            min: 1
+          });
           if (!valRes.isValid)
-            return { success: false, error: `cat: ${valRes.errorDetail}` };
+            return {
+              success: false,
+              error: `cat: ${valRes.errorDetail}`
+            };
         }
         let outputContent = "";
         let firstFile = true;
@@ -4360,11 +4600,15 @@ Options:
         for (const pathArg of args) {
           const pathValidation = FileSystemManager.validatePath(
             "cat",
-            pathArg,
-            { expectedType: Config.FILESYSTEM.DEFAULT_FILE_TYPE },
+            pathArg, {
+              expectedType: Config.FILESYSTEM.DEFAULT_FILE_TYPE
+            },
           );
           if (pathValidation.error)
-            return { success: false, error: pathValidation.error };
+            return {
+              success: false,
+              error: pathValidation.error
+            };
           if (
             !FileSystemManager.hasPermission(
               pathValidation.node,
@@ -4381,18 +4625,38 @@ Options:
           outputContent += pathValidation.node.content || "";
           firstFile = false;
         }
-        return { success: true, output: outputContent };
+        return {
+          success: true,
+          output: outputContent
+        };
       },
       description: "Concatenates and displays files.",
       helpText: "Usage: cat [file...]\n\n...",
     },
     rm: {
       handler: async (args, options) => {
-        const { flags, remainingArgs } = Utils.parseFlags(args, [
-          { name: "recursive", short: "-r", long: "--recursive" },
-          { name: "recursiveAlias", short: "-R" }, // -R is often an alias for -r
-          { name: "force", short: "-f", long: "--force" },
-          { name: "interactive", short: "-i", long: "--interactive" },
+        const {
+          flags,
+          remainingArgs
+        } = Utils.parseFlags(args, [{
+            name: "recursive",
+            short: "-r",
+            long: "--recursive"
+          },
+          {
+            name: "recursiveAlias",
+            short: "-R"
+          },
+          {
+            name: "force",
+            short: "-f",
+            long: "--force"
+          },
+          {
+            name: "interactive",
+            short: "-i",
+            long: "--interactive"
+          },
         ]);
 
         const validationResult = Utils.validateArguments(remainingArgs, {
@@ -4406,11 +4670,11 @@ Options:
 
         const isRecursiveOpt = flags.recursive || flags.recursiveAlias;
         const isForceOpt = flags.force;
-        // -f overrides -i
+
         const isInteractiveOpt = flags.interactive && !isForceOpt;
 
-        let allSuccess = true; // Tracks if all operations that *should* succeed did so
-        let anyChangeMade = false; // Tracks if any actual deletion occurred
+        let allSuccess = true;
+        let anyChangeMade = false;
         const messages = [];
         const currentUser = UserManager.getCurrentUser().name;
         const nowISO = new Date().toISOString();
@@ -4428,7 +4692,7 @@ Options:
           const parentNode = FileSystemManager.getNodeByPath(parentPath);
 
           if (!parentNode) {
-            // Should not happen if path validation passed for itemNode
+
             if (!isForceOpt)
               messages.push(
                 `rm: Internal error - parent of '${originalPathArg}' not found.`,
@@ -4436,7 +4700,6 @@ Options:
             return false;
           }
 
-          // Fundamental check: Can we even modify the parent directory? -f doesn't override this.
           if (
             !FileSystemManager.hasPermission(parentNode, currentUser, "write")
           ) {
@@ -4461,12 +4724,10 @@ Options:
             }
 
             if (confirmed) {
-              // With -f, we attempt the delete. If parent is writable, it should succeed.
-              // OopisOS doesn't have a separate file write-protection check that rm needs to bypass here
-              // beyond the parent directory's writability for entry removal.
+
               const itemName = itemResolvedPath.substring(
                 itemResolvedPath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR) +
-                  1,
+                1,
               );
               if (parentNode.children && parentNode.children[itemName]) {
                 delete parentNode.children[itemName];
@@ -4478,7 +4739,7 @@ Options:
                 anyChangeMade = true;
                 return true;
               } else {
-                // Should not happen if itemNode was valid
+
                 if (!isForceOpt)
                   messages.push(
                     `rm: Failed to remove '${originalPathArg}': Item not found in parent (internal error).`,
@@ -4489,7 +4750,7 @@ Options:
               messages.push(
                 `${Config.MESSAGES.REMOVAL_CANCELLED_PREFIX}'${originalPathArg}'${Config.MESSAGES.REMOVAL_CANCELLED_SUFFIX}`,
               );
-              return false; // User cancelled
+              return false;
             }
           } else if (
             itemNode.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE
@@ -4504,7 +4765,7 @@ Options:
 
             let confirmedDir = true;
             if (isInteractiveOpt) {
-              // Prompt before descending into or removing the directory itself
+
               confirmedDir = await new Promise((resolve) => {
                 ConfirmationManager.request(
                   [
@@ -4524,23 +4785,15 @@ Options:
               return false;
             }
 
-            // The permission check on itemNode itself (the directory) for being "writable"
-            // to list/delete its children is implicitly handled by `isForceOpt` or the interactive prompt.
-            // If -f, we proceed. If -i and confirmed, we proceed.
-            // If we can't read children (e.g. dir has no 'read' perm for current user), Object.keys might be empty or fail.
-            // FileSystemManager.hasPermission(itemNode, currentUser, 'read') could be checked here for non -f.
-            // However, POSIX rm -rf often tries to remove even if directory listing is restricted, if parent allows.
-
-            const childrenNames = Object.keys(itemNode.children || {}); // Handle potentially non-existent .children
+            const childrenNames = Object.keys(itemNode.children || {});
             for (const childName of childrenNames) {
-              if (!itemNode.children[childName]) continue; // Should not happen
+              if (!itemNode.children[childName]) continue;
               const childNode = itemNode.children[childName];
               const childResolvedPath = FileSystemManager.getAbsolutePath(
                 childName,
                 itemResolvedPath,
               );
-              // Pass the more user-friendly originalPathArg + childName for messages if possible,
-              // or childResolvedPath for accuracy. Using childResolvedPath for prompts.
+
               if (
                 !(await removeItemRecursively(
                   childResolvedPath,
@@ -4549,23 +4802,19 @@ Options:
                 ))
               ) {
                 if (!isForceOpt) {
-                  // If a child couldn't be removed (e.g., user said no, or true permission issue not bypassed by -f)
-                  // then this directory cannot be removed unless -f ignores this.
-                  // For now, if any child fails in non-force mode, this dir removal fails.
+
                   return false;
                 }
-                // If -f, continue trying to remove other children.
+
               }
             }
 
-            // All children that could be removed (or were skipped by -f) are now gone.
-            // Now, attempt to remove the directory itself.
             const dirName = itemResolvedPath.substring(
               itemResolvedPath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR) +
-                1,
+              1,
             );
             if (parentNode.children && parentNode.children[dirName]) {
-              // Check if directory is actually empty now
+
               const currentDirNodeCheck =
                 FileSystemManager.getNodeByPath(itemResolvedPath);
               if (
@@ -4578,9 +4827,8 @@ Options:
                   );
                   return false;
                 }
-                // If -f, and it's still not empty, it means some deeper item was truly undeletable.
-                // In a real OS, this would error. Here, we might just fail to delete the dir.
-                return false; // Can't remove non-empty dir even with -f if contents remain.
+
+                return false;
               }
 
               delete parentNode.children[dirName];
@@ -4599,7 +4847,7 @@ Options:
               return false;
             }
           }
-          // Should not be reached if itemNode.type is validated
+
           if (!isForceOpt)
             messages.push(
               `rm: cannot remove '${originalPathArg}': Unknown item type.`,
@@ -4613,11 +4861,11 @@ Options:
           });
 
           if (pathValidation.error) {
-            const isNoSuchFileError = pathValidation.node === null; // A simple check for "no such file/dir"
+            const isNoSuchFileError = pathValidation.node === null;
             if (isForceOpt && isNoSuchFileError) {
-              continue; // Silently ignore if -f and path does not exist
+              continue;
             }
-            messages.push(pathValidation.error); // Show error if not -f or if it's another error type
+            messages.push(pathValidation.error);
             allSuccess = false;
             continue;
           }
@@ -4625,7 +4873,6 @@ Options:
           const node = pathValidation.node;
           const resolvedPath = pathValidation.resolvedPath;
 
-          // Specific check for removing '.' or '..' which is generally disallowed or has special meaning
           const lastSegment = resolvedPath.substring(
             resolvedPath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR) + 1,
           );
@@ -4637,12 +4884,12 @@ Options:
               messages.push(
                 `rm: refusing to remove '.' or '..' directory: skipping '${pathArg}'`,
               );
-            allSuccess = false; // POSIX rm often errors on '.' or '..'
+            allSuccess = false;
             continue;
           }
 
           if (!(await removeItemRecursively(resolvedPath, node, pathArg))) {
-            allSuccess = false; // If any item fails, overall success is false, even if -f suppressed messages for it
+            allSuccess = false;
           }
         }
 
@@ -4651,7 +4898,7 @@ Options:
             messages.push(
               "rm: CRITICAL - Failed to save file system changes after removal operations.",
             );
-            // This is a more severe error that should probably be shown even with -f
+
             return {
               success: false,
               error: "rm: Failed to save file system changes after removal.",
@@ -4663,41 +4910,32 @@ Options:
 
         const finalOutput = messages.filter((m) => m).join("\n");
 
-        // With -f, the command should generally "succeed" (exit 0) unless a fundamental error occurred
-        // that prevented any action (like system save failure).
-        // If -f is active, and all failures were of the type -f is supposed to ignore (non-existent, perms),
-        // then 'allSuccess' could be considered true for exit status purposes.
-        // OopisOS doesn't have exit statuses, so the user message is key.
         if (isForceOpt && allSuccess === false && messages.length === 0) {
-          // If -f was on, and allSuccess became false, but no messages were generated
-          // (meaning all errors were suppressible by -f, like non-existent files),
-          // then we can consider the operation "successful" in the spirit of -f.
+
           allSuccess = true;
         }
 
         if (!allSuccess) {
           return {
-            success: false, // Overall operation reported issues
-            error: finalOutput || "rm: One or more errors occurred.", // Provide some error summary
-            output:
-              finalOutput ||
-              (anyChangeMade
-                ? "Some items removed, but errors occurred."
-                : "No items removed, errors occurred."),
+            success: false,
+            error: finalOutput || "rm: One or more errors occurred.",
+            output: finalOutput ||
+              (anyChangeMade ?
+                "Some items removed, but errors occurred." :
+                "No items removed, errors occurred."),
             messageType: Config.CSS_CLASSES.ERROR_MSG,
           };
         }
 
         return {
-          success: true, // All specified operations completed as expected (considering -f)
-          output:
-            finalOutput ||
-            (anyChangeMade
-              ? "Operation successful."
-              : Config.MESSAGES.NO_ACTION_TAKEN),
-          messageType: anyChangeMade
-            ? Config.CSS_CLASSES.SUCCESS_MSG
-            : Config.CSS_CLASSES.CONSOLE_LOG_MSG,
+          success: true,
+          output: finalOutput ||
+            (anyChangeMade ?
+              "Operation successful." :
+              Config.MESSAGES.NO_ACTION_TAKEN),
+          messageType: anyChangeMade ?
+            Config.CSS_CLASSES.SUCCESS_MSG :
+            Config.CSS_CLASSES.CONSOLE_LOG_MSG,
         };
       },
       description: "Removes files or directories.",
@@ -4712,12 +4950,22 @@ Removes specified files or directories.
     },
     mv: {
       handler: async (args, execOptions) => {
-        // Renamed 'options' to 'execOptions'
-        const flagDefinitions = [
-          { name: "force", short: "-f", long: "--force" },
-          { name: "interactive", short: "-i", long: "--interactive" }, // Added -i flag
+
+        const flagDefinitions = [{
+            name: "force",
+            short: "-f",
+            long: "--force"
+          },
+          {
+            name: "interactive",
+            short: "-i",
+            long: "--interactive"
+          },
         ];
-        const { flags, remainingArgs } = Utils.parseFlags(
+        const {
+          flags,
+          remainingArgs
+        } = Utils.parseFlags(
           args,
           flagDefinitions,
         );
@@ -4735,16 +4983,20 @@ Removes specified files or directories.
         const destPathArg = remainingArgs[1];
         const currentUser = UserManager.getCurrentUser().name;
         const nowISO = new Date().toISOString();
-        // -f overrides -i for prompting behavior
+
         const isInteractiveEffective = flags.interactive && !flags.force;
 
         const sourceValidation = FileSystemManager.validatePath(
           "mv (source)",
-          sourcePathArg,
-          { disallowRoot: true },
+          sourcePathArg, {
+            disallowRoot: true
+          },
         );
         if (sourceValidation.error)
-          return { success: false, error: sourceValidation.error };
+          return {
+            success: false,
+            error: sourceValidation.error
+          };
 
         const sourceNode = sourceValidation.node;
         const absSourcePath = sourceValidation.resolvedPath;
@@ -4769,50 +5021,49 @@ Removes specified files or directories.
             error: `mv: cannot move '${sourcePathArg}' from '${sourceParentPath}'${Config.MESSAGES.PERMISSION_DENIED_SUFFIX}`,
           };
         }
-        // POSIX mv also checks if the source itself is writable if it's a directory and being renamed,
-        // or if a sticky bit is involved. OopisOS model is simpler.
-        // For now, ability to write to sourceParent (to remove entry) and destParent (to add entry) is key.
 
         const destValidation = FileSystemManager.validatePath(
           "mv (destination)",
-          destPathArg,
-          { allowMissing: true },
+          destPathArg, {
+            allowMissing: true
+          },
         );
-        // Error if dest is invalid AND it's not just a "missing" error that we allow for new names
+
         if (
           destValidation.error &&
           !(destValidation.optionsUsed.allowMissing && !destValidation.node)
         ) {
-          return { success: false, error: destValidation.error };
+          return {
+            success: false,
+            error: destValidation.error
+          };
         }
 
         let absDestPath = destValidation.resolvedPath;
-        let destNode = destValidation.node; // This is the node AT the destination, if it exists
+        let destNode = destValidation.node;
         const sourceName = absSourcePath.substring(
           absSourcePath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR) + 1,
         );
-        let finalDestName = sourceName; // Default: if dest is a dir, source keeps its name inside it.
-        let targetContainerNode; // The directory node where the item will be placed.
-        let targetContainerAbsPath; // The absolute path of that container directory.
+        let finalDestName = sourceName;
+        let targetContainerNode;
+        let targetContainerAbsPath;
 
         if (
           destNode &&
           destNode.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE
         ) {
-          // Case: mv source existing_dir
+
           targetContainerNode = destNode;
           targetContainerAbsPath = absDestPath;
-          // finalDestName is already correct (sourceName)
-          // The actual final path of the moved item will be existing_dir/sourceName
+
           absDestPath = FileSystemManager.getAbsolutePath(
             sourceName,
             absDestPath,
           );
-          // Update destNode to be the potential item at existing_dir/sourceName
+
           destNode = targetContainerNode.children[sourceName];
         } else {
-          // Case: mv source new_name OR mv source existing_file (for overwrite)
-          // The destination argument `destPathArg` IS the final name/path of the item.
+
           targetContainerAbsPath =
             absDestPath.substring(
               0,
@@ -4824,7 +5075,7 @@ Removes specified files or directories.
           finalDestName = absDestPath.substring(
             absDestPath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR) + 1,
           );
-          // destNode is already correctly pointing to the item at absDestPath (if it exists)
+
         }
 
         if (
@@ -4858,8 +5109,7 @@ Removes specified files or directories.
         }
 
         if (destNode) {
-          // An item exists at the final destination path
-          // Type conflict checks
+
           if (
             sourceNode.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE &&
             destNode.type !== Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE
@@ -4880,7 +5130,7 @@ Removes specified files or directories.
           }
 
           if (isInteractiveEffective) {
-            // Use effective interactive flag
+
             const confirmed = await new Promise((resolve) => {
               ConfirmationManager.request(
                 [`Overwrite '${absDestPath}'?`],
@@ -4897,18 +5147,15 @@ Removes specified files or directories.
                 messageType: Config.CSS_CLASSES.CONSOLE_LOG_MSG,
               };
           } else if (!flags.force) {
-            // Not interactive and not force: error if exists
+
             return {
               success: false,
               error: `mv: '${absDestPath}' already exists. Use -f to overwrite or -i to prompt.`,
             };
           }
-          // If force, or interactive confirmed, or types match for dir merge (though mv doesn't merge dirs like cp, it replaces), proceed.
-          // For mv, if dest is a dir and source is a dir, it's usually an error unless dest is empty or specific flags are used.
-          // OopisOS mv will replace if names match and types allow (or -f).
+
         }
 
-        // Prevent moving a directory into itself
         if (
           sourceNode.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE &&
           absDestPath.startsWith(
@@ -4921,16 +5168,11 @@ Removes specified files or directories.
           };
         }
 
-        // The node to be moved (retaining its original attributes)
         const movedNode = Utils.deepCopyNode(sourceNode);
-        // Ownership and mode are part of sourceNode. mtime is also part of sourceNode.
-        // POSIX mv preserves timestamps by default.
 
-        // Add to new location
         targetContainerNode.children[finalDestName] = movedNode;
         targetContainerNode.mtime = nowISO;
 
-        // Remove from old location
         if (
           sourceParentNode &&
           sourceParentNode.children &&
@@ -4939,15 +5181,14 @@ Removes specified files or directories.
           delete sourceParentNode.children[sourceName];
           sourceParentNode.mtime = nowISO;
         } else {
-          // This would be an internal inconsistency if sourceValidation passed.
-          // Rollback the add if removal fails.
+
           delete targetContainerNode.children[finalDestName];
           console.error(
             Config.INTERNAL_ERRORS.SOURCE_NOT_FOUND_IN_PARENT_PREFIX +
-              sourceName +
-              Config.INTERNAL_ERRORS.SOURCE_NOT_FOUND_IN_PARENT_MIDDLE +
-              sourceParentPath +
-              Config.INTERNAL_ERRORS.SOURCE_NOT_FOUND_IN_PARENT_SUFFIX,
+            sourceName +
+            Config.INTERNAL_ERRORS.SOURCE_NOT_FOUND_IN_PARENT_MIDDLE +
+            sourceParentPath +
+            Config.INTERNAL_ERRORS.SOURCE_NOT_FOUND_IN_PARENT_SUFFIX,
           );
           return {
             success: false,
@@ -4956,8 +5197,7 @@ Removes specified files or directories.
         }
 
         if (!(await FileSystemManager.save(currentUser))) {
-          // Attempt to rollback if save fails (this is tricky and might leave inconsistent state)
-          // For simplicity, OopisOS might just report the save error.
+
           return {
             success: false,
             error: "mv: Failed to save file system changes.",
@@ -4980,15 +5220,36 @@ Moves (renames) <source_path> to <destination_path>, or moves one or more <sourc
     },
     cp: {
       handler: async (args, execOptions) => {
-        // Renamed 'options' to 'execOptions' to avoid clash
-        const flagDefinitions = [
-          { name: "recursive", short: "-r", long: "--recursive" },
-          { name: "recursiveAlias", short: "-R" },
-          { name: "force", short: "-f", long: "--force" },
-          { name: "preserve", short: "-p", long: "--preserve" },
-          { name: "interactive", short: "-i", long: "--interactive" }, // Added -i flag
+
+        const flagDefinitions = [{
+            name: "recursive",
+            short: "-r",
+            long: "--recursive"
+          },
+          {
+            name: "recursiveAlias",
+            short: "-R"
+          },
+          {
+            name: "force",
+            short: "-f",
+            long: "--force"
+          },
+          {
+            name: "preserve",
+            short: "-p",
+            long: "--preserve"
+          },
+          {
+            name: "interactive",
+            short: "-i",
+            long: "--interactive"
+          },
         ];
-        const { flags, remainingArgs } = Utils.parseFlags(
+        const {
+          flags,
+          remainingArgs
+        } = Utils.parseFlags(
           args,
           flagDefinitions,
         );
@@ -5005,7 +5266,7 @@ Moves (renames) <source_path> to <destination_path>, or moves one or more <sourc
         const currentUser = UserManager.getCurrentUser().name;
         const nowISO = new Date().toISOString();
         flags.isRecursive = flags.recursive || flags.recursiveAlias;
-        // -f overrides -i for prompting behavior
+
         flags.isInteractiveEffective = flags.interactive && !flags.force;
 
         const rawDestPathArg = remainingArgs.pop();
@@ -5014,7 +5275,6 @@ Moves (renames) <source_path> to <destination_path>, or moves one or more <sourc
         let overallSuccess = true;
         let anyChangesMadeGlobal = false;
 
-        // --- Start of _executeCopyInternal (Recursive Helper) ---
         async function _executeCopyInternal(
           sourceNode,
           sourcePathForMsg,
@@ -5023,7 +5283,7 @@ Moves (renames) <source_path> to <destination_path>, or moves one or more <sourc
           currentCommandFlags,
           currentDepth = 0,
         ) {
-          // Pass full flags object
+
           let currentOpMessages = [];
           let currentOpSuccess = true;
           let madeChangeInThisCall = false;
@@ -5035,7 +5295,7 @@ Moves (renames) <source_path> to <destination_path>, or moves one or more <sourc
           if (
             !targetContainerNode ||
             targetContainerNode.type !==
-              Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE
+            Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE
           ) {
             currentOpMessages.push(
               `cp: internal error or target container '${targetContainerAbsPath}' is not a directory.`,
@@ -5070,12 +5330,11 @@ Moves (renames) <source_path> to <destination_path>, or moves one or more <sourc
           let existingNodeAtDest =
             targetContainerNode.children[targetEntryName];
 
-          // Overwrite / Conflict Check
           if (existingNodeAtDest) {
             if (
               sourceNode.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE &&
               existingNodeAtDest.type !==
-                Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE
+              Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE
             ) {
               currentOpMessages.push(
                 `cp: cannot overwrite non-directory '${fullFinalDestPath}' with directory '${sourcePathForMsg}'`,
@@ -5089,7 +5348,7 @@ Moves (renames) <source_path> to <destination_path>, or moves one or more <sourc
             if (
               sourceNode.type !== Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE &&
               existingNodeAtDest.type ===
-                Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE
+              Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE
             ) {
               currentOpMessages.push(
                 `cp: cannot overwrite directory '${fullFinalDestPath}' with non-directory '${sourcePathForMsg}'`,
@@ -5101,9 +5360,8 @@ Moves (renames) <source_path> to <destination_path>, or moves one or more <sourc
               };
             }
 
-            // Prompting logic for overwrite, now using currentCommandFlags.isInteractiveEffective
             if (currentCommandFlags.isInteractiveEffective) {
-              // Check effective interactive flag
+
               const confirmed = await new Promise((resolve) => {
                 ConfirmationManager.request(
                   [`Overwrite '${fullFinalDestPath}'?`],
@@ -5120,15 +5378,13 @@ Moves (renames) <source_path> to <destination_path>, or moves one or more <sourc
                   success: true,
                   messages: currentOpMessages,
                   changesMade: false,
-                }; // Skipped, not an error.
+                };
               }
             } else if (!currentCommandFlags.force) {
-              // Not interactive and not force: error if exists
-              // This applies if it's a file-on-file overwrite.
-              // If it's dir-on-dir, we merge, so 'existingNodeAtDest' being a dir isn't an overwrite error itself.
+
               if (
                 existingNodeAtDest.type ===
-                  Config.FILESYSTEM.DEFAULT_FILE_TYPE ||
+                Config.FILESYSTEM.DEFAULT_FILE_TYPE ||
                 (existingNodeAtDest.type ===
                   Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE &&
                   sourceNode.type !== Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE)
@@ -5143,20 +5399,19 @@ Moves (renames) <source_path> to <destination_path>, or moves one or more <sourc
                 };
               }
             }
-            // If force is true, or interactive confirmed, or it's a directory merge, proceed.
+
           }
 
-          // Perform Copy
           if (sourceNode.type === Config.FILESYSTEM.DEFAULT_FILE_TYPE) {
             const newFileNode = {
               type: Config.FILESYSTEM.DEFAULT_FILE_TYPE,
               content: sourceNode.content,
-              owner: currentCommandFlags.preserve
-                ? sourceNode.owner
-                : currentUser,
-              mode: currentCommandFlags.preserve
-                ? sourceNode.mode
-                : Config.FILESYSTEM.DEFAULT_FILE_MODE,
+              owner: currentCommandFlags.preserve ?
+                sourceNode.owner :
+                currentUser,
+              mode: currentCommandFlags.preserve ?
+                sourceNode.mode :
+                Config.FILESYSTEM.DEFAULT_FILE_MODE,
               mtime: currentCommandFlags.preserve ? sourceNode.mtime : nowISO,
             };
             targetContainerNode.children[targetEntryName] = newFileNode;
@@ -5180,19 +5435,19 @@ Moves (renames) <source_path> to <destination_path>, or moves one or more <sourc
             if (
               existingNodeAtDest &&
               existingNodeAtDest.type ===
-                Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE
+              Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE
             ) {
               destDirNode = existingNodeAtDest;
             } else {
               destDirNode = {
                 type: Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE,
                 children: {},
-                owner: currentCommandFlags.preserve
-                  ? sourceNode.owner
-                  : currentUser,
-                mode: currentCommandFlags.preserve
-                  ? sourceNode.mode
-                  : Config.FILESYSTEM.DEFAULT_DIR_MODE,
+                owner: currentCommandFlags.preserve ?
+                  sourceNode.owner :
+                  currentUser,
+                mode: currentCommandFlags.preserve ?
+                  sourceNode.mode :
+                  Config.FILESYSTEM.DEFAULT_DIR_MODE,
                 mtime: currentCommandFlags.preserve ? sourceNode.mtime : nowISO,
               };
               targetContainerNode.children[targetEntryName] = destDirNode;
@@ -5213,7 +5468,7 @@ Moves (renames) <source_path> to <destination_path>, or moves one or more <sourc
                 childSourcePathForMsg,
                 fullFinalDestPath,
                 childName,
-                currentCommandFlags, // Pass the same command flags down
+                currentCommandFlags,
                 currentDepth + 1,
               );
 
@@ -5224,7 +5479,7 @@ Moves (renames) <source_path> to <destination_path>, or moves one or more <sourc
 
             if (childrenChangedOrAdded) {
               if (!currentCommandFlags.preserve) {
-                // Only update if not preserving and contents changed
+
                 destDirNode.mtime = nowISO;
               }
               madeChangeInThisCall = true;
@@ -5241,16 +5496,18 @@ Moves (renames) <source_path> to <destination_path>, or moves one or more <sourc
             changesMade: madeChangeInThisCall,
           };
         }
-        // --- End of _executeCopyInternal ---
 
-        // Validate destination path argument
         const destValidation = FileSystemManager.validatePath(
           "cp (destination)",
-          rawDestPathArg,
-          { allowMissing: true },
+          rawDestPathArg, {
+            allowMissing: true
+          },
         );
         if (destValidation.error && !destValidation.optionsUsed.allowMissing) {
-          return { success: false, error: destValidation.error };
+          return {
+            success: false,
+            error: destValidation.error
+          };
         }
         const absDestPath = destValidation.resolvedPath;
         const destNode = destValidation.node;
@@ -5269,8 +5526,9 @@ Moves (renames) <source_path> to <destination_path>, or moves one or more <sourc
         for (const srcArg of sourcePathArgs) {
           const srcValidation = FileSystemManager.validatePath(
             "cp (source)",
-            srcArg,
-            { disallowRoot: false },
+            srcArg, {
+              disallowRoot: false
+            },
           );
           if (srcValidation.error) {
             operationMessages.push(srcValidation.error);
@@ -5300,8 +5558,7 @@ Moves (renames) <source_path> to <destination_path>, or moves one or more <sourc
         if (sourcesInfo.length === 0 && overallSuccess === false) {
           return {
             success: false,
-            error:
-              operationMessages.join("\n") || "cp: No valid source arguments.",
+            error: operationMessages.join("\n") || "cp: No valid source arguments.",
           };
         }
 
@@ -5331,7 +5588,7 @@ Moves (renames) <source_path> to <destination_path>, or moves one or more <sourc
               targetEntryName =
                 srcInfo.path.substring(
                   srcInfo.path.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR) +
-                    1,
+                  1,
                 ) || srcInfo.path;
             } else if (targetEntryName === "") {
               operationMessages.push(
@@ -5358,7 +5615,7 @@ Moves (renames) <source_path> to <destination_path>, or moves one or more <sourc
             srcInfo.originalArg,
             targetContainerAbsPath,
             targetEntryName,
-            flags, // Pass the main command's parsed flags object
+            flags,
             0,
           );
 
@@ -5368,8 +5625,8 @@ Moves (renames) <source_path> to <destination_path>, or moves one or more <sourc
             anyChangesMadeGlobal = true;
             const alreadyHasTopLevelCopyMsg = copyExecuteResult.messages.some(
               (m) =>
-                m.startsWith(Config.MESSAGES.COPIED_PREFIX) &&
-                m.includes(srcInfo.originalArg),
+              m.startsWith(Config.MESSAGES.COPIED_PREFIX) &&
+              m.includes(srcInfo.originalArg),
             );
             if (copyExecuteResult.success && !alreadyHasTopLevelCopyMsg) {
               const successMsgDestPath = FileSystemManager.getAbsolutePath(
@@ -5411,14 +5668,13 @@ Moves (renames) <source_path> to <destination_path>, or moves one or more <sourc
         }
         return {
           success: true,
-          output:
-            finalOutputMessage ||
-            (anyChangesMadeGlobal
-              ? "Operation successful."
-              : Config.MESSAGES.NO_ACTION_TAKEN),
-          messageType: anyChangesMadeGlobal
-            ? Config.CSS_CLASSES.SUCCESS_MSG
-            : Config.CSS_CLASSES.CONSOLE_LOG_MSG,
+          output: finalOutputMessage ||
+            (anyChangesMadeGlobal ?
+              "Operation successful." :
+              Config.MESSAGES.NO_ACTION_TAKEN),
+          messageType: anyChangesMadeGlobal ?
+            Config.CSS_CLASSES.SUCCESS_MSG :
+            Config.CSS_CLASSES.CONSOLE_LOG_MSG,
         };
       },
       description: "Copies files and directories.",
@@ -5434,9 +5690,13 @@ Copies <source_path> to <destination_path>, or one or more <source_path>(s) to <
     },
     history: {
       handler: async (args, options) => {
-        const { flags } = Utils.parseFlags(args, [
-          { name: "clear", short: "-c", long: "--clear" },
-        ]);
+        const {
+          flags
+        } = Utils.parseFlags(args, [{
+          name: "clear",
+          short: "-c",
+          long: "--clear"
+        }, ]);
         if (flags.clear) {
           HistoryManager.clearHistory();
           return {
@@ -5463,7 +5723,9 @@ Copies <source_path> to <destination_path>, or one or more <source_path>(s) to <
     },
     edit: {
       handler: async (args, options) => {
-        const validationResult = Utils.validateArguments(args, { exact: 1 });
+        const validationResult = Utils.validateArguments(args, {
+          exact: 1
+        });
         if (!validationResult.isValid)
           return {
             success: false,
@@ -5472,8 +5734,10 @@ Copies <source_path> to <destination_path>, or one or more <source_path>(s) to <
         const filePathArg = args[0];
         const pathValidation = FileSystemManager.validatePath(
           "edit",
-          filePathArg,
-          { allowMissing: true, disallowRoot: true },
+          filePathArg, {
+            allowMissing: true,
+            disallowRoot: true
+          },
         );
         const currentUser = UserManager.getCurrentUser().name;
         if (
@@ -5502,7 +5766,10 @@ Copies <source_path> to <destination_path>, or one or more <source_path>(s) to <
           !pathValidation.node &&
           !pathValidation.optionsUsed.allowMissing
         )
-          return { success: false, error: pathValidation.error };
+          return {
+            success: false,
+            error: pathValidation.error
+          };
         const resolvedPath = pathValidation.resolvedPath;
         let content = "";
         if (pathValidation.node) content = pathValidation.node.content || "";
@@ -5524,182 +5791,206 @@ Copies <source_path> to <destination_path>, or one or more <source_path>(s) to <
     },
     grep: {
       handler: async (args, options) => {
-        const flagDefinitions = [
-          { name: "ignoreCase", short: "-i", long: "--ignore-case" }, //
-          { name: "invertMatch", short: "-v", long: "--invert-match" }, //
-          { name: "lineNumber", short: "-n", long: "--line-number" }, //
-          { name: "count", short: "-c", long: "--count" }, //
-          { name: "recursive", short: "-R" }, // NEW: Recursive flag
+        const flagDefinitions = [{
+            name: "ignoreCase",
+            short: "-i",
+            long: "--ignore-case"
+          },
+          {
+            name: "invertMatch",
+            short: "-v",
+            long: "--invert-match"
+          },
+          {
+            name: "lineNumber",
+            short: "-n",
+            long: "--line-number"
+          },
+          {
+            name: "count",
+            short: "-c",
+            long: "--count"
+          },
+          {
+            name: "recursive",
+            short: "-R"
+          },
         ];
-        const { flags, remainingArgs } = Utils.parseFlags(
+        const {
+          flags,
+          remainingArgs
+        } = Utils.parseFlags(
           args,
           flagDefinitions,
-        ); //
+        );
 
         if (remainingArgs.length === 0 && options.stdinContent === null) {
-          //
+
           return {
-            //
-            success: false, //
-            error: "grep: missing pattern and file arguments, and no stdin.", //
+
+            success: false,
+            error: "grep: missing pattern and file arguments, and no stdin.",
           };
         }
         if (remainingArgs.length === 0 && options.stdinContent !== null) {
-          //
-          return { success: false, error: "grep: missing pattern for stdin." }; //
-        }
 
-        const patternStr = remainingArgs[0]; //
-        const filePathsArgs = remainingArgs.slice(1); // Changed variable name for clarity
-        const currentUser = UserManager.getCurrentUser().name; //
-        let outputLines = []; //
-        let overallSuccess = true; // NEW: To track if any processing step fails
-
-        let regex; //
-        try {
-          regex = new RegExp(patternStr, flags.ignoreCase ? "i" : ""); //
-        } catch (e) {
           return {
-            //
-            success: false, //
-            error: `grep: invalid regular expression '${patternStr}': ${e.message}`, //
+            success: false,
+            error: "grep: missing pattern for stdin."
           };
         }
 
-        // processContent remains largely the same, but its usage will be more controlled
+        const patternStr = remainingArgs[0];
+        const filePathsArgs = remainingArgs.slice(1);
+        const currentUser = UserManager.getCurrentUser().name;
+        let outputLines = [];
+        let overallSuccess = true;
+
+        let regex;
+        try {
+          regex = new RegExp(patternStr, flags.ignoreCase ? "i" : "");
+        } catch (e) {
+          return {
+
+            success: false,
+            error: `grep: invalid regular expression '${patternStr}': ${e.message}`,
+          };
+        }
+
         const processContent = (content, filePathForDisplay) => {
-          // (filePathForDisplay was already a param)
-          const lines = content.split("\n"); //
-          let fileMatchCount = 0; //
-          let currentFileLines = []; //
+
+          const lines = content.split("\n");
+          let fileMatchCount = 0;
+          let currentFileLines = [];
 
           lines.forEach((line, index) => {
-            //
-            const isMatch = regex.test(line); //
-            const effectiveMatch = flags.invertMatch ? !isMatch : isMatch; //
+
+            const isMatch = regex.test(line);
+            const effectiveMatch = flags.invertMatch ? !isMatch : isMatch;
 
             if (effectiveMatch) {
-              //
-              fileMatchCount++; //
+
+              fileMatchCount++;
               if (!flags.count) {
-                //
-                let outputLine = ""; //
-                // NEW: Always prefix with filename if recursive, or if multiple files given and not recursive
+
+                let outputLine = "";
+
                 if (
                   filePathForDisplay &&
                   (flags.recursive || filePathsArgs.length > 1)
                 ) {
-                  outputLine += `${filePathForDisplay}:`; //
+                  outputLine += `${filePathForDisplay}:`;
                 }
                 if (flags.lineNumber) {
-                  //
-                  outputLine += `${index + 1}:`; //
+
+                  outputLine += `${index + 1}:`;
                 }
-                outputLine += line; //
-                currentFileLines.push(outputLine); //
+                outputLine += line;
+                currentFileLines.push(outputLine);
               }
             }
           });
 
           if (flags.count) {
-            //
-            let countOutput = ""; //
-            // NEW: Always prefix with filename if recursive, or if multiple files given and not recursive
+
+            let countOutput = "";
+
             if (
               filePathForDisplay &&
               (flags.recursive || filePathsArgs.length > 1)
             ) {
-              countOutput += `${filePathForDisplay}:`; //
+              countOutput += `${filePathForDisplay}:`;
             }
-            countOutput += fileMatchCount; //
-            outputLines.push(countOutput); //
+            countOutput += fileMatchCount;
+            outputLines.push(countOutput);
           } else {
-            outputLines.push(...currentFileLines); //
+            outputLines.push(...currentFileLines);
           }
-          // We don't use totalMatchesAcrossAllFiles here anymore, result success is per file for recursive
+
           return (
             fileMatchCount > 0 ||
             (flags.invertMatch && lines.length > 0 && fileMatchCount === 0)
-          ); // Return true if any match (or if inverting and not all lines matched)
+          );
         };
 
-        // NEW: Recursive search helper function
         async function searchRecursively(currentPath, displayPathArg) {
           const pathValidation = FileSystemManager.validatePath(
             "grep",
             currentPath,
-          ); // No expectedType, check type below
+          );
 
           if (pathValidation.error) {
             OutputManager.appendToOutput(pathValidation.error, {
               typeClass: Config.CSS_CLASSES.ERROR_MSG,
-            }); //
+            });
             overallSuccess = false;
             return;
           }
 
           const node = pathValidation.node;
           if (!FileSystemManager.hasPermission(node, currentUser, "read")) {
-            //
+
             OutputManager.appendToOutput(
-              `grep: ${displayPathArg}${Config.MESSAGES.PERMISSION_DENIED_SUFFIX}`,
-              { typeClass: Config.CSS_CLASSES.ERROR_MSG },
-            ); //
+              `grep: ${displayPathArg}${Config.MESSAGES.PERMISSION_DENIED_SUFFIX}`, {
+                typeClass: Config.CSS_CLASSES.ERROR_MSG
+              },
+            );
             overallSuccess = false;
             return;
           }
 
           if (node.type === Config.FILESYSTEM.DEFAULT_FILE_TYPE) {
-            //
-            processContent(node.content || "", currentPath); // Use currentPath (absolute) for display consistency
+
+            processContent(node.content || "", currentPath);
           } else if (node.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE) {
-            //
+
             if (!flags.recursive) {
-              // If -R was not specified but a directory is encountered.
+
               OutputManager.appendToOutput(
-                `grep: ${displayPathArg}: Is a directory`,
-                { typeClass: Config.CSS_CLASSES.ERROR_MSG },
-              ); //
+                `grep: ${displayPathArg}: Is a directory`, {
+                  typeClass: Config.CSS_CLASSES.ERROR_MSG
+                },
+              );
               overallSuccess = false;
               return;
             }
-            // It's a directory and -R is on, recurse.
-            const childrenNames = Object.keys(node.children || {}); //
+
+            const childrenNames = Object.keys(node.children || {});
             for (const childName of childrenNames) {
               const childPath = FileSystemManager.getAbsolutePath(
                 childName,
                 currentPath,
-              ); //
-              // For display, we want the path relative to how the user might see it or the full path.
-              // Using the absolute path for displayPathArg in recursive calls ensures clarity.
+              );
+
               await searchRecursively(childPath, childPath);
             }
           }
         }
 
         if (filePathsArgs.length > 0) {
-          //
+
           for (const pathArg of filePathsArgs) {
-            //
+
             const absolutePath = FileSystemManager.getAbsolutePath(
               pathArg,
               FileSystemManager.getCurrentPath(),
-            ); //
+            );
             if (flags.recursive) {
-              // NEW
-              await searchRecursively(absolutePath, pathArg); // pathArg for initial user-friendly display
+
+              await searchRecursively(absolutePath, pathArg);
             } else {
-              // Original non-recursive logic
+
               const pathValidation = FileSystemManager.validatePath(
                 "grep",
-                pathArg,
-                { expectedType: Config.FILESYSTEM.DEFAULT_FILE_TYPE },
-              ); //
+                pathArg, {
+                  expectedType: Config.FILESYSTEM.DEFAULT_FILE_TYPE
+                },
+              );
               if (pathValidation.error) {
-                //
+
                 OutputManager.appendToOutput(pathValidation.error, {
                   typeClass: Config.CSS_CLASSES.ERROR_MSG,
-                }); //
+                });
                 overallSuccess = false;
                 continue;
               }
@@ -5710,57 +6001,62 @@ Copies <source_path> to <destination_path>, or one or more <source_path>(s) to <
                   "read",
                 )
               ) {
-                //
+
                 OutputManager.appendToOutput(
-                  `grep: ${pathArg}${Config.MESSAGES.PERMISSION_DENIED_SUFFIX}`,
-                  { typeClass: Config.CSS_CLASSES.ERROR_MSG },
-                ); //
+                  `grep: ${pathArg}${Config.MESSAGES.PERMISSION_DENIED_SUFFIX}`, {
+                    typeClass: Config.CSS_CLASSES.ERROR_MSG
+                  },
+                );
                 overallSuccess = false;
                 continue;
               }
-              processContent(pathValidation.node.content || "", pathArg); //
+              processContent(pathValidation.node.content || "", pathArg);
             }
           }
         } else if (options.stdinContent !== null) {
-          //
-          processContent(options.stdinContent, null); // No filePathForDisplay for stdin
+
+          processContent(options.stdinContent, null);
         } else {
-          // This case should be caught earlier by length checks
+
           return {
             success: false,
             error: "grep: No input files or stdin provided after pattern.",
-          }; //
+          };
         }
 
-        return { success: overallSuccess, output: outputLines.join("\n") }; //
+        return {
+          success: overallSuccess,
+          output: outputLines.join("\n")
+        };
       },
       description: "Searches for patterns in files or input.",
-      helpText:
-        "Usage: grep [OPTIONS] PATTERN [FILE...]\n\nSearch for PATTERN in each FILE or standard input.\nExample: grep -i 'hello' myfile.txt\n\nOptions:\n  -i, --ignore-case   Ignore case distinctions.\n  -v, --invert-match  Select non-matching lines.\n  -n, --line-number   Print line number with output lines.\n  -c, --count         Print only a count of matching lines per FILE.\n  -R, --recursive     Read all files under each directory, recursively.",
+      helpText: "Usage: grep [OPTIONS] PATTERN [FILE...]\n\nSearch for PATTERN in each FILE or standard input.\nExample: grep -i 'hello' myfile.txt\n\nOptions:\n  -i, --ignore-case   Ignore case distinctions.\n  -v, --invert-match  Select non-matching lines.\n  -n, --line-number   Print line number with output lines.\n  -c, --count         Print only a count of matching lines per FILE.\n  -R, --recursive     Read all files under each directory, recursively.",
     },
     useradd: {
       handler: async (args, options) => {
-        const validationResult = Utils.validateArguments(args, { exact: 1 });
+        const validationResult = Utils.validateArguments(args, {
+          exact: 1
+        });
         if (!validationResult.isValid) {
           return {
             success: false,
             error: `useradd: ${validationResult.errorDetail}`,
-            messageType: Config.CSS_CLASSES.ERROR_MSG, // Consistent error styling
+            messageType: Config.CSS_CLASSES.ERROR_MSG,
           };
         }
         const username = args[0];
-        const result = await UserManager.register(username); // UserManager.register returns {success, message/error}
+        const result = await UserManager.register(username);
 
         if (result.success) {
           return {
             success: true,
-            output: result.message, // Assign the success message to output
+            output: result.message,
             messageType: Config.CSS_CLASSES.SUCCESS_MSG,
           };
         } else {
           return {
             success: false,
-            error: result.error, // Assign the error message to error
+            error: result.error,
             messageType: Config.CSS_CLASSES.ERROR_MSG,
           };
         }
@@ -5770,7 +6066,9 @@ Copies <source_path> to <destination_path>, or one or more <source_path>(s) to <
     },
     login: {
       handler: async (args, options) => {
-        const validationResult = Utils.validateArguments(args, { exact: 1 });
+        const validationResult = Utils.validateArguments(args, {
+          exact: 1
+        });
         if (!validationResult.isValid)
           return {
             success: false,
@@ -5788,9 +6086,9 @@ Copies <source_path> to <destination_path>, or one or more <source_path>(s) to <
           success: result.success,
           output: result.message,
           error: result.success ? undefined : result.error || "Login failed.",
-          messageType: result.success
-            ? Config.CSS_CLASSES.SUCCESS_MSG
-            : Config.CSS_CLASSES.ERROR_MSG,
+          messageType: result.success ?
+            Config.CSS_CLASSES.SUCCESS_MSG :
+            Config.CSS_CLASSES.ERROR_MSG,
         };
       },
       description: "Logs in as a specified user.",
@@ -5808,9 +6106,9 @@ Copies <source_path> to <destination_path>, or one or more <source_path>(s) to <
         return {
           ...result,
           output: result.message,
-          messageType: result.success
-            ? Config.CSS_CLASSES.SUCCESS_MSG
-            : Config.CSS_CLASSES.CONSOLE_LOG_MSG,
+          messageType: result.success ?
+            Config.CSS_CLASSES.SUCCESS_MSG :
+            Config.CSS_CLASSES.CONSOLE_LOG_MSG,
         };
       },
       description: "Logs out the current user.",
@@ -5818,11 +6116,13 @@ Copies <source_path> to <destination_path>, or one or more <source_path>(s) to <
     },
     whoami: {
       handler: async (args, options) => {
-        return { success: true, output: UserManager.getCurrentUser().name };
+        return {
+          success: true,
+          output: UserManager.getCurrentUser().name
+        };
       },
       description: "Displays the current username.",
-      helpText:
-        "Usage: whoami\n\nPrints the username of the currently logged-in user.",
+      helpText: "Usage: whoami\n\nPrints the username of the currently logged-in user.",
     },
     shutdown: {
       handler: async (args, options) => {
@@ -5839,7 +6139,10 @@ Copies <source_path> to <destination_path>, or one or more <source_path>(s) to <
             });
           }, 1000);
         }
-        return { success: true, output: "" };
+        return {
+          success: true,
+          output: ""
+        };
       },
       description: "Shuts down the OopisOS session.",
       helpText: "Usage: shutdown\n\n...",
@@ -5854,14 +6157,19 @@ Copies <source_path> to <destination_path>, or one or more <source_path>(s) to <
             window.location.reload();
           }, 1000);
         }
-        return { success: true, output: "" };
+        return {
+          success: true,
+          output: ""
+        };
       },
       description: "Reboots the OopisOS session.",
       helpText: "Usage: reboot\n\n...",
     },
     export: {
       handler: async (args, options) => {
-        const validationResult = Utils.validateArguments(args, { exact: 1 });
+        const validationResult = Utils.validateArguments(args, {
+          exact: 1
+        });
         if (!validationResult.isValid)
           return {
             success: false,
@@ -5870,11 +6178,15 @@ Copies <source_path> to <destination_path>, or one or more <source_path>(s) to <
         const pathArg = args[0];
         const pathValidation = FileSystemManager.validatePath(
           "export",
-          pathArg,
-          { expectedType: Config.FILESYSTEM.DEFAULT_FILE_TYPE },
+          pathArg, {
+            expectedType: Config.FILESYSTEM.DEFAULT_FILE_TYPE
+          },
         );
         if (pathValidation.error)
-          return { success: false, error: pathValidation.error };
+          return {
+            success: false,
+            error: pathValidation.error
+          };
         const fileNode = pathValidation.node;
         const currentUser = UserManager.getCurrentUser().name;
         if (!FileSystemManager.hasPermission(fileNode, currentUser, "read"))
@@ -5892,7 +6204,10 @@ Copies <source_path> to <destination_path>, or one or more <source_path>(s) to <
             type: "text/plain;charset=utf-8",
           });
           const url = URL.createObjectURL(blob);
-          const a = Utils.createElement("a", { href: url, download: fileName });
+          const a = Utils.createElement("a", {
+            href: url,
+            download: fileName
+          });
           document.body.appendChild(a);
           a.click();
           document.body.removeChild(a);
@@ -5919,7 +6234,9 @@ Copies <source_path> to <destination_path>, or one or more <source_path>(s) to <
             success: false,
             error: "upload: Can only be run in interactive mode.",
           };
-        const validationResult = Utils.validateArguments(args, { max: 1 });
+        const validationResult = Utils.validateArguments(args, {
+          max: 1
+        });
         if (!validationResult.isValid)
           return {
             success: false,
@@ -5927,16 +6244,20 @@ Copies <source_path> to <destination_path>, or one or more <source_path>(s) to <
           };
         let targetDirPath = FileSystemManager.getCurrentPath();
         const currentUser = UserManager.getCurrentUser().name;
-        const nowISO = new Date().toISOString(); // For mtime updates
+        const nowISO = new Date().toISOString();
 
         if (args.length === 1) {
           const destPathValidation = FileSystemManager.validatePath(
             "upload (destination)",
-            args[0],
-            { expectedType: Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE },
+            args[0], {
+              expectedType: Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE
+            },
           );
           if (destPathValidation.error)
-            return { success: false, error: destPathValidation.error };
+            return {
+              success: false,
+              error: destPathValidation.error
+            };
           targetDirPath = destPathValidation.resolvedPath;
         }
         const targetDirNode = FileSystemManager.getNodeByPath(targetDirPath);
@@ -5949,7 +6270,9 @@ Copies <source_path> to <destination_path>, or one or more <source_path>(s) to <
             error: `upload: cannot write to directory '${targetDirPath}'${Config.MESSAGES.PERMISSION_DENIED_SUFFIX}`,
           };
 
-        const input = Utils.createElement("input", { type: "file" });
+        const input = Utils.createElement("input", {
+          type: "file"
+        });
         input.style.display = "none";
         document.body.appendChild(input);
 
@@ -6045,9 +6368,9 @@ Copies <source_path> to <destination_path>, or one or more <source_path>(s) to <
             content: content,
             owner: currentUser,
             mode: Config.FILESYSTEM.DEFAULT_FILE_MODE,
-            mtime: nowISO, // Set mtime for uploaded file
+            mtime: nowISO,
           };
-          parentNode.mtime = nowISO; // Update parent directory's mtime
+          parentNode.mtime = nowISO;
 
           if (!(await FileSystemManager.save(currentUser)))
             throw new Error("Failed to save uploaded file to FS.");
@@ -6057,7 +6380,10 @@ Copies <source_path> to <destination_path>, or one or more <source_path>(s) to <
             messageType: Config.CSS_CLASSES.SUCCESS_MSG,
           };
         } catch (e) {
-          return { success: false, error: `upload: ${e.message}` };
+          return {
+            success: false,
+            error: `upload: ${e.message}`
+          };
         } finally {
           if (input.parentNode === document.body) {
             document.body.removeChild(input);
@@ -6065,8 +6391,7 @@ Copies <source_path> to <destination_path>, or one or more <source_path>(s) to <
         }
       },
       description: "Uploads a file from the user's computer to the virtual FS.",
-      helpText:
-        "Usage: upload [destination_directory]\n\nPrompts to select a file from your computer and uploads it to OopisOS's current directory, or to the optional [destination_directory]. Allowed file types: .txt, .md, .html, .sh, .js, .css. Will prompt to overwrite if file exists.",
+      helpText: "Usage: upload [destination_directory]\n\nPrompts to select a file from your computer and uploads it to OopisOS's current directory, or to the optional [destination_directory]. Allowed file types: .txt, .md, .html, .sh, .js, .css. Will prompt to overwrite if file exists.",
     },
     backup: {
       handler: async (args, options) => {
@@ -6083,7 +6408,10 @@ Copies <source_path> to <destination_path>, or one or more <source_path>(s) to <
             type: "application/json",
           });
           const url = URL.createObjectURL(blob);
-          const a = Utils.createElement("a", { href: url, download: fileName });
+          const a = Utils.createElement("a", {
+            href: url,
+            download: fileName
+          });
           document.body.appendChild(a);
           a.click();
           document.body.removeChild(a);
@@ -6162,9 +6490,9 @@ Copies <source_path> to <destination_path>, or one or more <source_path>(s) to <
           FileSystemManager.setFsData(
             Utils.deepCopyNode(backupData.fsDataSnapshot),
           );
-          // Ensure mtimes and permissions are present after restore from potentially older backup
+
           FileSystemManager._ensurePermissionsAndMtimeRecursive(
-            // <-- Modified call
+
             FileSystemManager.getFsData()[Config.FILESYSTEM.ROOT_PATH],
             targetUser,
             Config.FILESYSTEM.DEFAULT_DIR_MODE,
@@ -6184,7 +6512,10 @@ Copies <source_path> to <destination_path>, or one or more <source_path>(s) to <
             messageType: Config.CSS_CLASSES.SUCCESS_MSG,
           };
         } catch (e) {
-          return { success: false, error: `restore: ${e.message}` };
+          return {
+            success: false,
+            error: `restore: ${e.message}`
+          };
         } finally {
           if (input.parentNode) document.body.removeChild(input);
         }
@@ -6210,9 +6541,11 @@ Copies <source_path> to <destination_path>, or one or more <source_path>(s) to <
       description: "Manually saves the current user's file system state.",
       helpText: "Usage: savefs\n\n...",
     },
-	    clearfs: {
+    clearfs: {
       handler: async (args, options) => {
-        const validationResult = Utils.validateArguments(args, { exact: 0 });
+        const validationResult = Utils.validateArguments(args, {
+          exact: 0
+        });
         if (!validationResult.isValid) {
           return {
             success: false,
@@ -6222,7 +6555,10 @@ Copies <source_path> to <destination_path>, or one or more <source_path>(s) to <
 
         const currentUser = UserManager.getCurrentUser();
         if (!options.isInteractive) {
-          return { success: false, error: "clearfs: Can only be run in interactive mode." };
+          return {
+            success: false,
+            error: "clearfs: Can only be run in interactive mode."
+          };
         }
 
         const confirmed = await new Promise((resolve) =>
@@ -6240,7 +6576,7 @@ Copies <source_path> to <destination_path>, or one or more <source_path>(s) to <
 
         if (!confirmed) {
           return {
-            success: true, // Command itself didn't fail, user cancelled
+            success: true,
             output: `File system clear for '${currentUser.name}' cancelled. ${Config.MESSAGES.NO_ACTION_TAKEN}`,
             messageType: Config.CSS_CLASSES.CONSOLE_LOG_MSG,
           };
@@ -6250,40 +6586,38 @@ Copies <source_path> to <destination_path>, or one or more <source_path>(s) to <
         let finalMessage = "";
 
         try {
-          // Delete the existing FS for the user from IndexedDB
-          // While initialize + save would overwrite, explicit delete is cleaner.
-          await FileSystemManager.deleteUserFS(currentUser.name); //
 
-          // Initialize a new, empty FS in memory for the current user
-          await FileSystemManager.initialize(currentUser.name); //
+          await FileSystemManager.deleteUserFS(currentUser.name);
 
-          // Save the new empty FS to IndexedDB
-          if (!(await FileSystemManager.save(currentUser.name))) { //
+          await FileSystemManager.initialize(currentUser.name);
+
+          if (!(await FileSystemManager.save(currentUser.name))) {
             throw new Error("Failed to save the newly cleared file system to storage.");
           }
 
-          // Reset current path in memory to root for the active session
-          FileSystemManager.setCurrentPath(Config.FILESYSTEM.ROOT_PATH); //
+          FileSystemManager.setCurrentPath(Config.FILESYSTEM.ROOT_PATH);
 
-          // Update UI elements
           if (options.isInteractive) {
             TerminalUI.updatePrompt();
-            OutputManager.clearOutput(); // Clear the terminal screen
+            OutputManager.clearOutput();
           }
           finalMessage = `File system for user '${currentUser.name}' has been cleared and reset to default.`;
-          OutputManager.appendToOutput(finalMessage, { typeClass: Config.CSS_CLASSES.SUCCESS_MSG });
+          OutputManager.appendToOutput(finalMessage, {
+            typeClass: Config.CSS_CLASSES.SUCCESS_MSG
+          });
 
         } catch (e) {
           operationSuccess = false;
           finalMessage = `Error clearing file system for '${currentUser.name}': ${e.message || "Unknown error"}`;
           console.error("clearfs error:", e);
-          OutputManager.appendToOutput(finalMessage, { typeClass: Config.CSS_CLASSES.ERROR_MSG });
+          OutputManager.appendToOutput(finalMessage, {
+            typeClass: Config.CSS_CLASSES.ERROR_MSG
+          });
         }
 
         return {
           success: operationSuccess,
-          // If successful, primary feedback is via OutputManager.appendToOutput directly.
-          // If error, the error message has also been outputted.
+
           output: operationSuccess ? "" : finalMessage,
           error: operationSuccess ? null : finalMessage,
         };
@@ -6303,13 +6637,13 @@ history and user login) intact.
         if (result.success) {
           return {
             success: true,
-            output: result.message, // Assign the success message to output
+            output: result.message,
             messageType: Config.CSS_CLASSES.SUCCESS_MSG,
           };
         } else {
           return {
             success: false,
-            error: result.error, // Assign the error message to error
+            error: result.error,
             messageType: Config.CSS_CLASSES.ERROR_MSG,
           };
         }
@@ -6323,12 +6657,12 @@ history and user login) intact.
         return {
           success: result.success,
           output: result.message,
-          error: result.success
-            ? undefined
-            : result.message || "Failed to load state.",
-          messageType: result.success
-            ? Config.CSS_CLASSES.CONSOLE_LOG_MSG
-            : Config.CSS_CLASSES.ERROR_MSG,
+          error: result.success ?
+            undefined :
+            result.message || "Failed to load state.",
+          messageType: result.success ?
+            Config.CSS_CLASSES.CONSOLE_LOG_MSG :
+            Config.CSS_CLASSES.ERROR_MSG,
         };
       },
       description: "Loads a previously saved terminal session.",
@@ -6365,13 +6699,14 @@ history and user login) intact.
             messageType: Config.CSS_CLASSES.CONSOLE_LOG_MSG,
           };
       },
-      description:
-        "Resets all OopisOS data (users, FS, states) to factory defaults.",
+      description: "Resets all OopisOS data (users, FS, states) to factory defaults.",
       helpText: "Usage: reset\n\n...",
     },
     run: {
       handler: async (args, options) => {
-        const validationResult = Utils.validateArguments(args, { min: 1 });
+        const validationResult = Utils.validateArguments(args, {
+          min: 1
+        });
         if (!validationResult.isValid)
           return {
             success: false,
@@ -6384,11 +6719,15 @@ history and user login) intact.
 
         const pathValidation = FileSystemManager.validatePath(
           "run",
-          scriptPathArg,
-          { expectedType: Config.FILESYSTEM.DEFAULT_FILE_TYPE },
+          scriptPathArg, {
+            expectedType: Config.FILESYSTEM.DEFAULT_FILE_TYPE
+          },
         );
         if (pathValidation.error)
-          return { success: false, error: pathValidation.error };
+          return {
+            success: false,
+            error: pathValidation.error
+          };
 
         const scriptNode = pathValidation.node;
         if (
@@ -6449,8 +6788,7 @@ history and user login) intact.
         if (CommandExecutor.isScriptRunning() && options.isInteractive) {
           return {
             success: false,
-            error:
-              "run: Cannot execute a script while another is already running in interactive mode.",
+            error: "run: Cannot execute a script while another is already running in interactive mode.",
           };
         }
 
@@ -6515,104 +6853,37 @@ history and user login) intact.
         }
 
         if (overallScriptSuccess) {
-          return { success: true, output: null };
+          return {
+            success: true,
+            output: null
+          };
         } else {
-          return { success: false, error: `Script '${scriptPathArg}' failed.` };
+          return {
+            success: false,
+            error: `Script '${scriptPathArg}' failed.`
+          };
         }
       },
       description: "Executes a script file containing OopisOS commands.",
-      helpText:
-        "Usage: run <script_path> [arg1 arg2 ...]\n\nExecutes the commands listed in the specified <script_path> file.\nLines starting with '#' are comments. Basic argument passing is supported:\n  $1, $2, ... : Positional arguments passed to the script.\n  $@          : All arguments as a single string.\n  $#          : Number of arguments.",
+      helpText: "Usage: run <script_path> [arg1 arg2 ...]\n\nExecutes the commands listed in the specified <script_path> file.\nLines starting with '#' are comments. Basic argument passing is supported:\n  $1, $2, ... : Positional arguments passed to the script.\n  $@          : All arguments as a single string.\n  $#          : Number of arguments.",
     },
     find: {
       handler: async (args, execOptions) => {
-        // Renamed options to execOptions
+
         if (args.length === 0) {
-          return { success: false, error: "find: missing path specification" };
+          return {
+            success: false,
+            error: "find: missing path specification"
+          };
         }
 
         const startPathArg = args[0];
         const expressionArgs = args.slice(1);
         const currentUser = UserManager.getCurrentUser().name;
         let outputLines = [];
-        let overallSuccess = true; // Track if any part of find operation itself fails (e.g. bad expression)
-        let filesProcessedSuccessfully = true; // Track if all file operations (like -exec, -delete) succeed
+        let overallSuccess = true;
+        let filesProcessedSuccessfully = true;
 
-        // --- Helper: Glob to Regex ---
-        function globToRegex(glob) {
-          let regexStr = "^";
-          for (let i = 0; i < glob.length; i++) {
-            const char = glob[i];
-            switch (char) {
-              case "*":
-                regexStr += ".*";
-                break;
-              case "?":
-                regexStr += ".";
-                break;
-              case "[": {
-                let charClass = "[";
-                let k = i + 1;
-                if (k < glob.length && (glob[k] === "!" || glob[k] === "^")) {
-                  charClass += "^";
-                  k++;
-                }
-                // Allow ']' as the first char in the class or after negation
-                if (k < glob.length && glob[k] === "]") {
-                  charClass += "\\]"; // Literal ']'
-                  k++;
-                }
-                while (k < glob.length && glob[k] !== "]") {
-                  // Hyphen for range needs careful handling (start, end, or escaped)
-                  if (
-                    glob[k] === "-" &&
-                    charClass.length > 1 &&
-                    charClass[charClass.length - 1] !== "[" &&
-                    charClass[charClass.length - 1] !== "^" &&
-                    k + 1 < glob.length &&
-                    glob[k + 1] !== "]"
-                  ) {
-                    charClass += "-";
-                  } else if (/[.^${}()|[\]\\]/.test(glob[k])) {
-                    // Escape other special regex chars
-                    charClass += "\\" + glob[k];
-                  } else {
-                    charClass += glob[k];
-                  }
-                  k++;
-                }
-                if (k < glob.length && glob[k] === "]") {
-                  // Properly closed
-                  charClass += "]";
-                  i = k;
-                } else {
-                  // Unclosed bracket - treat '[' literally
-                  regexStr += "\\[";
-                  // charClass is discarded, '[' was already added to regexStr
-                  continue; // The outer loop will advance i
-                }
-                regexStr += charClass;
-                break;
-              }
-              default:
-                // Escape other regex metacharacters
-                if (/[.^${}()|[\]\\]/.test(char)) regexStr += "\\";
-                regexStr += char;
-            }
-          }
-          regexStr += "$";
-          try {
-            return new RegExp(regexStr);
-          } catch (e) {
-            // Invalid glob pattern results in an error during RegExp creation
-            console.warn(
-              `find: globToRegex failed for glob "${glob}": ${e.message}`,
-            );
-            return null; // Indicate failure to compile regex
-          }
-        }
-
-        // --- Predicate Evaluators ---
         const predicates = {
           "-name": (node, path, pattern) => {
             const name = path.substring(
@@ -6620,13 +6891,14 @@ history and user login) intact.
             );
             const regex = Utils.globToRegex(pattern);
             if (!regex) {
-              // Failed to compile glob
-              overallSuccess = false; // Mark overall find as having an issue
+
+              overallSuccess = false;
               OutputManager.appendToOutput(
-                `find: invalid pattern for -name: ${pattern}`,
-                { typeClass: Config.CSS_CLASSES.ERROR_MSG },
+                `find: invalid pattern for -name: ${pattern}`, {
+                  typeClass: Config.CSS_CLASSES.ERROR_MSG
+                },
               );
-              return false; // Treat as non-match due to bad pattern
+              return false;
             }
             return regex.test(name);
           },
@@ -6636,19 +6908,21 @@ history and user login) intact.
             if (typeChar === "d")
               return node.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE;
             OutputManager.appendToOutput(
-              `find: unknown type '${typeChar}' for -type`,
-              { typeClass: Config.CSS_CLASSES.ERROR_MSG },
+              `find: unknown type '${typeChar}' for -type`, {
+                typeClass: Config.CSS_CLASSES.ERROR_MSG
+              },
             );
             overallSuccess = false;
             return false;
           },
           "-user": (node, path, username) => node.owner === username,
           "-perm": (node, path, modeStr) => {
-            // Simplified for OopisOS: exact match of 2-digit octal string
+
             if (!/^[0-7]{2}$/.test(modeStr)) {
               OutputManager.appendToOutput(
-                `find: invalid mode '${modeStr}' for -perm. Use two octal digits.`,
-                { typeClass: Config.CSS_CLASSES.ERROR_MSG },
+                `find: invalid mode '${modeStr}' for -perm. Use two octal digits.`, {
+                  typeClass: Config.CSS_CLASSES.ERROR_MSG
+                },
               );
               overallSuccess = false;
               return false;
@@ -6663,22 +6937,23 @@ history and user login) intact.
             const twentyFourHoursInMs = 24 * 60 * 60 * 1000;
 
             let n;
-            let comparisonType = "exact"; // 'exact', 'older', 'newer'
+            let comparisonType = "exact";
 
             if (mtimeSpec.startsWith("+")) {
               n = parseInt(mtimeSpec.substring(1), 10);
-              comparisonType = "older"; // Modified more than N*24h ago
+              comparisonType = "older";
             } else if (mtimeSpec.startsWith("-")) {
               n = parseInt(mtimeSpec.substring(1), 10);
-              comparisonType = "newer"; // Modified less than N*24h ago
+              comparisonType = "newer";
             } else {
               n = parseInt(mtimeSpec, 10);
             }
 
             if (isNaN(n) || n < 0) {
               OutputManager.appendToOutput(
-                `find: invalid day count for -mtime: ${mtimeSpec}`,
-                { typeClass: Config.CSS_CLASSES.ERROR_MSG },
+                `find: invalid day count for -mtime: ${mtimeSpec}`, {
+                  typeClass: Config.CSS_CLASSES.ERROR_MSG
+                },
               );
               overallSuccess = false;
               return false;
@@ -6687,27 +6962,22 @@ history and user login) intact.
             const ageInMs = now - fileMTime;
 
             if (comparisonType === "exact") {
-              // file was modified n days ago (between n*24h and (n+1)*24h)
+
               return (
                 ageInMs >= n * twentyFourHoursInMs &&
                 ageInMs < (n + 1) * twentyFourHoursInMs
               );
             } else if (comparisonType === "older") {
-              // file was modified more than n days ago (actually > (n+1)*24h for POSIX `+n`)
-              // More intuitively, older than N full 24-hour periods.
-              // Standard POSIX `+n` means strictly greater than n 24-hour periods.
-              // So, ageInMs / twentyFourHoursInMs > n
+
               return ageInMs > n * twentyFourHoursInMs;
             } else if (comparisonType === "newer") {
-              // file was modified less than n days ago (within the last n*24h)
-              // Standard POSIX `-n` means strictly less than n 24-hour periods.
+
               return ageInMs < n * twentyFourHoursInMs;
             }
             return false;
           },
         };
 
-        // --- Actions ---
         const actions = {
           "-print": async (node, path) => {
             outputLines.push(path);
@@ -6715,70 +6985,68 @@ history and user login) intact.
           },
           "-exec": async (node, path, commandParts) => {
             const commandTemplate = commandParts.join(" ");
-            // Basic {} substitution. Does not handle {}+ or complex quoting within {}.
+
             const hydratedCommand = commandTemplate.replace(
               /\{\}/g,
               `'${path.replace(/'/g, "'\\''")}'`,
-            ); // Simple quote for paths
+            );
 
             const result = await CommandExecutor.processSingleCommand(
               hydratedCommand,
               false,
-            ); // Non-interactive
+            );
             if (!result.success) {
-              // POSIX -exec returns true if command exit 0.
-              // If command fails, -exec test fails. Output error for context.
+
               OutputManager.appendToOutput(
-                `find: -exec: ${hydratedCommand}: command failed${result.error ? `: ${result.error}` : ""}`,
-                { typeClass: Config.CSS_CLASSES.WARNING_MSG },
+                `find: -exec: ${hydratedCommand}: command failed${result.error ? `: ${result.error}` : ""}`, {
+                  typeClass: Config.CSS_CLASSES.WARNING_MSG
+                },
               );
               filesProcessedSuccessfully = false;
-              return false; // The -exec predicate itself failed
+              return false;
             }
-            return true; // The -exec predicate succeeded
+            return true;
           },
           "-delete": async (node, path) => {
-            // This needs to be careful. For directories, it must be recursive.
-            // This action implies -depth for directories. The traversal logic will handle -depth.
+
             let rmArgs = [];
             if (node.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE) {
-              rmArgs.push("-r"); // Add -R equivalent for rm
+              rmArgs.push("-r");
             }
-            rmArgs.push("-f"); // Force, as find -delete usually doesn't prompt
+            rmArgs.push("-f");
             rmArgs.push(path);
 
             const rmCommand = CommandExecutor.getCommands().rm;
             if (rmCommand) {
-              // Simulating calling rm. We pass `false` for isInteractive.
+
               const result = await rmCommand.handler(rmArgs, {
                 isInteractive: false,
               });
               if (!result.success) {
                 OutputManager.appendToOutput(
-                  `find: -delete: ${path}: ${result.error || "failed to delete"}`,
-                  { typeClass: Config.CSS_CLASSES.WARNING_MSG },
+                  `find: -delete: ${path}: ${result.error || "failed to delete"}`, {
+                    typeClass: Config.CSS_CLASSES.WARNING_MSG
+                  },
                 );
                 filesProcessedSuccessfully = false;
-                return false; // The -delete predicate failed
+                return false;
               }
               messages.push(`Deleted: ${path}`);
-              return true; // The -delete predicate succeeded
+              return true;
             } else {
               OutputManager.appendToOutput(
-                `find: -delete: 'rm' command not available`,
-                { typeClass: Config.CSS_CLASSES.ERROR_MSG },
+                `find: -delete: 'rm' command not available`, {
+                  typeClass: Config.CSS_CLASSES.ERROR_MSG
+                },
               );
-              overallSuccess = false; // This is a find configuration error
+              overallSuccess = false;
               filesProcessedSuccessfully = false;
               return false;
             }
           },
         };
 
-        // --- Expression Parsing & Evaluation ---
-        // Simplified parsing: build groups of ANDed terms, separated by OR.
-        // Each term can be negated by -not.
-        let parsedExpression = []; // Array of "term groups", where each group is ANDed.
+        let parsedExpression = [];
         let currentTermGroup = [];
         let nextTermNegated = false;
         let hasExplicitAction = false;
@@ -6798,18 +7066,23 @@ history and user login) intact.
               });
               currentTermGroup = [];
             }
-            parsedExpression.push({ type: "OR" });
+            parsedExpression.push({
+              type: "OR"
+            });
             i++;
             continue;
           } else if (token === "-and" || token === "-a") {
-            // Mostly implicit, but if used, just consume it.
+
             i++;
             continue;
           }
 
           let predicateFn = predicates[token];
           let actionFn = actions[token];
-          let term = { name: token, negated: nextTermNegated };
+          let term = {
+            name: token,
+            negated: nextTermNegated
+          };
           nextTermNegated = false;
 
           if (predicateFn) {
@@ -6820,8 +7093,9 @@ history and user login) intact.
               i++;
             } else {
               OutputManager.appendToOutput(
-                `find: missing argument to \`${token}\``,
-                { typeClass: Config.CSS_CLASSES.ERROR_MSG },
+                `find: missing argument to \`${token}\``, {
+                  typeClass: Config.CSS_CLASSES.ERROR_MSG
+                },
               );
               return {
                 success: false,
@@ -6834,15 +7108,16 @@ history and user login) intact.
             hasExplicitAction = true;
             if (token === "-exec") {
               term.commandParts = [];
-              i++; // Move past -exec token
+              i++;
               while (i < expressionArgs.length && expressionArgs[i] !== "\\;") {
                 term.commandParts.push(expressionArgs[i]);
                 i++;
               }
               if (i >= expressionArgs.length || expressionArgs[i] !== "\\;") {
                 OutputManager.appendToOutput(
-                  `find: missing terminating ';' or invalid syntax for -exec`,
-                  { typeClass: Config.CSS_CLASSES.ERROR_MSG },
+                  `find: missing terminating ';' or invalid syntax for -exec`, {
+                    typeClass: Config.CSS_CLASSES.ERROR_MSG
+                  },
                 );
                 return {
                   success: false,
@@ -6852,8 +7127,9 @@ history and user login) intact.
             }
           } else {
             OutputManager.appendToOutput(
-              `find: unknown predicate or invalid expression: ${token}`,
-              { typeClass: Config.CSS_CLASSES.ERROR_MSG },
+              `find: unknown predicate or invalid expression: ${token}`, {
+                typeClass: Config.CSS_CLASSES.ERROR_MSG
+              },
             );
             return {
               success: false,
@@ -6864,18 +7140,24 @@ history and user login) intact.
           i++;
         }
         if (currentTermGroup.length > 0) {
-          parsedExpression.push({ type: "AND_GROUP", terms: currentTermGroup });
+          parsedExpression.push({
+            type: "AND_GROUP",
+            terms: currentTermGroup
+          });
         }
         if (parsedExpression.length === 0 && expressionArgs.length > 0) {
-          // Only operators perhaps
+
           OutputManager.appendToOutput(`find: invalid expression`, {
             typeClass: Config.CSS_CLASSES.ERROR_MSG,
           });
-          return { success: false, error: `find: invalid expression` };
+          return {
+            success: false,
+            error: `find: invalid expression`
+          };
         }
 
         if (!hasExplicitAction) {
-          // Add default -print if no other action
+
           parsedExpression.push({
             type: "ACTION",
             name: "-print",
@@ -6885,7 +7167,7 @@ history and user login) intact.
         }
 
         async function evaluateExpressionForNode(node, path) {
-          if (!overallSuccess) return false; // If regex compilation failed etc.
+          if (!overallSuccess) return false;
 
           let orGroupValue = false;
           let currentAndGroupValue = true;
@@ -6895,7 +7177,7 @@ history and user login) intact.
             if (groupOrOperator.type === "OR") {
               if (isFirstAndGroup) orGroupValue = currentAndGroupValue;
               else orGroupValue = orGroupValue || currentAndGroupValue;
-              currentAndGroupValue = true; // Reset for the next AND group
+              currentAndGroupValue = true;
               isFirstAndGroup = false;
             } else if (groupOrOperator.type === "AND_GROUP") {
               let andSubResult = true;
@@ -6904,15 +7186,15 @@ history and user login) intact.
                   let result = await term.eval(node, path, term.arg);
                   if (term.negated) result = !result;
                   andSubResult = andSubResult && result;
-                  if (!andSubResult) break; // Short-circuit AND
+                  if (!andSubResult) break;
                 }
               }
               currentAndGroupValue = currentAndGroupValue && andSubResult;
             }
           }
-          // After loop, combine the last AND group's result
+
           if (isFirstAndGroup)
-            orGroupValue = currentAndGroupValue; // Only one AND group
+            orGroupValue = currentAndGroupValue;
           else orGroupValue = orGroupValue || currentAndGroupValue;
 
           return orGroupValue;
@@ -6921,7 +7203,7 @@ history and user login) intact.
         async function performActions(node, path) {
           let actionSuccess = true;
           for (const groupOrOperator of parsedExpression) {
-            // Iterate again for actions
+
             if (groupOrOperator.type === "AND_GROUP") {
               for (const term of groupOrOperator.terms) {
                 if (term.type === "ACTION") {
@@ -6929,10 +7211,10 @@ history and user login) intact.
                     node,
                     path,
                     term.commandParts,
-                  ); // commandParts for -exec
+                  );
                   if (!success) {
                     actionSuccess = false;
-                    // filesProcessedSuccessfully is usually set within the action
+
                   }
                 }
               }
@@ -6941,44 +7223,48 @@ history and user login) intact.
           return actionSuccess;
         }
 
-        // --- Recursive Traversal ---
         const startPathValidation = FileSystemManager.validatePath(
           "find",
           startPathArg,
         );
         if (startPathValidation.error) {
-          return { success: false, error: startPathValidation.error };
+          return {
+            success: false,
+            error: startPathValidation.error
+          };
         }
 
         const impliesDepth = parsedExpression.some(
           (g) =>
-            g.type === "AND_GROUP" && g.terms.some((t) => t.name === "-delete"),
+          g.type === "AND_GROUP" && g.terms.some((t) => t.name === "-delete"),
         );
 
         async function recurseFind(
           currentResolvedPath,
           processSelfFirst = !impliesDepth,
         ) {
-          if (!overallSuccess) return; // Early exit if find expression itself is bad
+          if (!overallSuccess) return;
 
           const node = FileSystemManager.getNodeByPath(currentResolvedPath);
           if (!node) {
-            // This case should ideally be caught by parent if permissions were an issue
+
             if (currentResolvedPath !== startPathArg) {
-              // Don't double-report for initial bad path
+
               OutputManager.appendToOutput(
-                `find: ‘${currentResolvedPath}’: No such file or directory`,
-                { typeClass: Config.CSS_CLASSES.ERROR_MSG },
+                `find: ‘${currentResolvedPath}’: No such file or directory`, {
+                  typeClass: Config.CSS_CLASSES.ERROR_MSG
+                },
               );
             }
-            filesProcessedSuccessfully = false; // Could not access this path
+            filesProcessedSuccessfully = false;
             return;
           }
           if (!FileSystemManager.hasPermission(node, currentUser, "read")) {
-            // Basic read check for listing
+
             OutputManager.appendToOutput(
-              `find: ‘${currentResolvedPath}’: Permission denied`,
-              { typeClass: Config.CSS_CLASSES.ERROR_MSG },
+              `find: ‘${currentResolvedPath}’: Permission denied`, {
+                typeClass: Config.CSS_CLASSES.ERROR_MSG
+              },
             );
             filesProcessedSuccessfully = false;
             return;
@@ -6996,19 +7282,19 @@ history and user login) intact.
           }
 
           if (node.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE) {
-            const childrenNames = Object.keys(node.children || {}); // Sort for consistent order? Find usually doesn't sort.
+            const childrenNames = Object.keys(node.children || {});
             for (const childName of childrenNames) {
               const childResolvedPath = FileSystemManager.getAbsolutePath(
                 childName,
                 currentResolvedPath,
               );
               await recurseFind(childResolvedPath, processSelfFirst);
-              if (!overallSuccess) return; // Propagate critical errors
+              if (!overallSuccess) return;
             }
           }
 
           if (!processSelfFirst) {
-            // For -depth behavior (like -delete)
+
             matches = await evaluateExpressionForNode(
               node,
               currentResolvedPath,
@@ -7021,15 +7307,14 @@ history and user login) intact.
 
         await recurseFind(startPathValidation.resolvedPath);
 
-        // Determine overall success of the find command itself
-        // `overallSuccess` tracks issues with find's own setup (bad patterns, unknown predicates)
-        // `filesProcessedSuccessfully` tracks issues with actions on files (exec failing, delete failing)
         const finalSuccess = overallSuccess && filesProcessedSuccessfully;
 
-        return { success: finalSuccess, output: outputLines.join("\n") };
+        return {
+          success: finalSuccess,
+          output: outputLines.join("\n")
+        };
       },
-      description:
-        "Searches for files in a directory hierarchy based on expressions.",
+      description: "Searches for files in a directory hierarchy based on expressions.",
       helpText: `Usage: find [path...] [expression]
 
 Default path is current directory. Default expression is -print.
@@ -7057,7 +7342,9 @@ Example: find . -name "*.js" -not -user Guest -o -type d -print
     },
     delay: {
       handler: async (args, options) => {
-        const validationResult = Utils.validateArguments(args, { exact: 1 });
+        const validationResult = Utils.validateArguments(args, {
+          exact: 1
+        });
         if (!validationResult.isValid) {
           return {
             success: false,
@@ -7088,21 +7375,22 @@ Example: find . -name "*.js" -not -user Guest -o -type d -print
                 typeClass: Config.CSS_CLASSES.CONSOLE_LOG_MSG,
               });
             }
-            resolve({ success: true, output: "" });
+            resolve({
+              success: true,
+              output: ""
+            });
           }, ms);
         });
       },
       description: "Pauses execution for a specified time.",
-      helpText:
-        "Usage: delay <milliseconds>\n\nPauses command execution for the specified number of milliseconds. Useful in scripts.",
+      helpText: "Usage: delay <milliseconds>\n\nPauses command execution for the specified number of milliseconds. Useful in scripts.",
     },
     check_fail: {
       handler: async (args, options) => {
         if (args.length !== 1) {
           return {
             success: false,
-            error:
-              "check_fail: expects exactly one argument (a command string)",
+            error: "check_fail: expects exactly one argument (a command string)",
           };
         }
         const commandToTest = args[0];
@@ -7119,29 +7407,33 @@ Example: find . -name "*.js" -not -user Guest -o -type d -print
 
         if (testResult.success) {
           const failureMessage = `CHECK_FAIL: FAILURE - Command <${commandToTest}> unexpectedly SUCCEEDED.`;
-          return { success: false, error: failureMessage };
+          return {
+            success: false,
+            error: failureMessage
+          };
         } else {
           const successMessage = `CHECK_FAIL: SUCCESS - Command <${commandToTest}> failed as expected. (Error: ${testResult.error || "N/A"})`;
-          return { success: true, output: successMessage };
+          return {
+            success: true,
+            output: successMessage
+          };
         }
       },
-      description:
-        "Tests if a given command string fails, as expected for negative test cases.",
-      helpText:
-        'Usage: check_fail "<command_string>"\n\nExecutes the <command_string>. If <command_string> fails, check_fail succeeds (and the script continues).\nIf <command_string> succeeds, check_fail fails (and the script halts), reporting the unexpected success.',
+      description: "Tests if a given command string fails, as expected for negative test cases.",
+      helpText: 'Usage: check_fail "<command_string>"\n\nExecutes the <command_string>. If <command_string> fails, check_fail succeeds (and the script continues).\nIf <command_string> succeeds, check_fail fails (and the script halts), reporting the unexpected success.',
     },
     register: {
       handler: async (args, options) => {
-        // Check if the useradd command and its handler exist
+
         if (commands.useradd?.handler) {
-          // Directly call the useradd handler and return its result
+
           return commands.useradd.handler(args, options);
         }
-        // Fallback if useradd command is somehow not found
+
         return {
           success: false,
           error: "register: useradd command not found.",
-          messageType: Config.CSS_CLASSES.ERROR_MSG, // Added for consistency
+          messageType: Config.CSS_CLASSES.ERROR_MSG,
         };
       },
       description: "Alias for useradd.",
@@ -7149,7 +7441,9 @@ Example: find . -name "*.js" -not -user Guest -o -type d -print
     },
     removeuser: {
       handler: async (args, options) => {
-        const validationResult = Utils.validateArguments(args, { exact: 1 });
+        const validationResult = Utils.validateArguments(args, {
+          exact: 1
+        });
         if (!validationResult.isValid) {
           return {
             success: false,
@@ -7176,8 +7470,7 @@ Example: find . -name "*.js" -not -user Guest -o -type d -print
 
         const users = StorageManager.loadItem(
           Config.STORAGE_KEYS.USER_CREDENTIALS,
-          "User list",
-          {},
+          "User list", {},
         );
         if (!users.hasOwnProperty(usernameToRemove)) {
           return {
@@ -7259,12 +7552,13 @@ Example: find . -name "*.js" -not -user Guest -o -type d -print
         }
       },
       description: "Removes a user account and all their data.",
-      helpText:
-        "Usage: removeuser <username>\n\nPermanently removes the specified <username> and all their files and saved sessions. This action requires confirmation and cannot be undone. You cannot remove yourself.",
+      helpText: "Usage: removeuser <username>\n\nPermanently removes the specified <username> and all their files and saved sessions. This action requires confirmation and cannot be undone. You cannot remove yourself.",
     },
     chmod: {
       handler: async (args, options) => {
-        const validationResult = Utils.validateArguments(args, { exact: 2 });
+        const validationResult = Utils.validateArguments(args, {
+          exact: 2
+        });
         if (!validationResult.isValid)
           return {
             success: false,
@@ -7274,7 +7568,7 @@ Example: find . -name "*.js" -not -user Guest -o -type d -print
         const modeArg = args[0];
         const pathArg = args[1];
         const currentUser = UserManager.getCurrentUser().name;
-        const nowISO = new Date().toISOString(); // For mtime update
+        const nowISO = new Date().toISOString();
 
         if (!/^[0-7]{2}$/.test(modeArg)) {
           return {
@@ -7286,7 +7580,10 @@ Example: find . -name "*.js" -not -user Guest -o -type d -print
 
         const pathValidation = FileSystemManager.validatePath("chmod", pathArg);
         if (pathValidation.error)
-          return { success: false, error: pathValidation.error };
+          return {
+            success: false,
+            error: pathValidation.error
+          };
 
         const node = pathValidation.node;
         if (node.owner !== currentUser) {
@@ -7297,11 +7594,11 @@ Example: find . -name "*.js" -not -user Guest -o -type d -print
         }
 
         node.mode = newMode;
-        node.mtime = nowISO; // Update mtime on permission change
+        node.mtime = nowISO;
         FileSystemManager._updateNodeAndParentMtime(
           pathValidation.resolvedPath,
           nowISO,
-        ); // Update parent's mtime as well
+        );
 
         if (!(await FileSystemManager.save(currentUser))) {
           return {
@@ -7316,12 +7613,13 @@ Example: find . -name "*.js" -not -user Guest -o -type d -print
         };
       },
       description: "Changes file mode bits (permissions).",
-      helpText:
-        "Usage: chmod <mode> <path>\n\nChanges the permissions of <path> to <mode>.\n<mode> is a two-digit octal number (e.g., 75 for rwxr-x, 64 for rw-r--).\nThe first digit is for the owner, the second for others.\n  r (read) = 4, w (write) = 2, x (execute) = 1.\nExample: 'chmod 75 myfile' sets owner=rwx, other=r-x.",
+      helpText: "Usage: chmod <mode> <path>\n\nChanges the permissions of <path> to <mode>.\n<mode> is a two-digit octal number (e.g., 75 for rwxr-x, 64 for rw-r--).\nThe first digit is for the owner, the second for others.\n  r (read) = 4, w (write) = 2, x (execute) = 1.\nExample: 'chmod 75 myfile' sets owner=rwx, other=r-x.",
     },
     chown: {
       handler: async (args, options) => {
-        const validationResult = Utils.validateArguments(args, { exact: 2 });
+        const validationResult = Utils.validateArguments(args, {
+          exact: 2
+        });
         if (!validationResult.isValid)
           return {
             success: false,
@@ -7331,12 +7629,11 @@ Example: find . -name "*.js" -not -user Guest -o -type d -print
         const newOwnerArg = args[0];
         const pathArg = args[1];
         const currentUser = UserManager.getCurrentUser().name;
-        const nowISO = new Date().toISOString(); // For mtime update
+        const nowISO = new Date().toISOString();
 
         const users = StorageManager.loadItem(
           Config.STORAGE_KEYS.USER_CREDENTIALS,
-          "User list",
-          {},
+          "User list", {},
         );
         if (!users[newOwnerArg] && newOwnerArg !== Config.USER.DEFAULT_NAME) {
           return {
@@ -7347,7 +7644,10 @@ Example: find . -name "*.js" -not -user Guest -o -type d -print
 
         const pathValidation = FileSystemManager.validatePath("chown", pathArg);
         if (pathValidation.error)
-          return { success: false, error: pathValidation.error };
+          return {
+            success: false,
+            error: pathValidation.error
+          };
 
         const node = pathValidation.node;
         if (node.owner !== currentUser) {
@@ -7358,11 +7658,11 @@ Example: find . -name "*.js" -not -user Guest -o -type d -print
         }
 
         node.owner = newOwnerArg;
-        node.mtime = nowISO; // Update mtime on ownership change
+        node.mtime = nowISO;
         FileSystemManager._updateNodeAndParentMtime(
           pathValidation.resolvedPath,
           nowISO,
-        ); // Update parent's mtime as well
+        );
 
         if (!(await FileSystemManager.save(currentUser))) {
           return {
@@ -7377,15 +7677,13 @@ Example: find . -name "*.js" -not -user Guest -o -type d -print
         };
       },
       description: "Changes file owner.",
-      helpText:
-        "Usage: chown <new_owner> <path>\n\nChanges the owner of <path> to <new_owner>.\nCurrently, only the current owner of the file can change its ownership.",
+      helpText: "Usage: chown <new_owner> <path>\n\nChanges the owner of <path> to <new_owner>.\nCurrently, only the current owner of the file can change its ownership.",
     },
     listusers: {
       handler: async (args, options) => {
         const users = StorageManager.loadItem(
           Config.STORAGE_KEYS.USER_CREDENTIALS,
-          "User list",
-          {},
+          "User list", {},
         );
         const userNames = Object.keys(users);
         if (!userNames.includes(Config.USER.DEFAULT_NAME))
@@ -7399,8 +7697,7 @@ Example: find . -name "*.js" -not -user Guest -o -type d -print
           };
         return {
           success: true,
-          output:
-            "Registered users:\n" + userNames.map((u) => `  ${u}`).join("\n"),
+          output: "Registered users:\n" + userNames.map((u) => `  ${u}`).join("\n"),
         };
       },
       description: "Lists all registered user accounts.",
@@ -7418,8 +7715,7 @@ Example: find . -name "*.js" -not -user Guest -o -type d -print
         return await cmdData.handler(segment.args, {
           ...execCtxOpts,
           stdinContent,
-          explicitForce:
-            segment.args.includes("-f") || segment.args.includes("--force"),
+          explicitForce: segment.args.includes("-f") || segment.args.includes("--force"),
         });
       } catch (e) {
         console.error(`Err in cmd handler for '${segment.command}':`, e);
@@ -7429,19 +7725,29 @@ Example: find . -name "*.js" -not -user Guest -o -type d -print
         };
       }
     } else if (segment.command)
-      return { success: false, error: `${segment.command}: command not found` };
-    return { success: true, output: "" };
+      return {
+        success: false,
+        error: `${segment.command}: command not found`
+      };
+    return {
+      success: true,
+      output: ""
+    };
   }
   async function _executePipeline(pipeline, isInteractive) {
     let currentStdin = null,
-      lastResult = { success: true, output: "" };
-    const user = UserManager.getCurrentUser().name; // Assuming UserManager is accessible
-    const nowISO = new Date().toISOString(); // For mtime updates in redirection
+      lastResult = {
+        success: true,
+        output: ""
+      };
+    const user = UserManager.getCurrentUser().name;
+    const nowISO = new Date().toISOString();
 
     for (let i = 0; i < pipeline.segments.length; i++) {
       lastResult = await _executeCommandHandler(
-        pipeline.segments[i],
-        { isInteractive }, // Pass the options object including isInteractive
+        pipeline.segments[i], {
+          isInteractive
+        },
         currentStdin,
       );
       if (!lastResult.success) {
@@ -7451,53 +7757,54 @@ Example: find . -name "*.js" -not -user Guest -o -type d -print
             typeClass: Config.CSS_CLASSES.ERROR_MSG,
           });
         } else {
-          console.log(`BG pipe err: ${err}`); // Log background errors to console
+          console.log(`BG pipe err: ${err}`);
         }
-        return { success: false, error: err, output: lastResult.output };
+        return {
+          success: false,
+          error: err,
+          output: lastResult.output
+        };
       }
       currentStdin = lastResult.output;
     }
 
     if (pipeline.redirection && lastResult.success) {
-      const { type: redirType, file: redirFile } = pipeline.redirection;
-      const outputToRedir = lastResult.output || ""; // Ensure it's a string
+      const {
+        type: redirType,
+        file: redirFile
+      } = pipeline.redirection;
+      const outputToRedir = lastResult.output || "";
 
       const redirVal = FileSystemManager.validatePath(
-        "redirection", // commandName for error messages from validatePath
-        redirFile,
-        {
-          allowMissing: true, // Important for redirection, file might not exist
-          disallowRoot: true, // Typically don't want to redirect to root itself
-          defaultToCurrentIfEmpty: false, // Filename must be provided
+        "redirection",
+        redirFile, {
+          allowMissing: true,
+          disallowRoot: true,
+          defaultToCurrentIfEmpty: false,
         },
       );
 
-      // DEBUG: Log absRedirPath (which is redirVal.resolvedPath)
-      // console.log("[DEBUG] Redirection: absRedirPath (from redirVal.resolvedPath) =", redirVal.resolvedPath);
-
-      // Check if validatePath itself returned an error that isn't "allowMissing" related for a new file
       if (
         redirVal.error &&
         !(redirVal.optionsUsed.allowMissing && !redirVal.node)
       ) {
         if (!pipeline.isBackground) {
           await OutputManager.appendToOutput(redirVal.error, {
-            // Use error from validatePath
+
             typeClass: Config.CSS_CLASSES.ERROR_MSG,
           });
         }
-        // DEBUG: Log error from validatePath
-        // console.log("[DEBUG] Redirection: validatePath failed with error:", redirVal.error);
-        return { success: false, error: redirVal.error };
+        return {
+          success: false,
+          error: redirVal.error
+        };
       }
 
       const absRedirPath = redirVal.resolvedPath;
-      let targetNode = redirVal.node; // This is the node AT the redirection target path, if it exists
+      let targetNode = redirVal.node;
 
       const pDirRes =
         FileSystemManager.createParentDirectoriesIfNeeded(absRedirPath);
-      // DEBUG: Log pDirRes
-      // console.log("[DEBUG] Redirection: pDirRes (result from createParentDirectoriesIfNeeded) =", Utils.deepCopyNode(pDirRes));
 
       if (pDirRes.error) {
         if (!pipeline.isBackground) {
@@ -7505,51 +7812,49 @@ Example: find . -name "*.js" -not -user Guest -o -type d -print
             typeClass: Config.CSS_CLASSES.ERROR_MSG,
           });
         }
-        // DEBUG: Log that createParentDirectoriesIfNeeded reported an error
-        // console.log("[DEBUG] Redirection: createParentDirectoriesIfNeeded failed with error:", pDirRes.error);
-        return { success: false, error: pDirRes.error };
+        return {
+          success: false,
+          error: pDirRes.error
+        };
       }
-      // pDirRes.parentNode is the directory *containing* the target redirection file,
-      // or the directory itself if it was the last part created.
-      // For file redirection, we are interested in the parent of absRedirPath.
 
       if (targetNode) {
-        // If the target file itself already exists
+
         if (targetNode.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE) {
           if (!pipeline.isBackground) {
             await OutputManager.appendToOutput(
-              `Redir err: '${redirFile}' is dir.`,
-              { typeClass: Config.CSS_CLASSES.ERROR_MSG },
+              `Redir err: '${redirFile}' is dir.`, {
+                typeClass: Config.CSS_CLASSES.ERROR_MSG
+              },
             );
           }
-          // DEBUG: Log if trying to redirect to an existing directory
-          // console.log("[DEBUG] Redirection: Target file path is an existing directory. Path:", absRedirPath);
-          return { success: false, error: `'${redirFile}' is dir.` };
+          return {
+            success: false,
+            error: `'${redirFile}' is dir.`
+          };
         }
         if (!FileSystemManager.hasPermission(targetNode, user, "write")) {
           if (!pipeline.isBackground) {
             await OutputManager.appendToOutput(
-              `Redir err: no write to '${redirFile}'${Config.MESSAGES.PERMISSION_DENIED_SUFFIX}`,
-              { typeClass: Config.CSS_CLASSES.ERROR_MSG },
+              `Redir err: no write to '${redirFile}'${Config.MESSAGES.PERMISSION_DENIED_SUFFIX}`, {
+                typeClass: Config.CSS_CLASSES.ERROR_MSG
+              },
             );
           }
-          // DEBUG: Log permission denial on existing target file
-          // console.log("[DEBUG] Redirection: Permission denied to write to existing target file. Path:", absRedirPath, "Node:", Utils.deepCopyNode(targetNode));
-          return { success: false, error: `no write to '${redirFile}'` };
+          return {
+            success: false,
+            error: `no write to '${redirFile}'`
+          };
         }
       } else {
-        // Target file does not exist, check parent directory permissions
+
         const parentP =
           absRedirPath.substring(
             0,
             absRedirPath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR),
           ) || Config.FILESYSTEM.ROOT_PATH;
-        // DEBUG: Log parentP
-        //console.log("[DEBUG] Redirection: parentP (path to directory for new file) =", parentP);
 
         const parentN = FileSystemManager.getNodeByPath(parentP);
-        // DEBUG: Log parentN (the node for parentP)
-        //console.log("[DEBUG] Redirection: parentN (node for parentP after potential creation by createParentDirectoriesIfNeeded) =", Utils.deepCopyNode(parentN));
         if (parentN === null) {
           console.log(
             "[DEBUG] Redirection: parentN is NULL. getNodeByPath failed to find:",
@@ -7561,35 +7866,21 @@ Example: find . -name "*.js" -not -user Guest -o -type d -print
           !parentN ||
           !FileSystemManager.hasPermission(parentN, user, "write")
         ) {
-          // DEBUG: Log details if permission check on parentN fails
-          //  if (parentN) { // If parentN exists but permission is denied
-          //        console.log("[DEBUG] Redirection: Permission DENIED to create file in parentN. User:", user, "Path for parentN:", parentP);
-          //       console.log("[DEBUG] Redirection: parentN.owner =", parentN.owner, "parentN.mode =", parentN.mode.toString(8)); // Log mode in octal
-          //     console.log("[DEBUG] Redirection: hasPermission(parentN, user, 'write') result =", FileSystemManager.hasPermission(parentN, user, "write"));
-          //   } else { // If parentN is null (means getNodeByPath failed to find the parent dir where file should be created)
-          //       console.log("[DEBUG] Redirection: Cannot create file in parentN because parentN is null. Path for parentN:", parentP);
-          //   }
 
           if (!pipeline.isBackground) {
             await OutputManager.appendToOutput(
-              `Redir err: no create in '${parentP}'${Config.MESSAGES.PERMISSION_DENIED_SUFFIX}`,
-              { typeClass: Config.CSS_CLASSES.ERROR_MSG },
+              `Redir err: no create in '${parentP}'${Config.MESSAGES.PERMISSION_DENIED_SUFFIX}`, {
+                typeClass: Config.CSS_CLASSES.ERROR_MSG
+              },
             );
           }
-          return { success: false, error: `no create in '${parentP}'` };
-        }
-        // DEBUG: Log if permission to create in parentN is granted
-        // console.log("[DEBUG] Redirection: Permission GRANTED to create file in parentN. Path for parentN:", parentP);
-        if (parentN) {
-          // Should not be null if we reached here
-          // console.log("[DEBUG] Redirection: parentN.owner =", parentN.owner, "parentN.mode =", parentN.mode.toString(8));
-          // console.log("[DEBUG] Redirection: hasPermission(parentN, user, 'write') result for parentN =", FileSystemManager.hasPermission(parentN, user, "write"));
+          return {
+            success: false,
+            error: `no create in '${parentP}'`
+          };
         }
       }
 
-      // At this point, permissions are fine, and parent directories exist.
-      // The actual parent node for the file is pDirRes.parentNode if the file is at the leaf of creation,
-      // or more generally, the directory part of absRedirPath.
       const finalParentDirPath =
         absRedirPath.substring(
           0,
@@ -7599,16 +7890,16 @@ Example: find . -name "*.js" -not -user Guest -o -type d -print
         FileSystemManager.getNodeByPath(finalParentDirPath);
 
       if (!finalParentNodeForFile) {
-        // This would be a very unexpected internal error if createParentDirectoriesIfNeeded succeeded
-        // and the subsequent permission checks on parentN also passed.
+
         console.error(
           "[DEBUG] Redirection: CRITICAL - finalParentNodeForFile is null. Path:",
           finalParentDirPath,
         );
         if (!pipeline.isBackground) {
           await OutputManager.appendToOutput(
-            `Redir err: critical internal error, parent dir '${finalParentDirPath}' for file write not found.`,
-            { typeClass: Config.CSS_CLASSES.ERROR_MSG },
+            `Redir err: critical internal error, parent dir '${finalParentDirPath}' for file write not found.`, {
+              typeClass: Config.CSS_CLASSES.ERROR_MSG
+            },
           );
         }
         return {
@@ -7624,67 +7915,68 @@ Example: find . -name "*.js" -not -user Guest -o -type d -print
       if (
         redirType === "append" &&
         finalParentNodeForFile.children[fName]?.type ===
-          Config.FILESYSTEM.DEFAULT_FILE_TYPE // Check on the correct parent
+        Config.FILESYSTEM.DEFAULT_FILE_TYPE
       ) {
         exContent = finalParentNodeForFile.children[fName].content || "";
         if (exContent && !exContent.endsWith("\n") && outputToRedir) {
-          // Only add newline if exContent exists and outputToRedir is not empty
+
           exContent += "\n";
         }
       }
 
-      // Determine owner and mode for the file being written
-      // If file exists (targetNode is not null), preserve its owner and mode.
-      // If file is new, it inherits ownership from 'user' and default file mode.
       const owner = targetNode ? targetNode.owner : user;
-      const mode = targetNode
-        ? targetNode.mode
-        : Config.FILESYSTEM.DEFAULT_FILE_MODE;
+      const mode = targetNode ?
+        targetNode.mode :
+        Config.FILESYSTEM.DEFAULT_FILE_MODE;
 
       finalParentNodeForFile.children[fName] = {
-        // Write to the correct parent
+
         type: Config.FILESYSTEM.DEFAULT_FILE_TYPE,
         content: exContent + outputToRedir,
         owner: owner,
         mode: mode,
-        mtime: nowISO, // Set mtime for redirected file
+        mtime: nowISO,
       };
-      // Update mtime of the parent directory where the file was written/created
-      FileSystemManager._updateNodeAndParentMtime(finalParentDirPath, nowISO); // This already updates parent, no need for the one below if path is dir
-      // FileSystemManager._updateNodeAndParentMtime(absRedirPath, nowISO); // This updates the file itself and its parent.
+
+      FileSystemManager._updateNodeAndParentMtime(absRedirPath, nowISO);
 
       if (!(await FileSystemManager.save(user))) {
         if (!pipeline.isBackground) {
           await OutputManager.appendToOutput(
-            `Failed to save redir to '${redirFile}'.`,
-            { typeClass: Config.CSS_CLASSES.ERROR_MSG },
+            `Failed to save redir to '${redirFile}'.`, {
+              typeClass: Config.CSS_CLASSES.ERROR_MSG
+            },
           );
         }
-        return { success: false, error: `save redir fail` };
+        return {
+          success: false,
+          error: `save redir fail`
+        };
       }
-      // If redirection happened, the output that was redirected should not also be printed to terminal.
-      lastResult.output = null; // Clear output as it has been redirected
+
+      lastResult.output = null;
     }
 
-    // Output handling if not redirected and not background with suppressed output
     if (
-      !pipeline.redirection && // ensure no redirection occurred
+      !pipeline.redirection &&
       lastResult.success &&
       lastResult.output !== null &&
-      lastResult.output !== undefined // Check for actual output
+      lastResult.output !== undefined
     ) {
       if (!pipeline.isBackground) {
         if (lastResult.output) {
-          // Only append if there's something to output
+
           await OutputManager.appendToOutput(lastResult.output, {
             typeClass: lastResult.messageType || null,
           });
         }
       } else if (lastResult.output && pipeline.isBackground) {
-        // Only show suppressed message if there *was* output
+
         await OutputManager.appendToOutput(
-          `${Config.MESSAGES.BACKGROUND_PROCESS_OUTPUT_SUPPRESSED} (Job ${pipeline.jobId})`,
-          { typeClass: Config.CSS_CLASSES.CONSOLE_LOG_MSG, isBackground: true },
+          `${Config.MESSAGES.BACKGROUND_PROCESS_OUTPUT_SUPPRESSED} (Job ${pipeline.jobId})`, {
+            typeClass: Config.CSS_CLASSES.CONSOLE_LOG_MSG,
+            isBackground: true
+          },
         );
       }
     }
@@ -7694,19 +7986,18 @@ Example: find . -name "*.js" -not -user Guest -o -type d -print
   async function _finalizeInteractiveModeUI(originalCommandText) {
     TerminalUI.clearInput();
     TerminalUI.updatePrompt();
-    // Only remove the hidden class if the editor is NOT active.
-    // EditorManager.isActive() will tell us this.
+
     if (!EditorManager.isActive()) {
-      // Check if EditorManager is defined and then if editor is active
+
       if (DOM.inputLineContainerDiv) {
-        // Check if DOM element exists
+
         DOM.inputLineContainerDiv.classList.remove(Config.CSS_CLASSES.HIDDEN);
       }
-      TerminalUI.focusInput(); // Also, only focus terminal input if editor is not active
+      TerminalUI.focusInput();
     }
-    // For scroll and history, these can still run
+
     if (DOM.outputDiv) {
-      // Check if DOM element exists
+
       DOM.outputDiv.scrollTop = DOM.outputDiv.scrollHeight;
     }
     if (!TerminalUI.getIsNavigatingHistory() && originalCommandText.trim()) {
@@ -7715,17 +8006,25 @@ Example: find . -name "*.js" -not -user Guest -o -type d -print
     TerminalUI.setIsNavigatingHistory(false);
   }
   async function processSingleCommand(rawCommandText, isInteractive = true) {
-    let finalResult = { success: true, output: null, error: null };
+    let finalResult = {
+      success: true,
+      output: null,
+      error: null
+    };
     if (
       scriptExecutionInProgress &&
       isInteractive &&
       !ConfirmationManager.isAwaiting()
     ) {
       OutputManager.appendToOutput(
-        "Script execution in progress. Input suspended.",
-        { typeClass: Config.CSS_CLASSES.WARNING_MSG },
+        "Script execution in progress. Input suspended.", {
+          typeClass: Config.CSS_CLASSES.WARNING_MSG
+        },
       );
-      return { success: false, error: "Script execution in progress." };
+      return {
+        success: false,
+        error: "Script execution in progress."
+      };
     }
     if (EditorManager.isActive()) return finalResult;
     if (ConfirmationManager.isAwaiting()) {
@@ -7755,30 +8054,37 @@ Example: find . -name "*.js" -not -user Guest -o -type d -print
         !parsedPipe.redirection
       ) {
         if (isInteractive) await _finalizeInteractiveModeUI(rawCommandText);
-        return { success: true, output: "" };
+        return {
+          success: true,
+          output: ""
+        };
       }
     } catch (e) {
       await OutputManager.appendToOutput(e.message || "Cmd parse err.", {
         typeClass: Config.CSS_CLASSES.ERROR_MSG,
       });
       if (isInteractive) await _finalizeInteractiveModeUI(rawCommandText);
-      return { success: false, error: e.message || "Cmd parse err." };
+      return {
+        success: false,
+        error: e.message || "Cmd parse err."
+      };
     }
     const execute = async () =>
       await _executePipeline(parsedPipe, isInteractive);
     if (parsedPipe.isBackground) {
       parsedPipe.jobId = ++backgroundProcessIdCounter;
       await OutputManager.appendToOutput(
-        `${Config.MESSAGES.BACKGROUND_PROCESS_STARTED_PREFIX}${parsedPipe.jobId}${Config.MESSAGES.BACKGROUND_PROCESS_STARTED_SUFFIX}`,
-        { typeClass: Config.CSS_CLASSES.CONSOLE_LOG_MSG },
+        `${Config.MESSAGES.BACKGROUND_PROCESS_STARTED_PREFIX}${parsedPipe.jobId}${Config.MESSAGES.BACKGROUND_PROCESS_STARTED_SUFFIX}`, {
+          typeClass: Config.CSS_CLASSES.CONSOLE_LOG_MSG
+        },
       );
       setTimeout(async () => {
         const bgRes = await execute();
         const statusMsg = `[Job ${parsedPipe.jobId} ${bgRes.success ? "finished" : "finished with error"}${bgRes.success ? "" : `: ${bgRes.error || ""}`}]`;
         OutputManager.appendToOutput(statusMsg, {
-          typeClass: bgRes.success
-            ? Config.CSS_CLASSES.CONSOLE_LOG_MSG
-            : Config.CSS_CLASSES.WARNING_MSG,
+          typeClass: bgRes.success ?
+            Config.CSS_CLASSES.CONSOLE_LOG_MSG :
+            Config.CSS_CLASSES.WARNING_MSG,
           isBackground: true,
         });
         if (!bgRes.success)
@@ -7786,18 +8092,24 @@ Example: find . -name "*.js" -not -user Guest -o -type d -print
             `Info: BG job ${parsedPipe.jobId} (${parsedPipe.segments.map((s) => s.command).join(" | ")}) err: ${bgRes.error || "Unknown"}`,
           );
       }, 0);
-      finalResult = { success: true, output: null };
+      finalResult = {
+        success: true,
+        output: null
+      };
     } else finalResult = await execute();
     if (isInteractive && !scriptExecutionInProgress)
       await _finalizeInteractiveModeUI(rawCommandText);
     return finalResult;
   }
+
   function getCommands() {
     return commands;
   }
+
   function isScriptRunning() {
     return scriptExecutionInProgress;
   }
+
   function setScriptExecutionInProgress(status) {
     scriptExecutionInProgress = status;
   }
@@ -7927,7 +8239,6 @@ window.onload = async () => {
   }
   OutputManager.initializeConsoleOverrides();
   try {
-    await OutputManager.appendToOutput("User accounts are now passwordless.");
     if (typeof IndexedDBManager?.init !== "function") {
       await OutputManager.appendToOutput("FATAL: IndexedDBManager not ready.", {
         typeClass: Config.CSS_CLASSES.ERROR_MSG,
@@ -7945,15 +8256,18 @@ window.onload = async () => {
       alert("FATAL ERROR: UserManager module failed. Check console.");
       return;
     }
-    UserManager.setCurrentUserObject({ name: UserManager.getDefaultUser() });
+    UserManager.setCurrentUserObject({
+      name: UserManager.getDefaultUser()
+    });
     if (
       typeof FileSystemManager === "undefined" ||
       typeof SessionManager === "undefined" ||
       typeof TabCompletionManager === "undefined"
     ) {
       await OutputManager.appendToOutput(
-        "FATAL: Core logic module (FS, Session, Tab) not ready.",
-        { typeClass: Config.CSS_CLASSES.ERROR_MSG },
+        "FATAL: Core logic module (FS, Session, Tab) not ready.", {
+          typeClass: Config.CSS_CLASSES.ERROR_MSG
+        },
       );
       console.error(
         "FATAL: FSManager, SessionManager, or TabCompletionManager not defined!",
@@ -7976,8 +8290,9 @@ window.onload = async () => {
     );
     if (DOM?.outputDiv && OutputManager?.appendToOutput) {
       OutputManager.appendToOutput(
-        `FATAL ERROR (onload): ${error.message}. Check console.`,
-        { typeClass: Config.CSS_CLASSES.ERROR_MSG },
+        `FATAL ERROR (onload): ${error.message}. Check console.`, {
+          typeClass: Config.CSS_CLASSES.ERROR_MSG
+        },
       );
     } else
       alert(
