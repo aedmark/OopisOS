@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OopisOS v1.6 - The Educational Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #18181b; /* zinc-900 */
+            color: #e4e4e7; /* zinc-200 */
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .nav-link {
+            transition: all 0.3s ease;
+        }
+        .nav-link.active, .nav-link:hover {
+            background-color: #3f3f46; /* zinc-700 */
+            color: #a7f3d0; /* emerald-200 */
+        }
+        h1, h2, h3, h4 {
+            font-family: 'VT323', monospace;
+            letter-spacing: 0.05em;
+        }
+        h1 { color: #34d399; /* emerald-400 */ }
+        h2 { color: #60a5fa; /* blue-400 */ border-bottom: 1px solid #52525b; /* zinc-600 */ padding-bottom: 0.25rem; margin-top: 1.5rem; margin-bottom: 1rem; }
+        h3 { color: #facc15; /* yellow-400 */ margin-top: 1rem; margin-bottom: 0.5rem; }
+        h4 { color: #fb923c; /* orange-400 */ margin-top: 0.75rem; margin-bottom: 0.25rem; }
+        p, li, table { line-height: 1.7; }
+        a { color: #2dd4bf; /* teal-400 */ text-decoration: underline; }
+        a:hover { color: #5eead4; /* teal-300 */ }
+        pre {
+            background-color: #27272a; /* zinc-800 */
+            color: #d4d4d8; /* zinc-300 */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            font-family: 'VT323', monospace;
+            font-size: 0.875rem; /* text-sm */
+            line-height: 1.5;
+            margin-top: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        code {
+            font-family: 'VT323', monospace;
+            background-color: #3f3f46; /* zinc-700 */
+            color: #fde047; /* yellow-300 */
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-size: 0.9em;
+        }
+        pre code {
+            padding: 0;
+            background-color: transparent;
+            color: inherit;
+        }
+        .sidebar {
+            background-color: #27272a; /* zinc-800 */
+        }
+        .main-content {
+            background-color: #18181b; /* zinc-900 */
+        }
+        .logo {
+            font-family: 'VT323', monospace;
+            color: #34d399; /* emerald-400 */
+        }
+        table {
+            width: 100%;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #52525b; /* zinc-600 */
+            padding: 0.75rem;
+            text-align: left;
+        }
+        th {
+            background-color: #3f3f46; /* zinc-700 */
+            font-family: 'VT323', monospace;
+            color: #a7f3d0; /* emerald-200 */
+        }
+        ul { list-style-type: disc; margin-left: 1.5rem; }
+        .terminal-example {
+            background-color: #0d0d0d; /* darker than zinc-950 */
+            border: 2px solid #3f3f46; /* zinc-700 */
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: inset 0 0 10px rgba(0, 255, 0, 0.1);
+        }
+        .terminal-example .prompt { color: #60a5fa; /* blue-400 */ }
+        .terminal-example .command { color: #a7f3d0; /* emerald-200 */ }
+        .terminal-example .output { color: #e4e4e7; /* zinc-200 */ white-space: pre-wrap; }
+        .footer {
+            border-top: 1px solid #52525b; /* zinc-600 */
+            padding-top: 1rem;
+            margin-top: 2rem;
+            font-size: 0.875rem;
+            color: #a1a1aa; /* zinc-400 */
+        }
+        /* Mobile Menu Button */
+        #menu-button {
+            display: none; /* Hidden by default */
+        }
+        @media (max-width: 768px) {
+            #menu-button {
+                display: block; /* Show on mobile */
+            }
+            .sidebar {
+                display: none; /* Hide sidebar by default on mobile */
+                width: 100%;
+                height: auto;
+                position: static;
+            }
+            .sidebar.open {
+                display: block; /* Show when open */
+            }
+            .flex {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <div class="flex flex-col md:flex-row min-h-screen">
+        <button id="menu-button" class="md:hidden p-4 bg-zinc-800 text-emerald-400 fixed top-0 left-0 z-20">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+            </svg>
+        </button>
+
+        <aside class="sidebar w-full md:w-64 lg:w-72 p-6 space-y-4 fixed md:sticky top-0 h-screen overflow-y-auto z-10">
+            <h1 class="logo text-4xl mb-6">OopisOS</h1>
+            <nav>
+                <ul class="space-y-2">
+                    <li><a href="#home" class="nav-link block p-3 rounded-lg active">Home & Overview</a></li>
+                    <li><a href="#user-guide" class="nav-link block p-3 rounded-lg">User Guide</a></li>
+                    <li><a href="#how-it-works" class="nav-link block p-3 rounded-lg">How It Works</a></li>
+                    <li><a href="#developer-docs" class="nav-link block p-3 rounded-lg">Developer Docs</a></li>
+                    <li><a href="#advanced-topics" class="nav-link block p-3 rounded-lg">Advanced Topics</a></li>
+                    <li><a href="#about" class="nav-link block p-3 rounded-lg">About & Credits</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="main-content flex-1 p-6 md:p-10 overflow-y-auto mt-16 md:mt-0">
+            <section id="home" class="content-section active">
+                <h1>Welcome to OopisOS!</h1>
+                <p class="text-lg mt-2 mb-6 text-zinc-400">The little browser-based Operating System that could (and does!).</p>
+
+                <div class="terminal-example">
+                    <span class="prompt">Guest@OopisOs:/&gt;</span> <span class="command">echo "Hello, OopisOS v1.6 World!"</span><br>
+                    <span class="output">Hello, OopisOS v1.6 World!</span>
+                </div>
+
+                <h2>What is OopisOS?</h2>
+                <p>OopisOS (v1.6) is a fully persistent, self-contained operating system simulation that runs entirely within your web browser. Born from a collaborative effort between Andrew Edmark and Gemini Pro, it aims to recreate the feel and functionality of a classic command-line interface (CLI) environment, complete with a hierarchical file system, user management, a powerful text editor, and a suite of useful commands.</p>
+                <p>It's an educational tool, a nostalgic playground, and a testament to what can be achieved with JavaScript, IndexedDB for persistence, and a lot of creative coding. The entire system is contained within <code>OopisOSv1_6.html</code> and its accompanying JavaScript files (<code>oopisos1_6.js</code>, <code>editor1_6.js</code>, <code>commexec1_6.js</code>).</p>
+
+                <h2>Core Philosophy</h2>
+                <ul class="list-disc ml-6 space-y-2 my-4">
+                    <li><strong>Persistence is Key:</strong> Your files, user accounts, and session states are saved using IndexedDB, meaning your work remains even after closing the browser tab.</li>
+                    <li><strong>Self-Contained:</strong> Everything runs client-side. No server needed (beyond serving the initial HTML/JS).</li>
+                    <li><strong>Educational & Fun:</strong> Designed to be a learning experience for those interested in OS concepts, CLI interactions, and JavaScript module architecture.</li>
+                    <li><strong>Extensible:</strong> Built with modularity in mind, making it possible for developers to contribute new commands and features.</li>
+                    <li><strong>POSIX-ish Familiarity:</strong> While not a strict POSIX implementation, many commands and concepts will feel familiar to users of Unix-like systems.</li>
+                </ul>
+
+                <h2>Key Features at a Glance (v1.6)</h2>
+                <ul class="list-disc ml-6 space-y-2 my-4">
+                    <li><strong>Persistent File System:</strong> Create, edit, move, copy, and delete files and directories. Stored in IndexedDB. Commands include `mkdir`, `ls` (with flags like `-l`, `-a`, `-R`, `-t`, `-S`), `cd`, `pwd`, `touch` (with `-c`, `-d`, `-t`), `cat`, `cp` (with `-r`, `-f`, `-p`, `-i`), `mv` (with `-f`, `-i`), `rm` (with `-r`, `-f`, `-i`), `tree` (with `-L`, `-d`), `find` (with various predicates and actions).</li>
+                    <li><strong>Advanced Command-Line Interface:</strong> Retro-styled terminal with history, tab completion, command pipelining (`|`), I/O redirection (`>`, `>>`), and background processes (`&`).</li>
+                    <li><strong>User Management:</strong> Register multiple users (`useradd`/`register`), log in/out (`login`, `logout`), `whoami`, `listusers`, `removeuser` (with confirmation). Each user has an isolated FS.</li>
+                    <li><strong>Enhanced Text Editor (`edit`):** Supports plain text, Markdown, and HTML (with live preview). Features line numbers (gutter hides on word wrap), toggleable word wrap (persists), status bar, view modes (`Ctrl+P`), `Ctrl+S` (save/exit), `Ctrl+O` (exit/confirm discard via modal), Markdown/HTML formatting toolbar, and HTML preview export.</li>
+                    <li><strong>Scripting Engine (`run`):</strong> Execute script files with comments (`#`), shebang support (ignored), and argument passing (`$1`, `$@`, `$#`). Includes `delay` and `check_fail` for basic control.</li>
+                    <li><strong>Session Management:</strong> Automatic session saving, manual `savestate`/`loadstate` (with FS snapshot and confirmation), `backup`/`restore` via JSON (with confirmation), `clearfs` (user FS wipe with confirmation), and full `reset` (all data wipe with confirmation).</li>
+                    <li><strong>Utilities:</strong> `echo`, `date`, `help`, `clear`, `history -c`, `export`, `upload` (with type checks and overwrite prompt), `chmod`, `chown`, `grep` (with `-i`, `-v`, `-n`, `-c`, `-R`), and `printscreen <filepath>` (saves terminal output to a file).</li>
+                </ul>
+                <p>Dive in, explore, and see what you can create in the world of OopisOS v1.6!</p>
+            </section>
+
+            <section id="user-guide" class="content-section">
+                <h1>OopisOS User Guide (v1.6)</h1>
+                <p>Welcome to your OopisOS journey! This guide will help you get started with the basics of version 1.6.</p>
+
+                <h2>The Terminal Interface</h2>
+                <p>OopisOS presents a classic terminal interface. Here's what you'll see:</p>
+                <div class="terminal-example">
+                    <span class="prompt">Guest@OopisOs:/&gt;</span> <span class="command">_</span>
+                </div>
+                <ul class="list-disc ml-6 my-4 space-y-2">
+                    <li><strong>Prompt:</strong> Shows `username@hostname:current_path&gt;`. For example, <code>Guest@OopisOs:/&gt;</code>.</li>
+                    <li><strong>Input Area:</strong> Where you type your commands.</li>
+                    <li><strong>Output Area:</strong> Where command results and messages appear.</li>
+                </ul>
+
+                <h2>Essential Commands</h2>
+                <p>Here are some fundamental commands to get you started. For a full list, type <code>help</code>. For help on a specific command, type <code>help [command_name]</code>.</p>
+                <table class="min-w-full divide-y divide-zinc-700">
+                    <thead>
+                        <tr>
+                            <th class="px-4 py-2">Command</th>
+                            <th class="px-4 py-2">Description</th>
+                            <th class="px-4 py-2">Example</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-zinc-800">
+                        <tr><td><code>help</code></td><td>Displays available commands or help for a specific command.</td><td><code>help ls</code></td></tr>
+                        <tr><td><code>ls</code></td><td>Lists directory contents. Supports flags like <code>-l</code>, <code>-a</code>, <code>-R</code>, <code>-t</code>, <code>-S</code>.</td><td><code>ls -l /docs</code></td></tr>
+                        <tr><td><code>cd [directory]</code></td><td>Changes the current directory.</td><td><code>cd /docs</code></td></tr>
+                        <tr><td><code>pwd</code></td><td>Prints the current working directory path.</td><td><code>pwd</code></td></tr>
+                        <tr><td><code>mkdir [directory_name]</code></td><td>Creates a new directory. Use <code>-p</code> to create parent directories.</td><td><code>mkdir -p my_project/src</code></td></tr>
+                        <tr><td><code>cat [file_path]</code></td><td>Displays the content of a file.</td><td><code>cat /README.md</code></td></tr>
+                        <tr><td><code>echo [text]</code></td><td>Displays text or writes it to a file using redirection.</td><td><code>echo "Hello" > /greeting.txt</code></td></tr>
+                        <tr><td><code>edit [file_path]</code></td><td>Opens a file in the built-in text editor. Creates the file if it doesn't exist.</td><td><code>edit my_notes.md</code></td></tr>
+                        <tr><td><code>touch [file_path]</code></td><td>Creates an empty file or updates the timestamp of an existing file/directory. Supports <code>-c</code>, <code>-d</code>, <code>-t</code>.</td><td><code>touch -t 202301010000 oldfile.log</code></td></tr>
+                        <tr><td><code>rm [item]</code></td><td>Removes a file or directory. Use <code>-r</code> for directories, <code>-f</code> to force, <code>-i</code> for interactive.</td><td><code>rm -rf old_project</code></td></tr>
+                        <tr><td><code>cp [source] [dest]</code></td><td>Copies files or directories. Use <code>-r</code> for directories, <code>-f</code>, <code>-p</code>, <code>-i</code>.</td><td><code>cp -r /docs /backup/docs_copy</code></td></tr>
+                        <tr><td><code>mv [source] [dest]</code></td><td>Moves or renames files or directories. Supports <code>-f</code>, <code>-i</code>.</td><td><code>mv old_name.txt new_name.txt</code></td></tr>
+                        <tr><td><code>grep [pattern] [file...]</code></td><td>Searches for patterns. Supports <code>-i</code>, <code>-v</code>, <code>-n</code>, <code>-c</code>, <code>-R</code> (recursive).</td><td><code>grep -R "config" /etc</code></td></tr>
+                        <tr><td><code>find [path] [expression]</code></td><td>Finds files/directories. E.g., <code>-name</code>, <code>-type</code>, <code>-user</code>, <code>-perm</code>, <code>-mtime</code>, <code>-exec</code>, <code>-delete</code>.</td><td><code>find / -name "*.log" -mtime +7 -delete</code></td></tr>
+                        <tr><td><code>printscreen [filepath]</code></td><td>Saves current terminal output to the specified file.</td><td><code>printscreen session.log</code></td></tr>
+                        <tr><td><code>whoami</code></td><td>Displays your current username.</td><td><code>whoami</code></td></tr>
+                        <tr><td><code>clear</code></td><td>Clears the terminal screen.</td><td><code>clear</code></td></tr>
+                    </tbody>
+                </table>
+
+                <h2>The File System</h2>
+                <p>OopisOS has a hierarchical file system, much like Linux or macOS.</p>
+                <ul class="list-disc ml-6 my-4 space-y-2">
+                    <li>The root directory is <code>/</code>.</li>
+                    <li>Paths are separated by <code>/</code>.</li>
+                    <li><code>.</code> refers to the current directory.</li>
+                    <li><code>..</code> refers to the parent directory.</li>
+                    <li>Hidden files and directories start with a <code>.</code> (e.g., <code>.config</code>).</li>
+                </ul>
+                <p>You can navigate using <code>cd</code>, list contents with <code>ls</code>, and create directories with <code>mkdir</code>.</p>
+
+                <h2>The Editor (`edit` command)</h2>
+                <p>OopisOS includes a powerful text editor accessible via the <code>edit</code> command.</p>
+                <ul class="list-disc ml-6 my-4 space-y-2">
+                    <li><strong>Modes:</strong> Supports plain text, Markdown, and HTML (with preview). Mode is auto-detected by file extension (<code>.md</code>, <code>.html</code>, <code>.htm</code>).</li>
+                    <li><strong>Controls:</strong>
+                        <ul>
+                            <li><code>Ctrl+S</code>: Save and Exit</li>
+                            <li><code>Ctrl+O</code>: Exit (will show a modal to confirm if there are unsaved changes)</li>
+                            <li><code>Ctrl+P</code>: Toggle Preview (Split, Edit Only, Preview Only for Markdown/HTML)</li>
+                        </ul>
+                    </li>
+                    <li><strong>Features:</strong> Line numbers (gutter hidden if word wrap is on), status bar (lines, words, chars, cursor position), word wrap toggle (setting persists), export HTML preview, Markdown/HTML formatting toolbar.</li>
+                </ul>
+                <div class="terminal-example">
+                    <span class="prompt">Guest@OopisOs:/&gt;</span> <span class="command">edit my_feature.md</span><br>
+                    <span class="output">(Editor interface appears)</span>
+                </div>
+
+                <h2>Users and Permissions</h2>
+                <p>OopisOS supports multiple users. Each file and directory has an owner and permissions.</p>
+                <ul class="list-disc ml-6 my-4 space-y-2">
+                    <li><code>register [username]</code> (or <code>useradd</code>): Create a new user.</li>
+                    <li><code>login [username]</code>: Log in as an existing user.</li>
+                    <li><code>logout</code>: Log out and return to the Guest user.</li>
+                    <li><code>whoami</code>: See your current username.</li>
+                    <li><code>listusers</code>: Show all registered users.</li>
+                    <li><code>removeuser [username]</code>: Deletes a user and their data (requires confirmation).</li>
+                    <li><code>chmod [mode] [path]</code>: Change permissions (e.g., <code>chmod 75 myfile</code> for rwxr-xr-x). Mode is two octal digits: first for owner, second for others. (4=read, 2=write, 1=execute).</li>
+                    <li><code>chown [new_owner] [path]</code>: Change the owner of a file/directory (only current owner can do this).</li>
+                </ul>
+                <p>Permissions are displayed in <code>ls -l</code> output (e.g., <code>drwxr-xr-x</code>).</p>
+
+                <h2>Pipes and Redirection</h2>
+                <p>Like other shells, OopisOS supports piping and redirection:</p>
+                <ul class="list-disc ml-6 my-4 space-y-2">
+                    <li><strong>Pipes `|`</strong>: Send the output of one command as input to another.
+                        <br>Example: <code>ls -a / | grep docs</code>
+                    </li>
+                    <li><strong>Output Redirection `>`</strong>: Write command output to a file (overwrites existing).
+                        <br>Example: <code>echo "My data" > data.txt</code>
+                    </li>
+                    <li><strong>Output Redirection `>>`</strong>: Append command output to a file.
+                        <br>Example: <code>date >> /system.log</code>
+                    </li>
+                </ul>
+                <p>This is just the beginning! Explore the <code>help</code> command and experiment to discover all that OopisOS v1.6 can do.</p>
+            </section>
+
+            <section id="how-it-works" class="content-section">
+                <h1>OopisOS v1.6: Under The Hood</h1>
+                <p>Curious about how OopisOS ticks? This section delves into the core architecture and key JavaScript modules that power this browser-based operating system.</p>
+
+                <h2>Overall Architecture</h2>
+                <p>OopisOS is a single-page application (SPA) built with vanilla JavaScript, structured into several key modules that manage different aspects of the OS simulation. It uses the browser's IndexedDB for persistent storage of file systems and user data, and localStorage for simpler session states and settings.</p>
+                <p>The user interacts primarily through a terminal interface (<code>OopisOSv1_6.html</code> provides the structure), and commands are processed by a dedicated execution pipeline. The core JavaScript logic is split into:
+                    <ul>
+                        <li><code>oopisos1_6.js</code>: Contains core OS managers (Config, Utils, Timestamps, Output, Storage, IndexedDB, FileSystem, History, Confirmation, User, Session, UI, TabCompletion).</li>
+                        <li><code>editor1_6.js</code>: Contains all editor-related logic (EditorAppConfig, EditorUtils, EditorUI, EditorManager, EditorModal).</li>
+                        <li><code>commexec1_6.js</code>: Contains the CommandExecutor, including the Lexer, Parser, and all command definitions.</li>
+                    </ul>
+                </p>
+
+                <h2>Core Modules</h2>
+
+                <h3>From <code>oopisos1_6.js</code>:</h3>
+                <ul class="list-disc ml-6 my-4 space-y-2">
+                    <li><strong>`Config`</strong>: Global configuration object for constants.</li>
+                    <li><strong>`Utils`</strong>: General utility functions.</li>
+                    <li><strong>`TimestampParser`</strong>: Parses timestamp strings for commands like `touch -t`.</li>
+                    <li><strong>`OutputManager`</strong>: Manages terminal output and console overrides.</li>
+                    <li><strong>`StorageManager`</strong>: Wrapper for `localStorage`.</li>
+                    <li><strong>`IndexedDBManager`</strong>: Manages IndexedDB connection for file system persistence.</li>
+                    <li><strong>`FileSystemManager`</strong>: The heart of file storage, managing the `fsData` object, path resolution, node operations, permissions, and IndexedDB interaction.</li>
+                    <li><strong>`HistoryManager`</strong>: Manages command history.</li>
+                    <li><strong>`ConfirmationManager`</strong>: Handles user confirmations for sensitive operations (now uses `EditorModal` when editor is involved, otherwise terminal prompts).</li>
+                    <li><strong>`UserManager`</strong>: Manages user accounts (registration, login, logout).</li>
+                    <li><strong>`SessionManager`</strong>: Handles saving/loading of user sessions (automatic, manual, backup/restore, reset).</li>
+                    <li><strong>`TerminalUI`</strong>: Manages terminal DOM interactions (prompt updates, input focus, etc.).</li>
+                    <li><strong>`TabCompletionManager`</strong>: Provides command and path completion.</li>
+                </ul>
+
+                <h3>From <code>editor1_6.js</code>:</h3>
+                <ul class="list-disc ml-6 my-4 space-y-2">
+                    <li><strong>`EditorAppConfig`</strong>: Configuration constants specific to the editor.</li>
+                    <li><strong>`EditorUtils`</strong>: Utility functions for the editor (mode determination, preview styling, status bar info).</li>
+                    <li><strong>`EditorUI`</strong>: Builds and manages the editor's DOM elements (textarea, preview, controls, status bar, line gutter, formatting toolbar).</li>
+                    <li><strong>`EditorManager`</strong>: Main controller for the editor's lifecycle, state, and event handling (input, shortcuts, view modes, word wrap).</li>
+                    <li><strong>`EditorModal`</strong>: Handles modal dialogs within the editor for confirmations (e.g., discard unsaved changes).</li>
+                </ul>
+                
+                <h3>From <code>commexec1_6.js</code>:</h3>
+                 <ul class="list-disc ml-6 my-4 space-y-2">
+                    <li><strong>`CommandExecutor`</strong>: The engine for processing commands.
+                        <ul>
+                            <li><strong>Lexer & Parser:</strong> Tokenizes input strings and parses them into executable pipeline structures, understanding operators like `|`, `>`, `>>`, `&`.</li>
+                            <li><strong>Command Dispatch & Pipeline Execution:</strong> Looks up command handlers and manages data flow between piped commands.</li>
+                            <li><strong>Redirection & Backgrounding:</strong> Implements I/O redirection and background process simulation.</li>
+                            <li><strong>Command Definitions:</strong> Contains the `commands` object mapping names to handlers, descriptions, and help text. This is where all built-in commands like `ls`, `cat`, `edit`, `run`, `printscreen`, etc., are defined.</li>
+                            <li><strong>Script Execution (`run` command):</strong> Parses and executes script files, handling comments and argument substitution.</li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <h3>Global Initialization (<code>window.onload</code> in <code>oopisos1_6.js</code>)</h3>
+                <p>Orchestrates the startup: initializes DOM references, console overrides, IndexedDB, loads the default user's FS and session, and attaches terminal event listeners.</p>
+
+                <p>This modular design, now split across logical files, aims for better organization and maintainability as OopisOS grows.</p>
+            </section>
+
+            <section id="developer-docs" class="content-section">
+                <h1>OopisOS v1.6 Developer Documentation</h1>
+                <p>Welcome, aspiring OopisOS contributor or module developer! This section provides insights into the codebase and how you can extend OopisOS v1.6.</p>
+
+                <h2>Code Structure Overview</h2>
+                <p>The primary logic for OopisOS is now split into three main JavaScript files, all referenced by <code>OopisOSv1_6.html</code>:</p>
+                <ul class="list-disc ml-6 my-4 space-y-2">
+                    <li><strong><code>oopisos1_6.js</code>:</strong> Contains the core OS infrastructure, including configuration, general utilities, and managers for Output, Storage (LocalStorage), IndexedDB, FileSystem, History, User accounts, Sessions, Terminal UI, and Tab Completion.</li>
+                    <li><strong><code>editor1_6.js</code>:</strong> Houses all logic related to the built-in text editor, including its specific configuration, utility functions, UI management, core manager, and modal dialogs.</li>
+                    <li><strong><code>commexec1_6.js</code>:</strong> Dedicated to command execution. It includes the Lexer for tokenizing input, the Parser for creating command pipelines, and the `CommandExecutor` module which contains the definitions and handlers for all built-in commands.</li>
+                </ul>
+                <p>Each file generally uses Immediately Invoked Function Expressions (IIFEs) to create modules, encapsulating logic and avoiding global namespace pollution.</p>
+
+                <h2>Contributing to OopisOS</h2>
+                <p>The spirit of open source and learning is encouraged!</p>
+                <ol class="list-decimal ml-6 my-4 space-y-2">
+                    <li><strong>Understand the Code:</strong> Familiarize yourself with the modules in their respective files. For command-related work, <code>commexec1_6.js</code> is key. For file system internals, see <code>oopisos1_6.js</code>. For editor enhancements, look at <code>editor1_6.js</code>.</li>
+                    <li><strong>Identify an Area:</strong> Bug fix, command improvement, new command, editor feature?</li>
+                    <li><strong>Modularity is Key:</strong> Keep new features or fixes well-contained.</li>
+                    <li><strong>Follow Patterns:</strong> Observe existing command definitions in <code>CommandExecutor.commands</code> (in <code>commexec1_6.js</code>).</li>
+                    <li><strong>User Experience:</strong> Clear error messages (<code>OutputManager</code>), confirmations (<code>ConfirmationManager</code> in <code>oopisos1_6.js</code> or <code>EditorModal</code> in <code>editor1_6.js</code>).</li>
+                    <li><strong>Persistence:</strong> Use <code>FileSystemManager.save()</code> for FS changes.</li>
+                    <li><strong>Testing:</strong>
+                        <ul>
+                            <li>Thoroughly test changes. Consider edge cases.</li>
+                            <li>Use or extend <code>diagnostic_tool1_6.sh</code> and <code>inflatev1_6.sh</code>.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Documentation:</strong> Update command <code>description</code>/<code>helpText</code>, and this manual if needed.</li>
+                </ol>
+
+                <h2>Developing New Commands</h2>
+                <p>Adding a new command involves defining it within the <code>commands</code> object in the <code>CommandExecutor</code> module (inside <code>commexec1_6.js</code>).</p>
+                <pre><code class="language-javascript">
+// Inside commexec1_6.js, within CommandExecutor IIFE, in the 'commands' object:
+"yournewcommand": {
+    handler: async (args, options) => {
+        // args: Array of string arguments.
+        // options: Object { isInteractive, stdinContent, explicitForce }.
+
+        // 1. Validate arguments (Utils.validateArguments from oopisos1_6.js)
+        // 2. Parse flags (Utils.parseFlags from oopisos1_6.js)
+        // 3. Implement logic (interact with FileSystemManager, UserManager, etc., from oopisos1_6.js)
+        // 4. Return { success: true/false, output: "...", error: "..." }
+        
+        return { success: true, output: `New command processed: ${args.join(' ')}` };
+    },
+    description: "Brief description of your new command.",
+    helpText: "Usage: yournewcommand [options] [arguments]\\n\\nDetailed help."
+}
+                </code></pre>
+                <p>Refer to existing commands in <code>commexec1_6.js</code> for detailed examples of flag parsing, file system interaction, and permission checking.</p>
+                <p>Happy developing with OopisOS v1.6!</p>
+            </section>
+
+            <section id="advanced-topics" class="content-section">
+                <h1>OopisOS v1.6: Advanced Topics & Features</h1>
+                <p>Ready to delve deeper? This section explores some of the more advanced capabilities and concepts within OopisOS v1.6.</p>
+
+                <h2>Scripting with `run`</h2>
+                <p>OopisOS supports shell scripting via the <code>run</code> command (defined in <code>commexec1_6.js</code>). Create text files (e.g., <code>myscript.sh</code>) containing a sequence of OopisOS commands.</p>
+                <pre><code class="language-bash">
+# Example: myscript.sh
+echo "Starting my v1.6 script..."
+mkdir /test_data_v1_6
+echo "Hello from script v1.6" > /test_data_v1_6/script_output.txt
+ls /test_data_v1_6
+echo "Script finished."
+                </code></pre>
+                <p>To execute: <code>chmod 70 /myscript.sh</code> then <code>run /myscript.sh</code>.</p>
+                <h3>Script Features:</h3>
+                <ul class="list-disc ml-6 my-4 space-y-2">
+                    <li><strong>Shebang/Comments:</strong> <code>#!</code> lines and <code>#</code> comments are handled.</li>
+                    <li><strong>Argument Passing:</strong> <code>$1</code>, <code>$2</code>, ..., <code>$@</code>, <code>$#</code>.</li>
+                </ul>
+
+                <h3>Example Scripts Provided:</h3>
+                <ul class="list-disc ml-6 my-4 space-y-2">
+                    <li><strong><code>inflatev1_6.sh</code>:</strong> Populates the FS with diverse dummy data for testing.</li>
+                    <li><strong><code>diagnostic_tool1_6.sh</code>:</strong> A test suite script using <code>check_fail</code> to verify command outcomes and error conditions.</li>
+                </ul>
+
+                <h2>Permissions Deep Dive (`chmod`, `chown`)</h2>
+                <p>OopisOS uses a simplified Unix-like permission model (owner/others, read/write/execute defined by two octal digits). See `FileSystemManager` in `oopisos1_6.js` for implementation details.</p>
+                <ul class="list-disc ml-6 my-4 space-y-2">
+                    <li><code>chmod [mode] [path]</code>: Example: <code>chmod 75 myfile</code> (Owner: rwx, Others: r-x).</li>
+                    <li><code>chown [new_owner] [path]</code>: Example: <code>chown anotheruser myfile</code>.</li>
+                    <li>Displayed by <code>ls -l</code>.</li>
+                </ul>
+
+                <h2>Pipes (`|`) and Redirection (`>`, `>>`)</h2>
+                <p>The `CommandExecutor` in `commexec1_6.js` parses and handles these standard shell features.</p>
+                <ul class="list-disc ml-6 my-4 space-y-2">
+                    <li><strong>Pipes (`|`):</strong> <code>ls / | grep docs</code></li>
+                    <li><strong>Output Redirection (`>`):</strong> <code>echo "Report" > /report.txt</code> (overwrites)</li>
+                    <li><strong>Append Output Redirection (`>>`):</strong> <code>date >> /report.txt</code> (appends)</li>
+                </ul>
+
+                <h2>Background Processes (`&`)</h2>
+                <p>Append <code>&</code> to run a command asynchronously. The `CommandExecutor` manages this, providing a job ID.</p>
+                <div class="terminal-example">
+                    <span class="prompt">Guest@OopisOs:/&gt;</span> <span class="command">delay 5000 &</span><br>
+                    <span class="output">[1] Backgrounded.</span><br>
+                     <span class="output">(After 5 seconds, a completion message appears)</span>
+                </div>
+                
+                <h2>Recursive Grep (`grep -R`)</h2>
+                <p>The <code>grep</code> command in v1.6 now supports the <code>-R</code> flag for recursive searching through directories. This allows you to find patterns within files across an entire directory tree.</p>
+                <div class="terminal-example">
+                    <span class="prompt">Guest@OopisOs:/docs&gt;</span> <span class="command">grep -R "OopisOS" .</span><br>
+                    <span class="output">./index.md:Welcome to the grand library of OopisOS knowledge!</span><br>
+                    <span class="output">./chapter1.txt:So, you have found yourself within OopisOS.</span><br>
+                    <span class="output">... (and so on for all matches in /docs and its subdirectories)</span>
+                </div>
+
+            </section>
+
+            <section id="about" class="content-section">
+                <h1>About OopisOS (v1.6)</h1>
+                <p>OopisOS Version 1.6 continues its evolution as a browser-based operating system simulation.</p>
+                
+                <h2>The Creators</h2>
+                <p>This digital marvel was brought into existence through the dedicated and often caffeine-fueled collaboration of:</p>
+                <ul class="list-disc ml-6 my-4 space-y-2">
+                    <li><strong>Andrew Edmark</strong></li>
+                    <li><strong>Gemini Pro</strong> (That's me, updated for v1.6 features!)</li>
+                </ul>
+                <p>Our joint efforts involved countless hours of design, coding, debugging, and refining the myriad components. The copyright notice <code>Copyright (c) 2025 Andrew Edmark and Gemini. (MIT Licensed)</code> reflects this partnership.</p>
+
+                <h2>The Journey to 1.6</h2>
+                <p>Version 1.6 builds upon the solid foundation of previous releases, introducing key enhancements like the editor's formatting toolbar, more robust modal confirmations, and the `printscreen` command, alongside numerous refinements to existing commands and internal logic now better organized across <code>oopisos1_6.js</code>, <code>editor1_6.js</code>, and <code>commexec1_6.js</code>.</p>
+                <p>The creation of updated tools like <code>inflatev1_6.sh</code> and <code>diagnostic_tool1_6.sh</code> were integral to ensuring the stability and correctness of these new features.</p>
+
+                <h2>Philosophy Revisited</h2>
+                <p>OopisOS was built with a few core ideas in mind:</p>
+                <ul class="list-disc ml-6 my-4 space-y-2">
+                    <li><strong>Learning by Doing:</strong> To provide a hands-on environment for understanding OS concepts.</li>
+                    <li><strong>The Power of the Browser:</strong> To demonstrate that complex, stateful applications can thrive entirely client-side.</li>
+                    <li><strong>A Touch of Nostalgia:</strong> For those who appreciate the elegance and power of the command line.</li>
+                    <li><strong>Collaborative Innovation:</strong> As a testament to human-AI teamwork in creative coding endeavors.</li>
+                </ul>
+
+                <h2>Future</h2>
+                <p>Who knows what the future holds for OopisOS? Perhaps a GUI? Networking? An in-OS game? The modular architecture is designed to welcome such expansions. For now, we hope you enjoy exploring and using OopisOS v1.6!</p>
+                <p>If you're interested in the nitty-gritty, feel free to explore the source code and the HTML structure (<code>OopisOSv1_6.html</code>).</p>
+                <p class="mt-6"><em>"OopisOS v1.6: Even Oopisier!"</em></p>
+            </section>
+
+            <footer class="footer text-center">
+                <p>&copy; 2025 Andrew Edmark & Gemini. OopisOS Educational Portal (v1.6).</p>
+            </footer>
+        </main>
+    </div>
+
+    <script>
+        // Simple SPA navigation
+        const navLinks = document.querySelectorAll('.nav-link');
+        const contentSections = document.querySelectorAll('.content-section');
+        const sidebar = document.querySelector('.sidebar');
+        const menuButton = document.getElementById('menu-button');
+
+        function updateActiveSection() {
+            const hash = window.location.hash || '#home';
+            navLinks.forEach(link => {
+                link.classList.toggle('active', link.getAttribute('href') === hash);
+            });
+            contentSections.forEach(section => {
+                section.classList.toggle('active', section.id === hash.substring(1));
+            });
+            // Scroll to top of content area on navigation
+            document.querySelector('.main-content').scrollTop = 0;
+            // Close mobile menu after navigation
+            if (sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open');
+            }
+        }
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                if (this.getAttribute('href').startsWith('#')) {
+                    if (window.location.hash === this.getAttribute('href')) {
+                         document.querySelector('.main-content').scrollTop = 0;
+                    }
+                }
+            });
+        });
+        
+        menuButton.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+        });
+
+        window.addEventListener('hashchange', updateActiveSection);
+        // Initial load
+        updateActiveSection();
+    </script>
+</body>
+</html>

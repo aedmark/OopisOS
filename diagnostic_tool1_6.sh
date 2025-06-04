@@ -1075,3 +1075,5 @@ echo ""
 echo "===== End of Manual Testing Suggestions ====="
 echo "Remember to log out or clean up test users and files as needed after manual tests."
 echo "------------------------------------------------------"
+printscreen diag.txt
+edit diag.txt

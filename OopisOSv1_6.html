@@ -9,7 +9,7 @@
 			rel="stylesheet"
 		/>
 		<script src="https://cdn.tailwindcss.com"></script>
-		<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+		<script src="./marked.min.js"></script>
 		<style>
 			html {
 				box-sizing: border-box;
@@ -156,6 +156,96 @@
 				white-space: pre !important;
 				overflow-x: auto !important;
 			}
+/* --- Editor Confirmation Modal Styles (In-Editor Box) --- */
+#editor-modal-dialog {
+    position: absolute; /* Positioned relative to its containing block (editor container) */
+    top: 50%; /* Center vertically */
+    left: 50%; /* Center horizontally */
+    transform: translate(-50%, -50%); /* Precise centering */
+    background-color: #000000;
+    color: #D1D5DB; /* Light gray text */
+    padding: 20px 25px;
+    border-radius: 6px;
+    z-index: 1000; /* Ensure it's above other editor elements */
+    min-width: 300px; /* Minimum width */
+    max-width: 420px; /* Maximum width */
+    box-shadow: 0 6px 18px rgba(0,0,0,0.6); /* Softer, deeper shadow */
+    border: 1px solid #64d000; /* Slightly lighter border than background */
+    font-family: 'VT323', monospace; /* Match your terminal font */
+    text-align: center; /* Align text to the left for messages */
+}
+
+#editor-modal-dialog p {
+    margin-top: 0;
+    margin-bottom: 20px; 
+    font-size: 1.05em;   
+    line-height: 1.5;
+    color: #18c901; /* Softer text color for the message */
+}
+
+.editor-modal-buttons {
+    display: flex;
+    justify-content: flex-start; /* Align buttons to the right */
+    gap: 12px; 
+}
+
+.btn-editor-modal {
+    padding: 7px 16px;
+    border: 1px solid #4B5563; /* Darker border for buttons */
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: normal; 
+    font-size: 1em;
+    transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out, box-shadow 0.15s ease, transform 0.1s ease;
+    color: #F3F4F6; /* Light text on buttons */
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.btn-editor-modal:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+.btn-editor-modal:active {
+    transform: translateY(0px);
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.2);
+}
+
+/* Confirm button (e.g., "Discard Changes") - Terminal Green */
+/* Matching text-lime-400 (approx #A3E635) or text-green-400 (approx #4ADE80) */
+/* Let's go with a slightly desaturated green for the button background */
+#editor-modal-dialog .btn-confirm {
+    background-color: #000000; /* Tailwind green-400 equivalent */
+    border-color: #12a41a; /* Darker green border */
+    color: #05b525; /* Dark green text for contrast on light green button */
+}
+#editor-modal-dialog .btn-confirm:hover {
+    background-color: #165202; /* Lighter green on hover */
+    border-color: #12a41a;
+}
+#editor-modal-dialog .btn-confirm:focus {
+    outline: 1px solid #197005; 
+    outline-offset: 1px;
+}
+
+/* Cancel button (e.g., "Keep Editing") - Error Red */
+/* Matching text-red-500 (approx #EF4444) */
+#editor-modal-dialog .btn-cancel {
+    background-color: #1f0a0a; /* Tailwind red-500 */
+    border-color: #DC2626; /* Darker red border */
+    color: #df0808; /* White/very light text */
+}
+#editor-modal-dialog .btn-cancel:hover {
+    background-color: #241414; /* Lighter red on hover */
+    border-color: #B91C1C;
+}
+#editor-modal-dialog .btn-cancel:focus {
+     outline: 1px solid #b50a0a; 
+     outline-offset: 1px;
+}
+
+
+
+
 		</style>
 	</head>
 	<body class="bg-neutral-900 text-green-500 m-0 p-5 flex flex-col items-center justify-center min-h-screen overflow-x-hidden">
@@ -195,7 +285,10 @@
 				</div>
 			</div>
 		</div>
-		<h1 class="text-xl text-green-500 font-['VT323'] mb-4"> OopisOS v1.6 | Copyright ©2025 Andrew Edmark & Gemini Pro v2.5 under the MIT License </h1>
+		<h3 class="text-green-500 font-['VT323'] mb-4"> <a href="./diagnostic_tool1_6.sh">Diagnostic Script Download</a> | <a href="./inflate1_6.sh">Dummy Data Inflation Script</a>
+		<h1 class="text-xl text-green-500 font-['VT323'] mb-4"> <a href="./index2.html">OopisOS v1.6 USER GUIDE</a> | <a href="https://github.com/aedmark/oopisos">GIT</a> | Copyright ©2025 Andrew Edmark & Gemini Pro v2.5 under the MIT License </h1>
 		<script src="./oopisos1_6.js"></script>
+		<script src="./editor1_6.js"></script>
+		<script src="./commexec1_6.js"></script>
 	</body>
 </html>
