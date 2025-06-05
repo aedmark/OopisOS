@@ -81,7 +81,7 @@ const CommandExecutor = (() => {
         const payload = {
           contents: chatHistory
         };
-        const apiKey = "AIzaSyBEDXpCxsYIoiAyirxhWgdajx1Qr9FkRKY"; // Left empty as per instructions for Canvas environment
+        const apiKey = ""; // Left empty as per instructions for Canvas environment
         const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
         try {
