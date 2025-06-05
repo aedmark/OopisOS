@@ -6,37 +6,99 @@ const CommandExecutor = (() => {
   let backgroundProcessIdCounter = 0;
 
   const commands = {
-    // --- START OF NEW GEMINI COMMAND ---
     gemini: {
       handler: async (args, options) => {
-        const prompt = args.join(" ");
-        if (!prompt) {
+        if (args.length < 2) {
           return {
             success: false,
-            error: "gemini: Please provide a prompt. Usage: gemini \"your prompt\"",
+            error: "gemini: Insufficient arguments. Usage: gemini <filepath> \"<base_prompt>\"",
           };
         }
 
+        const filePathArg = args[0];
+        const basePrompt = args.slice(1).join(" ");
+
+        if (!filePathArg) {
+          return {
+            success: false,
+            error: "gemini: Filepath cannot be empty.",
+          };
+        }
+        if (!basePrompt) {
+          return {
+            success: false,
+            error: "gemini: Base prompt cannot be empty.",
+          };
+        }
+
+        // Validate file path and read file content
+        const currentUser = UserManager.getCurrentUser().name;
+        const pathValidation = FileSystemManager.validatePath("gemini", filePathArg, {
+          expectedType: Config.FILESYSTEM.DEFAULT_FILE_TYPE,
+        });
+
+        if (pathValidation.error) {
+          return {
+            success: false,
+            error: pathValidation.error
+          };
+        }
+
+        const fileNode = pathValidation.node;
+        if (!FileSystemManager.hasPermission(fileNode, currentUser, "read")) {
+          return {
+            success: false,
+            error: `gemini: Cannot read file '${filePathArg}'${Config.MESSAGES.PERMISSION_DENIED_SUFFIX}`,
+          };
+        }
+
+        const fileContent = fileNode.content || "";
+        if (fileContent.trim() === "") {
+          return {
+            success: false,
+            error: `gemini: File '${filePathArg}' is empty or contains only whitespace.`,
+          }
+        }
+
+        const combinedPrompt = `${basePrompt}\n\n---\nFile Content:\n${fileContent}\n---`;
+
         // Display a thinking message
         if (options.isInteractive) {
-            OutputManager.appendToOutput("Gemini is thinking...", { typeClass: Config.CSS_CLASSES.CONSOLE_LOG_MSG });
+          OutputManager.appendToOutput("Gemini is processing the file and thinking...", {
+            typeClass: Config.CSS_CLASSES.CONSOLE_LOG_MSG
+          });
         }
 
         let chatHistory = [];
-        chatHistory.push({ role: "user", parts: [{ text: prompt }] });
-        const payload = { contents: chatHistory };
-        const apiKey = "AIzaSyBp2mGVsfMk2_buCcLCHXNextXQgudt6F4"; // Left empty as per instructions for Canvas environment
+        // For file-based context, it's often better to send the whole combined prompt as one user message.
+        chatHistory.push({
+          role: "user",
+          parts: [{
+            text: combinedPrompt
+          }]
+        });
+
+        const payload = {
+          contents: chatHistory
+        };
+        const apiKey = "AIzaSyBEDXpCxsYIoiAyirxhWgdajx1Qr9FkRKY"; // Left empty as per instructions for Canvas environment
         const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
         try {
           const response = await fetch(apiUrl, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+              'Content-Type': 'application/json'
+            },
             body: JSON.stringify(payload)
           });
 
           if (!response.ok) {
-            const errorBody = await response.json().catch(() => ({ error: { message: "Unknown error structure" } }));
+            const errorBody = await response.json().catch(() => ({
+              error: {
+                message: "Unknown error structure"
+              }
+            }));
             console.error("Gemini API Error Response:", errorBody);
             return {
               success: false,
@@ -47,18 +109,44 @@ const CommandExecutor = (() => {
           const result = await response.json();
 
           if (result.candidates && result.candidates.length > 0 &&
-              result.candidates[0].content && result.candidates[0].content.parts &&
-              result.candidates[0].content.parts.length > 0) {
+            result.candidates[0].content && result.candidates[0].content.parts &&
+            result.candidates[0].content.parts.length > 0) {
             const text = result.candidates[0].content.parts[0].text;
             return {
               success: true,
               output: text,
             };
+          } else if (result.candidates && result.candidates.length > 0 && result.candidates[0].finishReason) {
+            // Handle cases where the model might finish for safety reasons or citation issues without parts
+            let finishMessage = `Gemini finished with reason: ${result.candidates[0].finishReason}.`;
+            if (result.candidates[0].safetyRatings) {
+              finishMessage += ` Safety Ratings: ${JSON.stringify(result.candidates[0].safetyRatings)}`;
+            }
+            if (result.promptFeedback && result.promptFeedback.blockReason) {
+              finishMessage += ` Prompt blocked: ${result.promptFeedback.blockReason}.`;
+              if (result.promptFeedback.safetyRatings) {
+                finishMessage += ` Details: ${JSON.stringify(result.promptFeedback.safetyRatings)}`;
+              }
+            }
+            return {
+              success: false, // Or true with a warning, depending on how you want to treat these
+              error: `gemini: ${finishMessage}`,
+              output: `Gemini response note: ${finishMessage}` // Provide some output
+            };
+          } else if (result.promptFeedback && result.promptFeedback.blockReason) {
+            let blockMessage = `gemini: Prompt was blocked. Reason: ${result.promptFeedback.blockReason}.`;
+            if (result.promptFeedback.safetyRatings) {
+              blockMessage += ` Safety Ratings: ${JSON.stringify(result.promptFeedback.safetyRatings)}`;
+            }
+            return {
+              success: false,
+              error: blockMessage,
+            };
           } else {
             console.error("Gemini API Unexpected Response Structure:", result);
             return {
               success: false,
-              error: "gemini: Received an unexpected response structure from the API.",
+              error: "gemini: Received an unexpected or empty response structure from the API.",
             };
           }
         } catch (error) {
@@ -69,10 +157,9 @@ const CommandExecutor = (() => {
           };
         }
       },
-      description: "Sends a prompt to the Gemini AI model and displays the response.",
-      helpText: "Usage: gemini \"<prompt_text>\"\n\nSends the provided <prompt_text> to the Gemini AI and shows the result.\nExample: gemini \"What is the capital of Illinois?\"",
+      description: "Sends a base prompt and file content to Gemini AI for a response.",
+      helpText: "Usage: gemini <filepath> \"<base_prompt>\"\n\nReads the content of <filepath>, combines it with your <base_prompt>,\nand sends it to the Gemini AI. The AI's response is then displayed.\nExample: gemini /documents/report.txt \"Summarize this report focusing on key financial data.\"",
     },
-    // --- END OF NEW GEMINI COMMAND ---
     help: {
       handler: async (args, options) => {
         let output = "OopisOS Help:\n\n";
@@ -2739,155 +2826,173 @@ Copies <source_path> to <destination_path>, or one or more <source_path>(s) to <
       helpText: "Usage: export <file_path>\n\nDownloads the specified <file_path> from OopisOS's virtual file system to your local computer. Your browser will prompt you to save the file.",
     },
     upload: {
-        handler: async (args, options) => {
-            if (!options.isInteractive)
-                return {
-                    success: false,
-                    error: "upload: Can only be run in interactive mode.",
-                };
+      handler: async (args, options) => {
+        if (!options.isInteractive)
+          return {
+            success: false,
+            error: "upload: Can only be run in interactive mode.",
+          };
 
-            const { flags, remainingArgs } = Utils.parseFlags(args, [
-                { name: "force", short: "-f", long: "--force" }
-            ]);
+        const {
+          flags,
+          remainingArgs
+        } = Utils.parseFlags(args, [{
+          name: "force",
+          short: "-f",
+          long: "--force"
+        }]);
 
-            const validationResult = Utils.validateArguments(remainingArgs, { max: 1 }); // 0 or 1 arg for destination dir
-            if (!validationResult.isValid)
-                return {
-                    success: false,
-                    error: `upload: ${validationResult.errorDetail}`,
-                };
+        const validationResult = Utils.validateArguments(remainingArgs, {
+          max: 1
+        }); // 0 or 1 arg for destination dir
+        if (!validationResult.isValid)
+          return {
+            success: false,
+            error: `upload: ${validationResult.errorDetail}`,
+          };
 
-            let targetDirPath = FileSystemManager.getCurrentPath();
-            const currentUser = UserManager.getCurrentUser().name;
-            const nowISO = new Date().toISOString();
-            const operationMessages = [];
-            let allFilesSuccess = true;
-            let anyFileProcessed = false;
+        let targetDirPath = FileSystemManager.getCurrentPath();
+        const currentUser = UserManager.getCurrentUser().name;
+        const nowISO = new Date().toISOString();
+        const operationMessages = [];
+        let allFilesSuccess = true;
+        let anyFileProcessed = false;
 
-            if (remainingArgs.length === 1) {
-                const destPathValidation = FileSystemManager.validatePath(
-                    "upload (destination)",
-                    remainingArgs[0], { expectedType: Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE },
-                );
-                if (destPathValidation.error)
-                    return { success: false, error: destPathValidation.error };
-                targetDirPath = destPathValidation.resolvedPath;
-            }
+        if (remainingArgs.length === 1) {
+          const destPathValidation = FileSystemManager.validatePath(
+            "upload (destination)",
+            remainingArgs[0], {
+              expectedType: Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE
+            },
+          );
+          if (destPathValidation.error)
+            return {
+              success: false,
+              error: destPathValidation.error
+            };
+          targetDirPath = destPathValidation.resolvedPath;
+        }
 
-            const targetDirNode = FileSystemManager.getNodeByPath(targetDirPath);
-            if (!targetDirNode || !FileSystemManager.hasPermission(targetDirNode, currentUser, "write"))
-                return {
-                    success: false,
-                    error: `upload: cannot write to directory '${targetDirPath}'${Config.MESSAGES.PERMISSION_DENIED_SUFFIX}`,
-                };
+        const targetDirNode = FileSystemManager.getNodeByPath(targetDirPath);
+        if (!targetDirNode || !FileSystemManager.hasPermission(targetDirNode, currentUser, "write"))
+          return {
+            success: false,
+            error: `upload: cannot write to directory '${targetDirPath}'${Config.MESSAGES.PERMISSION_DENIED_SUFFIX}`,
+          };
 
-            const input = Utils.createElement("input", { type: "file", multiple: true }); // Enable multiple file selection
-            input.style.display = "none";
-            document.body.appendChild(input);
+        const input = Utils.createElement("input", {
+          type: "file",
+          multiple: true
+        }); // Enable multiple file selection
+        input.style.display = "none";
+        document.body.appendChild(input);
 
-            const fileSelectionPromise = new Promise((resolve, reject) => {
-                let fileSelectedOrDialogClosed = false;
-                const handleFocus = () => {
-                    setTimeout(() => {
-                        window.removeEventListener("focus", handleFocus);
-                        if (!fileSelectedOrDialogClosed) {
-                            fileSelectedOrDialogClosed = true;
-                            reject(new Error(Config.MESSAGES.UPLOAD_NO_FILE));
-                        }
-                    }, 300); // Increased timeout slightly
-                };
-                input.onchange = (e) => {
-                    fileSelectedOrDialogClosed = true;
-                    window.removeEventListener("focus", handleFocus);
-                    const files = e.target.files; // This is a FileList
-                    if (files && files.length > 0) resolve(files);
-                    else reject(new Error(Config.MESSAGES.UPLOAD_NO_FILE));
-                };
-                window.addEventListener("focus", handleFocus);
-                input.click();
-            });
+        const fileSelectionPromise = new Promise((resolve, reject) => {
+          let fileSelectedOrDialogClosed = false;
+          const handleFocus = () => {
+            setTimeout(() => {
+              window.removeEventListener("focus", handleFocus);
+              if (!fileSelectedOrDialogClosed) {
+                fileSelectedOrDialogClosed = true;
+                reject(new Error(Config.MESSAGES.UPLOAD_NO_FILE));
+              }
+            }, 300); // Increased timeout slightly
+          };
+          input.onchange = (e) => {
+            fileSelectedOrDialogClosed = true;
+            window.removeEventListener("focus", handleFocus);
+            const files = e.target.files; // This is a FileList
+            if (files && files.length > 0) resolve(files);
+            else reject(new Error(Config.MESSAGES.UPLOAD_NO_FILE));
+          };
+          window.addEventListener("focus", handleFocus);
+          input.click();
+        });
 
+        try {
+          const filesToUpload = await fileSelectionPromise; // This is a FileList
+          anyFileProcessed = true;
+
+          for (const file of filesToUpload) { // Iterate through the FileList
             try {
-                const filesToUpload = await fileSelectionPromise; // This is a FileList
-                anyFileProcessed = true;
+              const allowedExt = [".txt", ".md", ".html", ".sh", ".js", ".css", ".json"]; // Added .json
+              const fileExt = file.name.substring(file.name.lastIndexOf(".")).toLowerCase();
+              if (!allowedExt.includes(fileExt))
+                throw new Error(`${Config.MESSAGES.UPLOAD_INVALID_TYPE_PREFIX}'${file.name}' (type '${fileExt}')${Config.MESSAGES.UPLOAD_INVALID_TYPE_SUFFIX}`);
 
-                for (const file of filesToUpload) { // Iterate through the FileList
-                    try {
-                        const allowedExt = [".txt", ".md", ".html", ".sh", ".js", ".css", ".json"]; // Added .json
-                        const fileExt = file.name.substring(file.name.lastIndexOf(".")).toLowerCase();
-                        if (!allowedExt.includes(fileExt))
-                            throw new Error(`${Config.MESSAGES.UPLOAD_INVALID_TYPE_PREFIX}'${file.name}' (type '${fileExt}')${Config.MESSAGES.UPLOAD_INVALID_TYPE_SUFFIX}`);
-                        
-                        const content = await new Promise((resolveFile, rejectFile) => {
-                            const reader = new FileReader();
-                            reader.onload = (e) => resolveFile(e.target.result);
-                            reader.onerror = (e) => rejectFile(new Error(`${Config.MESSAGES.UPLOAD_READ_ERROR_PREFIX}'${file.name}'${Config.MESSAGES.UPLOAD_READ_ERROR_SUFFIX}`));
-                            reader.readAsText(file);
-                        });
+              const content = await new Promise((resolveFile, rejectFile) => {
+                const reader = new FileReader();
+                reader.onload = (e) => resolveFile(e.target.result);
+                reader.onerror = (e) => rejectFile(new Error(`${Config.MESSAGES.UPLOAD_READ_ERROR_PREFIX}'${file.name}'${Config.MESSAGES.UPLOAD_READ_ERROR_SUFFIX}`));
+                reader.readAsText(file);
+              });
 
-                        const targetPath = FileSystemManager.getAbsolutePath(file.name, targetDirPath);
-                        const parentDirResult = FileSystemManager.createParentDirectoriesIfNeeded(targetPath);
-                        if (parentDirResult.error) throw new Error(parentDirResult.error);
-                        
-                        const parentNode = parentDirResult.parentNode;
-                        const newFileName = targetPath.substring(targetPath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR) + 1);
-                        const existingFileNode = parentNode.children[newFileName];
+              const targetPath = FileSystemManager.getAbsolutePath(file.name, targetDirPath);
+              const parentDirResult = FileSystemManager.createParentDirectoriesIfNeeded(targetPath);
+              if (parentDirResult.error) throw new Error(parentDirResult.error);
 
-                        if (existingFileNode) {
-                            if (!FileSystemManager.hasPermission(existingFileNode, currentUser, "write"))
-                                throw new Error(`cannot overwrite existing file '${newFileName}'${Config.MESSAGES.PERMISSION_DENIED_SUFFIX}`);
-                            if (!flags.force) { // Check force flag
-                                const confirmed = await new Promise((resolveInner) =>
-                                    ConfirmationManager.request(
-                                        [`File '${newFileName}' already exists in '${targetDirPath}'. Overwrite?`], null,
-                                        () => resolveInner(true), () => resolveInner(false),
-                                    ),
-                                );
-                                if (!confirmed) {
-                                    operationMessages.push(`Skipped overwriting '${file.name}'.`);
-                                    continue; // Skip this file
-                                }
-                            }
-                        }
-                        
-                        parentNode.children[newFileName] = {
-                            type: Config.FILESYSTEM.DEFAULT_FILE_TYPE,
-                            content: content,
-                            owner: currentUser,
-                            mode: Config.FILESYSTEM.DEFAULT_FILE_MODE,
-                            mtime: nowISO,
-                        };
-                        parentNode.mtime = nowISO;
-                        operationMessages.push(`${Config.MESSAGES.UPLOAD_SUCCESS_PREFIX}'${file.name}'${Config.MESSAGES.UPLOAD_SUCCESS_MIDDLE}'${targetDirPath}'${Config.MESSAGES.UPLOAD_SUCCESS_SUFFIX}`);
-                    } catch (fileError) {
-                        operationMessages.push(`Error uploading '${file.name}': ${fileError.message}`);
-                        allFilesSuccess = false;
-                    }
-                } // End of loop through files
+              const parentNode = parentDirResult.parentNode;
+              const newFileName = targetPath.substring(targetPath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR) + 1);
+              const existingFileNode = parentNode.children[newFileName];
 
-                if (anyFileProcessed && (await FileSystemManager.save(currentUser))) {
-                     // FS save is done once after all files are processed
-                } else if (anyFileProcessed) {
-                    operationMessages.push("Critical: Failed to save file system changes after uploads.");
-                    allFilesSuccess = false;
+              if (existingFileNode) {
+                if (!FileSystemManager.hasPermission(existingFileNode, currentUser, "write"))
+                  throw new Error(`cannot overwrite existing file '${newFileName}'${Config.MESSAGES.PERMISSION_DENIED_SUFFIX}`);
+                if (!flags.force) { // Check force flag
+                  const confirmed = await new Promise((resolveInner) =>
+                    ConfirmationManager.request(
+                      [`File '${newFileName}' already exists in '${targetDirPath}'. Overwrite?`], null,
+                      () => resolveInner(true), () => resolveInner(false),
+                    ),
+                  );
+                  if (!confirmed) {
+                    operationMessages.push(`Skipped overwriting '${file.name}'.`);
+                    continue; // Skip this file
+                  }
                 }
+              }
 
-                return {
-                    success: allFilesSuccess,
-                    output: operationMessages.join("\n") || (anyFileProcessed ? "Upload process complete." : "No files selected or processed."),
-                    messageType: allFilesSuccess && anyFileProcessed ? Config.CSS_CLASSES.SUCCESS_MSG : Config.CSS_CLASSES.WARNING_MSG,
-                };
-
-            } catch (e) { // Catch error from fileSelectionPromise (e.g., user cancelled dialog)
-                return { success: false, error: `upload: ${e.message}` };
-            } finally {
-                if (input.parentNode === document.body) {
-                    document.body.removeChild(input);
-                }
+              parentNode.children[newFileName] = {
+                type: Config.FILESYSTEM.DEFAULT_FILE_TYPE,
+                content: content,
+                owner: currentUser,
+                mode: Config.FILESYSTEM.DEFAULT_FILE_MODE,
+                mtime: nowISO,
+              };
+              parentNode.mtime = nowISO;
+              operationMessages.push(`${Config.MESSAGES.UPLOAD_SUCCESS_PREFIX}'${file.name}'${Config.MESSAGES.UPLOAD_SUCCESS_MIDDLE}'${targetDirPath}'${Config.MESSAGES.UPLOAD_SUCCESS_SUFFIX}`);
+            } catch (fileError) {
+              operationMessages.push(`Error uploading '${file.name}': ${fileError.message}`);
+              allFilesSuccess = false;
             }
-        },
-        description: "Uploads one or more files from the user's computer to the virtual FS.",
-        helpText: "Usage: upload [-f] [destination_directory]\n\nPrompts to select one or more files from your computer and uploads them to OopisOS's current directory, or to the optional [destination_directory].\nAllowed file types: .txt, .md, .html, .sh, .js, .css, .json.\n  -f, --force   Overwrite existing files without prompting.\nWill prompt to overwrite if a file exists and -f is not used.",
+          } // End of loop through files
+
+          if (anyFileProcessed && (await FileSystemManager.save(currentUser))) {
+            // FS save is done once after all files are processed
+          } else if (anyFileProcessed) {
+            operationMessages.push("Critical: Failed to save file system changes after uploads.");
+            allFilesSuccess = false;
+          }
+
+          return {
+            success: allFilesSuccess,
+            output: operationMessages.join("\n") || (anyFileProcessed ? "Upload process complete." : "No files selected or processed."),
+            messageType: allFilesSuccess && anyFileProcessed ? Config.CSS_CLASSES.SUCCESS_MSG : Config.CSS_CLASSES.WARNING_MSG,
+          };
+
+        } catch (e) { // Catch error from fileSelectionPromise (e.g., user cancelled dialog)
+          return {
+            success: false,
+            error: `upload: ${e.message}`
+          };
+        } finally {
+          if (input.parentNode === document.body) {
+            document.body.removeChild(input);
+          }
+        }
+      },
+      description: "Uploads one or more files from the user's computer to the virtual FS.",
+      helpText: "Usage: upload [-f] [destination_directory]\n\nPrompts to select one or more files from your computer and uploads them to OopisOS's current directory, or to the optional [destination_directory].\nAllowed file types: .txt, .md, .html, .sh, .js, .css, .json.\n  -f, --force   Overwrite existing files without prompting.\nWill prompt to overwrite if a file exists and -f is not used.",
     },
     backup: {
       handler: async (args, options) => {
@@ -4374,16 +4479,23 @@ If the file exists, it will be overwritten. If the path does not exist, parent d
         // For now, let's assume `sampleAdventure` is accessible or we define a fallback.
         let sampleAdventureData;
         if (typeof window.sampleAdventure !== 'undefined') {
-            sampleAdventureData = window.sampleAdventure;
+          sampleAdventureData = window.sampleAdventure;
         } else {
-            // Fallback minimal sample if not globally available - ideally, this isn't hit.
-            console.warn("adventure command: window.sampleAdventure not found, using minimal fallback. Ensure adventure.js loads and defines it globally or registers the command itself.");
-            sampleAdventureData = {
-                title: "Fallback Sample Adventure",
-                startingRoomId: "room1",
-                rooms: { "room1": { id: "room1", name: "A Plain Room", description: "You are in a plain room. There are no exits.", exits: {} } },
-                items: {}
-            };
+          // Fallback minimal sample if not globally available - ideally, this isn't hit.
+          console.warn("adventure command: window.sampleAdventure not found, using minimal fallback. Ensure adventure.js loads and defines it globally or registers the command itself.");
+          sampleAdventureData = {
+            title: "Fallback Sample Adventure",
+            startingRoomId: "room1",
+            rooms: {
+              "room1": {
+                id: "room1",
+                name: "A Plain Room",
+                description: "You are in a plain room. There are no exits.",
+                exits: {}
+              }
+            },
+            items: {}
+          };
         }
 
 

@@ -2512,6 +2512,7 @@ const TabCompletionManager = (() => {
     "grep",
     "adventure",
     "printscreen",
+    "gemini",
   ];
 
   function findLongestCommonPrefix(strs) {
@@ -2620,6 +2621,33 @@ const TabCompletionManager = (() => {
     } else if (PATH_COMMANDS.includes(baseCommandForPath)) {
         if (baseCommandForPath === "grep" && tokensInitial.length < ((tokensInitial[1] && tokensInitial[1].startsWith("-")) ? 3 : 2) && !lastCharIsSpace && (startOfWordIndex <= (textBeforeCursor.indexOf(tokensInitial[1] || "") + (tokensInitial[1] || "").length))) {
              return { textToInsert: null, newCursorPos: cursorPos };
+        }
+        if (baseCommandForPath === "gemini") {
+            // `gemini <filepath> "prompt"`
+            // Path completion should only apply to the first argument (tokensInitial[1]).
+            
+            // Check if the first argument (filepath) is already fully typed and followed by a space.
+            // tokensInitial: ["gemini", "filepatharg"]
+            if (lastCharIsSpace && tokensInitial.length === 2) {
+                // User typed: `gemini /some/file.txt ` (cursor is after the space)
+                // The next word is the prompt, so no path completion.
+                return { textToInsert: null, newCursorPos: cursorPos };
+            }
+
+            // Check if we are beyond the first argument.
+            // tokensInitial: ["gemini", "filepatharg", "\"promptpart"]
+            if (tokensInitial.length > 2) {
+                // User typed: `gemini /some/file.txt "partial prompt`
+                // The currentWordPrefix would be part of the prompt.
+                // We need to ensure `startOfWordIndex` correctly points to the start of this prompt part.
+                // If `startOfWordIndex` is after the end of where the first argument `tokensInitial[1]` ended,
+                // then we are indeed on the second argument or later.
+                const endOfFirstArgInText = textBeforeCursor.indexOf(tokensInitial[1]) + tokensInitial[1].length;
+                if (startOfWordIndex > endOfFirstArgInText) {
+                    return { textToInsert: null, newCursorPos: cursorPos };
+                }
+            }
+            // If none of the above conditions are met, we are likely completing the filepath (first argument).
         }
 
         let isActivelyQuoted = false;
