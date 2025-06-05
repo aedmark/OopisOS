@@ -4422,6 +4422,98 @@ Example: printscreen /documents/session_log.txt
          printscreen my_output.txt (saves in the current directory)
 If the file exists, it will be overwritten. If the path does not exist, parent directories will be created if possible.`
     },
+    adventure: {
+        handler: async (args, options) => {
+            // Assumption: TextAdventureModal and TextAdventureEngine are globally available
+            // and adventure1_6.js (containing TextAdventureEngine) is loaded.
+
+            if (typeof TextAdventureModal === 'undefined' || typeof TextAdventureModal.isActive !== 'function') {
+                return { success: false, error: "Adventure UI (TextAdventureModal) is not available." };
+            }
+            if (typeof TextAdventureEngine === 'undefined' || typeof TextAdventureEngine.startAdventure !== 'function') {
+                return { success: false, error: "Adventure Engine (TextAdventureEngine) is not available." };
+            }
+
+            if (TextAdventureModal.isActive()) {
+                return { 
+                    success: false, 
+                    error: "An adventure is already in progress. Type 'quit' or 'exit' in the adventure window to leave the current game." 
+                };
+            }
+
+            // --- Sample Adventure Data (can be moved to adventure1_6.js or loaded from a file later) ---
+            const sampleAdventureData = {
+                title: "The Lost Key of Oopis",
+                startingRoomId: "forest_entrance",
+                player: { inventory: [] },
+                rooms: {
+                    "forest_entrance": { id: "forest_entrance", name: "Forest Entrance", description: "You are at the edge of a dark, ancient forest. A narrow path leads north into the woods. To the south is a vast, open plain you just crossed.", exits: { "north": "clearing", "south": "plains_edge" }},
+                    "plains_edge": { id: "plains_edge", name: "Edge of the Plains", description: "You are on the edge of a wide, windswept plain. The forest entrance is to the north.", exits: { "north": "forest_entrance" }},
+                    "clearing": { id: "clearing", name: "Forest Clearing", description: "You are in a small clearing. Sunlight dapples through the leaves. Paths lead east and west. The way south leads back to the forest entrance. There is an old, locked chest here.", exits: { "south": "forest_entrance", "east": "grove", "west": "cave_mouth" }},
+                    "grove": { id: "grove", name: "Quiet Grove", description: "A peaceful grove. A small, shiny object glints under a bush. A path leads west back to the clearing.", exits: { "west": "clearing" }},
+                    "cave_mouth": { id: "cave_mouth", name: "Cave Mouth", description: "The path ends at the dark mouth of a cave. It looks spooky. You can go east to return to the clearing or enter the cave to the north.", exits: { "east": "clearing", "north": "dark_cave" }},
+                    "dark_cave": { id: "dark_cave", name: "Dark Cave", description: "It's pitch black. You can't see a thing! Maybe you should have brought a light source. You can only feel your way south, back to the cave mouth.", exits: { "south": "cave_mouth" }}
+                },
+                items: {
+                    "key": { id: "key", name: "Shiny Key", description: "A small, intricately carved key. It looks important.", location: "grove", canTake: true },
+                    "chest": { id: "chest", name: "Old Chest", description: "A sturdy wooden chest, bound with iron. It's locked.", location: "clearing", canTake: false, isLocked: true, unlocksWith: "key" },
+                    "treasure": { id: "treasure", name: "Oopis Gem", description: "A brilliant, pulsating gem. The legendary Oopis Gem!", location: "chest_contents", canTake: true }
+                },
+                winCondition: { type: "playerHasItem", itemId: "treasure" },
+                winMessage: "\n*** You found the Oopis Gem! Your quest is complete! ***"
+            };
+            // --- End of Sample Adventure Data ---
+
+            let adventureToLoad = sampleAdventureData; // Default to sample
+
+            if (args.length > 0) {
+                const filePath = args[0];
+                // Validate the path using FileSystemManager (ensure it's loaded/available)
+                if (typeof FileSystemManager === 'undefined' || typeof UserManager === 'undefined' || typeof Config === 'undefined') {
+                     return { success: false, error: "FileSystemManager or UserManager not available for loading adventure file." };
+                }
+
+                const pathValidation = FileSystemManager.validatePath("adventure", filePath, { 
+                    expectedType: Config.FILESYSTEM.DEFAULT_FILE_TYPE 
+                });
+
+                if (pathValidation.error) {
+                    return { success: false, error: pathValidation.error };
+                }
+                
+                const fileNode = pathValidation.node;
+                const currentUser = UserManager.getCurrentUser().name;
+
+                if (!FileSystemManager.hasPermission(fileNode, currentUser, "read")) {
+                    return { success: false, error: `adventure: Cannot read file '${filePath}'${Config.MESSAGES.PERMISSION_DENIED_SUFFIX}` };
+                }
+
+                try {
+                    adventureToLoad = JSON.parse(fileNode.content);
+                    // Basic validation of adventure file structure
+                    if (!adventureToLoad.rooms || !adventureToLoad.startingRoomId || !adventureToLoad.items) {
+                        throw new Error("Invalid adventure file format. Missing essential parts like rooms, items, or startingRoomId.");
+                    }
+                    if (!adventureToLoad.title) adventureToLoad.title = filePath; // Use filename as title if not specified
+                } catch (e) {
+                    return { success: false, error: `adventure: Error parsing adventure file '${filePath}': ${e.message}` };
+                }
+            }
+            
+            // Start the adventure using the TextAdventureEngine
+            TextAdventureEngine.startAdventure(adventureToLoad);
+            
+            // The game itself runs in the modal. This command's job is just to launch it.
+            // The output here is minimal as the game handles its own output in the modal.
+            return { 
+                success: true, 
+                output: `Launching adventure: "${adventureToLoad.title || 'Untitled Adventure'}"...\n(Game interaction now happens in the adventure modal.)`,
+                messageType: Config.CSS_CLASSES.CONSOLE_LOG_MSG 
+            };
+        },
+        description: "Starts a text-based adventure game.",
+        helpText: "Usage: adventure [path_to_adventure_file.json]\n\nStarts a text-based adventure game. If a JSON file path is provided, it attempts to load that adventure. Otherwise, a sample adventure is launched."
+    }
   };
   async function _executeCommandHandler(
     segment,

@@ -1,3 +1,5 @@
+// oopisos.js - OopisOS Mainframe v1.6
+
 const Config = (() => {
   "use strict";
   return {
