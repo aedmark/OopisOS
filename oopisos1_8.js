@@ -50,12 +50,9 @@ const Config = (() => {
       DEFAULT_DIRECTORY_TYPE: "directory",
       DEFAULT_FILE_TYPE: "file",
       PATH_SEPARATOR: "/",
-      // CHANGED: Permissions are now more restrictive by default.
-      // 60 = (rw-------) for owner, no access for other.
-      DEFAULT_FILE_MODE: 0o60,
-      // 70 = (rwx------) for owner, no access for other.
-      DEFAULT_DIR_MODE: 0o77,
-	  DEFAULT_SCRIPT_MODE: 0o70,
+      DEFAULT_FILE_MODE: 0o60, // rw------- (owner rw, other ---)
+      DEFAULT_DIR_MODE: 0o70, // rwx------
+	  DEFAULT_SCRIPT_MODE: 0o70, // rwx------
       PERMISSION_BIT_READ: 0b100,
       PERMISSION_BIT_WRITE: 0b010,
       PERMISSION_BIT_EXECUTE: 0b001,
@@ -228,32 +225,28 @@ const Utils = (() => {
     return { isValid: true, error: null };
   }
 
-  // UPDATED Utils.parseFlags function
   function parseFlags(argsArray, flagDefinitions) {
     const flags = {};
     const remainingArgs = [];
 
-    // Initialize flags based on definitions
     flagDefinitions.forEach((def) => {
         flags[def.name] = def.takesValue ? null : false;
     });
 
     for (let i = 0; i < argsArray.length; i++) {
         const arg = argsArray[i];
-        let consumedAsFlag = false; // Tracks if the current arg was consumed as a flag or part of one
+        let consumedAsFlag = false; 
 
-        if (arg.startsWith("--") && arg.length > 2) { // Long flag (e.g., --long)
+        if (arg.startsWith("--") && arg.length > 2) { 
             for (const def of flagDefinitions) {
                 if (arg === def.long) {
                     if (def.takesValue) {
                         if (i + 1 < argsArray.length) {
                             flags[def.name] = argsArray[i + 1];
-                            i++; // Consume the flag's value as well
+                            i++;
                         } else {
-                            // Error: Flag expects a value but none is provided.
-                            // Depending on desired strictness, could throw or set to a specific error value.
                             console.warn(`Flag ${arg} expects a value, but none was provided.`);
-                            flags[def.name] = null; // Or some error indicator
+                            flags[def.name] = null;
                         }
                     } else {
                         flags[def.name] = true;
@@ -262,8 +255,7 @@ const Utils = (() => {
                     break;
                 }
             }
-        } else if (arg.startsWith("-") && !arg.startsWith("--") && arg.length > 1) { // Short flag or combined short flags
-            // Check if it's an exact match for a defined short flag that might be multi-character (e.g. -R, -p for parents)
+        } else if (arg.startsWith("-") && !arg.startsWith("--") && arg.length > 1) {
             let isExactShortFlag = false;
             for (const def of flagDefinitions) {
                 if (arg === def.short) {
@@ -284,13 +276,13 @@ const Utils = (() => {
                 }
             }
 
-            if (!isExactShortFlag && arg.length > 1) { // Potentially combined flags like -ltr
-                const chars = arg.substring(1); // Get characters after '-' e.g., "tr"
-                let allCharsAreFlags = true; // Assume all chars in the group are valid flags initially
-                let tempCombinedFlags = {}; // Store flags from this group temporarily
+            if (!isExactShortFlag && arg.length > 1) {
+                const chars = arg.substring(1); 
+                let allCharsAreFlags = true;
+                let tempCombinedFlags = {};
 
                 for (let j = 0; j < chars.length; j++) {
-                    const charAsFlag = '-' + chars[j]; // e.g., "-t", then "-r"
+                    const charAsFlag = '-' + chars[j];
                     let charIsDefinedFlag = false;
                     let charFlagTakesValue = false;
                     let charFlagDefName = null;
@@ -306,43 +298,34 @@ const Utils = (() => {
 
                     if (charIsDefinedFlag) {
                         if (charFlagTakesValue) {
-                            // A value-taking flag in a combined group must be the last one,
-                            // and the *next* argument in the main argsArray is its value.
-                            if (j === chars.length - 1) { // If it's the last char in the combined group
+                            if (j === chars.length - 1) { 
                                 if (i + 1 < argsArray.length) {
                                     tempCombinedFlags[charFlagDefName] = argsArray[i + 1];
-                                    // Do NOT increment 'i' here; the outer loop will handle the value if this group is valid.
-                                    // Instead, mark that the *next* arg is consumed IF this combined group is fully processed.
                                 } else {
                                     console.warn(`Flag ${charAsFlag} in group ${arg} expects a value, but none was provided.`);
-                                    tempCombinedFlags[charFlagDefName] = null; // Or error
+                                    tempCombinedFlags[charFlagDefName] = null;
                                 }
-                                // This flag and its potential value will be processed together with the group
                             } else {
-                                // Value-taking flag not at the end of a group is typically an error or ambiguous
                                 console.warn(`Value-taking flag ${charAsFlag} in combined group ${arg} must be at the end of the group.`);
-                                allCharsAreFlags = false; // Treat the whole arg as a non-flag
-                                break; // Stop processing this char group
+                                allCharsAreFlags = false;
+                                break;
                             }
-                        } else { // Boolean flag
+                        } else {
                             tempCombinedFlags[charFlagDefName] = true;
                         }
                     } else {
-                        allCharsAreFlags = false; // One char in the group is not a defined flag
-                        break; // Stop processing this char group
+                        allCharsAreFlags = false;
+                        break;
                     }
                 }
 
                 if (allCharsAreFlags) {
-                    // If all characters were valid flags, apply them
                     Object.assign(flags, tempCombinedFlags);
                     consumedAsFlag = true;
-                    // If the last char flag took a value, the outer loop's 'i' needs to be incremented
-                    // to skip that value argument.
                     const lastCharInGroup = '-' + chars[chars.length -1];
                     const lastCharDef = flagDefinitions.find(d => d.short === lastCharInGroup);
                     if (lastCharDef && lastCharDef.takesValue && (i + 1 < argsArray.length)) {
-                        i++; // The value for the last flag in the group was consumed
+                        i++;
                     }
                 }
             }
@@ -390,9 +373,6 @@ const Utils = (() => {
     validateArguments, parseNumericArg, validateUsernameFormat, parseFlags, globToRegex,
   };
 })();
-
-// ... (Rest of oopisos1_8.js: TimestampParser, OutputManager, StorageManager, IndexedDBManager, FileSystemManager, etc. remain unchanged) ...
-// ... (Ensure HistoryManager, ConfirmationManager, UserManager, SessionManager, TerminalUI, TabCompletionManager, and window.onload are present from your full file)
 
 const TimestampParser = (() => {
   "use strict";
@@ -494,6 +474,29 @@ const FileSystemManager = (() => {
   "use strict";
   let fsData = {};
   let currentPath = Config.FILESYSTEM.ROOT_PATH;
+
+  async function initialize(guestUsername) {
+    fsData = {
+      [Config.FILESYSTEM.ROOT_PATH]: {
+        type: Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE,
+        children: {
+          'home': {
+            type: Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE,
+            children: {},
+            owner: 'root',
+            mode: 0o75,
+            mtime: new Date().toISOString()
+          }
+        },
+        owner: 'root',
+        mode: 0o75, 
+        mtime: new Date().toISOString()
+      }
+    };
+    await createUserHomeDirectory(guestUsername);
+	await createUserHomeDirectory('root');
+  }
+  
   async function createUserHomeDirectory(username) {
     if (!fsData['/']?.children?.home) {
       console.error("FileSystemManager: Cannot create user home directory, /home does not exist.");
@@ -505,37 +508,13 @@ const FileSystemManager = (() => {
         type: Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE,
         children: {},
         owner: username,
-        mode: 0o75,
+        mode: 0o70,
         mtime: new Date().toISOString()
       };
       homeDirNode.mtime = new Date().toISOString();
     }
   }
 
-  async function initialize(guestUsername) {
-    fsData = {
-      [Config.FILESYSTEM.ROOT_PATH]: {
-        type: Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE,
-        children: {
-          'home': {
-            type: Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE,
-            children: {},
-            owner: 'root',
-            mode: 0o77,
-            mtime: new Date().toISOString()
-          }
-        },
-        owner: 'root',
-        mode: 0o75,
-        mtime: new Date().toISOString()
-      }
-    };
-    // It creates the home for the username passed to it.
-    await createUserHomeDirectory(guestUsername);
-	await createUserHomeDirectory('root');
-  }
-  
-  // FIX #2: The 'user' variable has been removed from error messages.
   async function save() {
     let db;
     try {
@@ -556,13 +535,12 @@ const FileSystemManager = (() => {
     });
   }
 
-  // FIX #3: The load() function is now corrected and simplified.
   async function load() {
     let db;
     try {
       db = IndexedDBManager.getDbInstance();
     } catch (e) {
-      await initialize(Config.USER.DEFAULT_NAME); // Pass default name if DB fails
+      await initialize(Config.USER.DEFAULT_NAME);
       return Promise.reject(Config.INTERNAL_ERRORS.DB_NOT_INITIALIZED_FS_LOAD);
     }
     return new Promise(async (resolve, reject) => {
@@ -575,15 +553,14 @@ const FileSystemManager = (() => {
         if (result && result.data) {
           fsData = result.data;
         } else {
-          // This happens on the very first boot of the OS.
           OutputManager.appendToOutput("No file system found. Initializing new one.", { typeClass: Config.CSS_CLASSES.CONSOLE_LOG_MSG });
-          await initialize(Config.USER.DEFAULT_NAME); // Pass default name
+          await initialize(Config.USER.DEFAULT_NAME);
           await save();
         }
         resolve();
       };
       request.onerror = async (event) => {
-        await initialize(Config.USER.DEFAULT_NAME); // Pass default name
+        await initialize(Config.USER.DEFAULT_NAME);
         reject(event.target.error);
       };
     });
@@ -596,14 +573,17 @@ const FileSystemManager = (() => {
     if (typeof node.mtime === "undefined") node.mtime = new Date().toISOString();
     if (node.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE && node.children) { for (const childName in node.children) _ensurePermissionsAndMtimeRecursive(node.children[childName], defaultOwner, defaultMode); }
   }
+
   async function clearAllFS() {
     let db; try { db = IndexedDBManager.getDbInstance(); } catch(e) { OutputManager.appendToOutput("Error: File system storage not available for clearing all data.", { typeClass: Config.CSS_CLASSES.ERROR_MSG }); return Promise.reject(Config.INTERNAL_ERRORS.DB_NOT_INITIALIZED_FS_CLEAR); }
     return new Promise((resolve, reject) => { const transaction = db.transaction([Config.DATABASE.FS_STORE_NAME], "readwrite"); const store = transaction.objectStore(Config.DATABASE.FS_STORE_NAME); const request = store.clear(); request.onsuccess = () => resolve(true); request.onerror = (event) => { console.error("Error clearing FileSystemsStore:", event.target.error); OutputManager.appendToOutput("Error: OopisOs could not clear all user file systems. Your data might still be present. Please try the operation again.", { typeClass: Config.CSS_CLASSES.ERROR_MSG }); reject(event.target.error); }; });
   }
+
   function getCurrentPath() { return currentPath; }
   function setCurrentPath(path) { currentPath = path; }
   function getFsData() { return fsData; }
   function setFsData(newData) { fsData = newData; }
+  
   function getAbsolutePath(targetPath, basePath) {
     if (!targetPath) targetPath = Config.FILESYSTEM.CURRENT_DIR_SYMBOL;
     let effectiveBasePath = basePath; if (targetPath.startsWith(Config.FILESYSTEM.PATH_SEPARATOR)) effectiveBasePath = Config.FILESYSTEM.ROOT_PATH;
@@ -613,15 +593,37 @@ const FileSystemManager = (() => {
     if (resolvedSegments.length === 0) return Config.FILESYSTEM.ROOT_PATH;
     return Config.FILESYSTEM.PATH_SEPARATOR + resolvedSegments.join(Config.FILESYSTEM.PATH_SEPARATOR);
   }
+
   function getNodeByPath(path) {
-    const absolutePath = getAbsolutePath(path, currentPath); if (absolutePath === Config.FILESYSTEM.ROOT_PATH) return fsData[Config.FILESYSTEM.ROOT_PATH];
+    const absolutePath = getAbsolutePath(path, currentPath);
+    const currentUser = UserManager.getCurrentUser().name;
+    
+    if (absolutePath === Config.FILESYSTEM.ROOT_PATH) {
+        return fsData[Config.FILESYSTEM.ROOT_PATH];
+    }
+
     const segments = absolutePath.substring(1).split(Config.FILESYSTEM.PATH_SEPARATOR).filter((s) => s);
     let currentNode = fsData[Config.FILESYSTEM.ROOT_PATH];
-    for (const segment of segments) { if (currentNode && currentNode.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE && currentNode.children && currentNode.children[segment]) currentNode = currentNode.children[segment]; else return null; }
+
+    for (const segment of segments) {
+        if (!hasPermission(currentNode, currentUser, "execute")) {
+            return null;
+        }
+
+        if (!currentNode.children || !currentNode.children[segment]) {
+            return null;
+        }
+        
+        currentNode = currentNode.children[segment];
+    }
+
     return currentNode;
   }
+
   function calculateNodeSize(node) { if (!node) return 0; if (node.type === Config.FILESYSTEM.DEFAULT_FILE_TYPE) return (node.content || "").length; if (node.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE) { let totalSize = 0; for (const childName in node.children) totalSize += calculateNodeSize(node.children[childName]); return totalSize; } return 0; }
+  
   function _updateNodeAndParentMtime(nodePath, nowISO) { if (!nodePath || !nowISO) return; const node = getNodeByPath(nodePath); if (node) node.mtime = nowISO; if (nodePath !== Config.FILESYSTEM.ROOT_PATH) { const parentPath = nodePath.substring(0, nodePath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR)) || Config.FILESYSTEM.ROOT_PATH; const parentNode = getNodeByPath(parentPath); if (parentNode && parentNode.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE) parentNode.mtime = nowISO; } }
+  
   function createParentDirectoriesIfNeeded(fullPath) {
     const currentUserForCPDIF = UserManager.getCurrentUser().name; const nowISO = new Date().toISOString();
     if (fullPath === Config.FILESYSTEM.ROOT_PATH) return { parentNode: null, error: "Cannot create directory structure for root." };
@@ -642,28 +644,60 @@ const FileSystemManager = (() => {
     }
     return { parentNode: currentParentNode, error: null };
   }
+
   function validatePath(commandName, pathArg, options = {}) {
     const { allowMissing = false, expectedType = null, disallowRoot = false, defaultToCurrentIfEmpty = true } = options;
     const effectivePathArg = pathArg === "" && defaultToCurrentIfEmpty ? Config.FILESYSTEM.CURRENT_DIR_SYMBOL : pathArg;
-    const resolvedPath = getAbsolutePath(effectivePathArg, currentPath); const node = getNodeByPath(resolvedPath);
+    const resolvedPath = getAbsolutePath(effectivePathArg, currentPath); 
+    const node = getNodeByPath(resolvedPath);
+    
+    // This is a specific patch to fix a bug in the 'cd' command's implementation,
+    // which should be performing this check itself. By placing it here, we enforce
+    // the security rule within the FileSystemManager for this specific command.
+    if (commandName.startsWith("cd") && node) { // Use startsWith to catch "cd" even if commandName is "cd (source)" etc.
+        const currentUser = UserManager.getCurrentUser().name;
+        if (!hasPermission(node, currentUser, "execute")) {
+            return { error: `cd: '${pathArg}'${Config.MESSAGES.PERMISSION_DENIED_SUFFIX}`, node, resolvedPath, optionsUsed: options };
+        }
+    }
+
     if (disallowRoot && resolvedPath === Config.FILESYSTEM.ROOT_PATH) return { error: `${commandName}: '${pathArg}' (resolved to root) is not a valid target for this operation.`, node: null, resolvedPath, optionsUsed: options };
     if (!node) { if (allowMissing) return { error: null, node: null, resolvedPath, optionsUsed: options }; return { error: `${commandName}: '${pathArg}' (resolved to '${resolvedPath}'): No such file or directory`, node: null, resolvedPath, optionsUsed: options }; }
     if (expectedType && node.type !== expectedType) { const typeName = expectedType === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE ? "directory" : "file"; const actualTypeName = node.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE ? "directory" : node.type === Config.FILESYSTEM.DEFAULT_FILE_TYPE ? "file" : "unknown type"; return { error: `${commandName}: '${pathArg}' (resolved to '${resolvedPath}') is not a ${typeName} (it's a ${actualTypeName})`, node, resolvedPath, optionsUsed: options }; }
+    
     return { error: null, node, resolvedPath, optionsUsed: options };
   }
+  
   function hasPermission(node, username, permissionType) {
-	  if (username === 'root') return true; // root can do anything
+	  if (username === 'root') {
+      return true;
+    } 
 
     if (!node || typeof node.mode !== "number" || typeof node.owner !== "string") {
       console.warn("hasPermission: Invalid node or missing permissions info.", node);
       return false;
     }
     let permissionMask;
-    switch (permissionType) { case "read": permissionMask = Config.FILESYSTEM.PERMISSION_BIT_READ; break; case "write": permissionMask = Config.FILESYSTEM.PERMISSION_BIT_WRITE; break; case "execute": permissionMask = Config.FILESYSTEM.PERMISSION_BIT_EXECUTE; break; default: console.warn("hasPermission: Unknown permission type requested:", permissionType); return false; }
-    const isOwner = node.owner === username; let effectiveModeBits;
-    if (isOwner) effectiveModeBits = (node.mode >> 3) & 0b111; else effectiveModeBits = node.mode & 0b111;
-    return (effectiveModeBits & permissionMask) === permissionMask;
+    switch (permissionType) { 
+      case "read": permissionMask = Config.FILESYSTEM.PERMISSION_BIT_READ; break; 
+      case "write": permissionMask = Config.FILESYSTEM.PERMISSION_BIT_WRITE; break; 
+      case "execute": permissionMask = Config.FILESYSTEM.PERMISSION_BIT_EXECUTE; break; 
+      default: 
+        console.warn("hasPermission: Unknown permission type requested:", permissionType); 
+        return false; 
+    }
+    const isOwner = node.owner === username;
+    let effectiveModeBits;
+    if (isOwner) {
+      effectiveModeBits = (node.mode >> 3) & 0b111; 
+    } else {
+      effectiveModeBits = node.mode & 0b111;
+    }
+
+    const result = (effectiveModeBits & permissionMask) === permissionMask;
+    return result;
   }
+  
   function formatModeToString(node) {
     if (!node || typeof node.mode !== "number") return "---------"; const mode = node.mode;
     const typeChar = node.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE ? "d" : "-";
@@ -675,19 +709,8 @@ const FileSystemManager = (() => {
     str += (otherPerms & r) ? "r" : "-"; str += (otherPerms & w) ? "w" : "-"; str += (otherPerms & x) ? "x" : "-"; // Group perms (same as other)
     return str;
   }
-  return { initialize, createUserHomeDirectory, save, load, clearAllFS, getCurrentPath, setCurrentPath, getFsData, setFsData, getAbsolutePath, getNodeByPath, createParentDirectoriesIfNeeded, calculateNodeSize, validatePath, hasPermission, formatModeToString, _updateNodeAndParentMtime, _ensurePermissionsAndMtimeRecursive, getFsData,
-    setFsData,
-    getCurrentPath,
-    setCurrentPath,
-    getAbsolutePath,
-    getNodeByPath,
-    validatePath,
-    hasPermission,
-    formatModeToString,
-    _updateNodeAndParentMtime,
-    calculateNodeSize,
-    createParentDirectoriesIfNeeded,
-    _ensurePermissionsAndMtimeRecursive };
+  
+  return { initialize, createUserHomeDirectory, save, load, clearAllFS, getCurrentPath, setCurrentPath, getFsData, setFsData, getAbsolutePath, getNodeByPath, createParentDirectoriesIfNeeded, calculateNodeSize, validatePath, hasPermission, formatModeToString, _updateNodeAndParentMtime, _ensurePermissionsAndMtimeRecursive };
 })();
 
 const HistoryManager = (() => {
@@ -740,7 +763,7 @@ const UserManager = (() => {
 
     if (users[username]) return { success: false, error: `User '${username}' already exists.` };
 
-    users[username] = {}; // Store the user
+    users[username] = {};
     
     await FileSystemManager.createUserHomeDirectory(username);
     
@@ -795,7 +818,6 @@ const UserManager = (() => {
     return { success: true, message: `User ${prevUserName} logged out. Now logged in as ${Config.USER.DEFAULT_NAME}.` };
   }
 
-  // This is the critical addition that exposes the functions
   return {
     getCurrentUser,
     register,
@@ -808,12 +830,14 @@ const SessionManager = (() => {
   "use strict";
   function _getAutomaticSessionStateKey(user) { return `${Config.STORAGE_KEYS.USER_TERMINAL_STATE_PREFIX}${user}`; }
   function _getManualUserTerminalStateKey(user) { const userName = typeof user === "object" && user !== null && user.name ? user.name : String(user); return `${Config.STORAGE_KEYS.MANUAL_TERMINAL_STATE_PREFIX}${userName}`; }
+  
   function saveAutomaticState(username) {
     if (!username) { console.warn("saveAutomaticState: No username provided. State not saved."); return; }
     const currentInput = TerminalUI.getCurrentInputValue();
     const autoState = { currentPath: FileSystemManager.getCurrentPath(), outputHTML: DOM.outputDiv ? DOM.outputDiv.innerHTML : "", currentInput: currentInput, commandHistory: HistoryManager.getFullHistory() };
     StorageManager.saveItem(_getAutomaticSessionStateKey(username), autoState, `Auto session for ${username}`);
   }
+
   function loadAutomaticState(username) {
     if (!username) {
       console.warn("loadAutomaticState: No username provided. Cannot load state.");
@@ -840,15 +864,12 @@ const SessionManager = (() => {
       TerminalUI.setCurrentInputValue(autoState.currentInput || "");
       HistoryManager.setHistory(autoState.commandHistory || []);
     } else {
-      // THIS IS THE CORRECTED LOGIC FOR A FRESH START
       if (DOM.outputDiv) DOM.outputDiv.innerHTML = "";
       TerminalUI.setCurrentInputValue("");
-      // Default to the user's home directory instead of root
       const homePath = `/home/${username}`;
       if (FileSystemManager.getNodeByPath(homePath)) {
         FileSystemManager.setCurrentPath(homePath);
       } else {
-        // Fallback to root only if home doesn't exist for some reason
         FileSystemManager.setCurrentPath(Config.FILESYSTEM.ROOT_PATH);
       }
       HistoryManager.clearHistory();
@@ -858,12 +879,14 @@ const SessionManager = (() => {
     if (DOM.outputDiv) DOM.outputDiv.scrollTop = DOM.outputDiv.scrollHeight;
     return !!autoState;
   }
+
   async function saveManualState() {
     const currentUser = UserManager.getCurrentUser(); const currentInput = TerminalUI.getCurrentInputValue();
     const manualStateData = { user: currentUser.name, osVersion: Config.OS.VERSION, timestamp: new Date().toISOString(), currentPath: FileSystemManager.getCurrentPath(), outputHTML: DOM.outputDiv ? DOM.outputDiv.innerHTML : "", currentInput: currentInput, fsDataSnapshot: Utils.deepCopyNode(FileSystemManager.getFsData()), commandHistory: HistoryManager.getFullHistory() };
     if (StorageManager.saveItem(_getManualUserTerminalStateKey(currentUser), manualStateData, `Manual save for ${currentUser.name}`)) return { success: true, message: `${Config.MESSAGES.SESSION_SAVED_FOR_PREFIX}${currentUser.name}.` };
     else return { success: false, error: "Failed to save session manually." };
   }
+
   async function loadManualState() {
     const currentUser = UserManager.getCurrentUser(); const manualStateData = StorageManager.loadItem(_getManualUserTerminalStateKey(currentUser), `Manual save for ${currentUser.name}`);
     if (manualStateData) {
@@ -875,7 +898,9 @@ const SessionManager = (() => {
       return { success: true, message: "Confirmation requested for loading state." };
     } else return { success: false, message: `${Config.MESSAGES.NO_MANUAL_SAVE_FOUND_PREFIX}${currentUser.name}.` };
   }
+  
   function clearUserSessionStates(username) { if (!username || typeof username !== "string") { console.warn("SessionManager.clearUserSessionStates: Invalid username provided.", username); return false; } try { StorageManager.removeItem(_getAutomaticSessionStateKey(username)); StorageManager.removeItem(_getManualUserTerminalStateKey(username)); return true; } catch (e) { console.error(`Error clearing session states for user '${username}':`, e); return false; } }
+  
   async function performFullReset() {
     OutputManager.clearOutput();
     TerminalUI.clearInput();
@@ -902,21 +927,18 @@ const SessionManager = (() => {
       });
     }
 
-    // --- CORRECTED LOGIC ---
     await OutputManager.appendToOutput("Reset complete. Rebooting OopisOS...", {
       typeClass: Config.CSS_CLASSES.SUCCESS_MSG
     });
 
-    // IMMEDIATELY disable the input to prevent further commands.
     TerminalUI.setInputState(false);
     if (DOM.inputLineContainerDiv) {
         DOM.inputLineContainerDiv.classList.add(Config.CSS_CLASSES.HIDDEN);
     }
-
-    // Schedule the reload to ensure a clean start.
+    
     setTimeout(() => {
       window.location.reload();
-    }, 1500); // Wait 1.5 seconds for the user to read the message.
+    }, 1500);
   }
   return { saveAutomaticState, loadAutomaticState, saveManualState, loadManualState, clearUserSessionStates, performFullReset };
 })();
@@ -1023,7 +1045,6 @@ function initializeTerminalEventListeners() {
 }
 
 window.onload = async () => {
-  // --- FIX 1: Populate the DOM object immediately ---
   DOM = {
     terminalBezel: document.getElementById("terminal-bezel"),
     terminalDiv: document.getElementById("terminal"),
@@ -1038,25 +1059,14 @@ window.onload = async () => {
     adventureInput: document.getElementById('adventure-input'),
   };
 
-  // Initialize console overrides now that the DOM is ready for output.
   OutputManager.initializeConsoleOverrides();
 
   try {
-    // --- FIX 2: Corrected Initialization Flow ---
-
-    // 1. Initialize the database. It will log to the console if it needs to.
     await IndexedDBManager.init();
-
-    // 2. Load the unified filesystem. This handles creating a new one on first run.
     await FileSystemManager.load();
-
-    // 3. Load the session for the default "Guest" user.
-    // The UserManager is already initialized with Guest as the current user.
     SessionManager.loadAutomaticState(Config.USER.DEFAULT_NAME);
 
-    // 4. Set the initial path correctly after loading state.
     const guestHome = `/home/${Config.USER.DEFAULT_NAME}`;
-    // If the saved path from the session is invalid, default to home or root.
     if (!FileSystemManager.getNodeByPath(FileSystemManager.getCurrentPath())) {
         if (FileSystemManager.getNodeByPath(guestHome)) {
             FileSystemManager.setCurrentPath(guestHome);
@@ -1065,16 +1075,14 @@ window.onload = async () => {
         }
     }
 
-    // 5. Initialize the terminal UI and event listeners.
     initializeTerminalEventListeners();
-    TerminalUI.updatePrompt(); // Update prompt with correct user and path.
+    TerminalUI.updatePrompt();
     TerminalUI.focusInput();
 
     console.log(`${Config.OS.NAME} v.${Config.OS.VERSION} loaded successfully!`);
 
   } catch (error) {
     console.error("Failed to initialize OopisOs on window.onload:", error, error.stack);
-    // A last-ditch effort to display the error in the terminal UI itself.
     if (DOM.outputDiv) {
         DOM.outputDiv.innerHTML += `<div class="text-red-500">FATAL ERROR: ${error.message}. Check console for details.</div>`;
     }
