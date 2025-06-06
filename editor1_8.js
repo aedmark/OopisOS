@@ -1,4 +1,4 @@
-// editor.js - OopisOS Live Markdown Text Editor v1.7
+// editor.js - OopisOS Live Markdown Text Editor v1.8
 
 // --- EditorModal Module ---
 const EditorModal = (() => {
