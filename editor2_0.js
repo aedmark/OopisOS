@@ -1,6 +1,5 @@
-// editor.js - OopisOS Live Markdown Text Editor v1.8
+// editor.js - OopisOS Live Markdown Text Editor v2.0
 
-// --- EditorModal Module ---
 const EditorModal = (() => {
   "use strict";
   let modalElement = null;
@@ -743,7 +742,7 @@ const EditorManager = (() => {
     let contentToExport = "";
     let baseFilename = "preview";
     if (currentFilePath) {
-      baseFilename = currentFilePath.substring(currentFilePath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR) + 1); // Global Config for FS
+      baseFilename = currentFilePath.substring(currentFilePath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR) + 1);
       const dotIndex = baseFilename.lastIndexOf(".");
       if (dotIndex > 0) baseFilename = baseFilename.substring(0, dotIndex);
     }
@@ -782,7 +781,7 @@ const EditorManager = (() => {
       console.error("Error exporting preview:", error);
       OutputManager.appendToOutput(`Error exporting preview: ${error.message}`, {
         typeClass: Config.CSS_CLASSES.ERROR_MSG
-      }); // Global Config for general error
+      });
     }
   }
 
@@ -866,7 +865,7 @@ const EditorManager = (() => {
       default:
         return;
     }
-    if (type !== 'link' && type !== 'quote' && type !== 'codeblock' && type !== 'ul' && type !== 'ol') { // For simpler prefix/suffix types
+    if (type !== 'link' && type !== 'quote' && type !== 'codeblock' && type !== 'ul' && type !== 'ol') {
       if (!selectedTextVal) selectedTextVal = placeholder;
       modifiedSegment = prefix + selectedTextVal + suffix;
       finalSelectionStart = selection.start + prefix.length;
@@ -942,7 +941,7 @@ const EditorManager = (() => {
   async function _performExitActions() {
     EditorUI.destroyLayout();
     isActiveState = false;
-    // OutputManager.setEditorActive(false); // This will be handled by the caller if needed
+
     currentFilePath = null;
     currentFileMode = EditorAppConfig.EDITOR.DEFAULT_MODE;
     isDirty = false;

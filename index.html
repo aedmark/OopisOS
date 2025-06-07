@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>OopisOS Version 1.8</title>
+  <title>OopisOS Version 2.0</title>
   <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="./marked.min.js"></script>
@@ -12,7 +12,7 @@
 </head>
 
 <body class="bg-neutral-900 text-green-500 m-0 p-5 flex flex-col items-center justify-center min-h-screen overflow-x-hidden">
-  <!-- Main Terminal Bezel -->
+
   <div id="terminal-bezel" class="bg-neutral-800 p-6 rounded-2xl terminal-bezel-shadow inline-block">
     <div id="terminal" class="w-[90vw] max-w-[800px] h-[70vh] max-h-[600px] bg-neutral-950 border-2 border-neutral-900 rounded-lg p-5 overflow-x-hidden terminal-screen-glow flex flex-col" style="position: relative;">
       <div id="output" class="flex-grow mb-2.5 overflow-x-hidden w-full min-w-0 overflow-y-auto"></div>
@@ -30,7 +30,7 @@
           </div>
         </div>
       </div>
-      <!-- Text Adventure Modal (MOVED INSIDE #terminal and initially hidden) -->
+
       <div id="adventure-modal" class="hidden">
         <div id="adventure-container">
           <div id="adventure-header">
@@ -38,7 +38,7 @@
             <button id="adventure-close-btn" class="btn-adventure">Exit Adventure</button>
           </div>
           <div id="adventure-output">
-            <!-- Game text will appear here -->
+
           </div>
           <div id="adventure-input-container">
             <span>&gt;</span>
@@ -46,17 +46,17 @@
           </div>
         </div>
       </div>
-    </div> <!-- This is the closing div for #terminal -->
-  </div> <!-- This is the closing div for #terminal-bezel -->
-  <h1 class="text-xl text-green-500 font-['VT323'] mt-4 mb-4"> OopisOS v1.8 | Copyright ©2025 Andrew Edmark & Gemini |
+    </div>
+  </div>
+  <h1 class="text-xl text-green-500 font-['VT323'] mt-4 mb-4"> OopisOS v2.0 | Copyright ©2025 Andrew Edmark & Gemini |
     MIT Licensed </h1>
 
-  <!-- Scripts -->
-  <script src="./oopisos1_8.js"></script>
-  <script src="./editor1_8.js"></script>
-  <script src="./lexpar1_8.js"></script>
-  <script src="./commexec1_8.js"></script>
-  <script src="./adventure1_8.js"></script>
+
+  <script src="./oopisos2_0.js"></script>
+  <script src="./editor2_0.js"></script>
+  <script src="./lexpar2_0.js"></script>
+  <script src="./commexec2_0.js"></script>
+  <script src="./adventure2_0.js"></script>
 </body>
 
 </html>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OopisOS v1.8 - The Educational Portal</title>
+    <title>OopisOS v2.0 - The Educational Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=VT323&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -163,9 +163,9 @@
                 <ul class="space-y-2">
                     <li><a href="#home" class="nav-link block p-3 rounded-lg active">Home & Overview</a></li>
                     <li><a href="#user-guide" class="nav-link block p-3 rounded-lg">User Guide</a></li>
-                    <li><a href="#how-it-works" class="nav-link block p-3 rounded-lg">How It Works</a></li>
-                    <li><a href="#developer-docs" class="nav-link block p-3 rounded-lg">Developer Docs</a></li>
                     <li><a href="#advanced-topics" class="nav-link block p-3 rounded-lg">Advanced Topics</a></li>
+                    <li><a href="#developer-docs" class="nav-link block p-3 rounded-lg">Developer Docs</a></li>
+                    <li><a href="#testing-env" class="nav-link block p-3 rounded-lg">Testing & Showcase</a></li>
                     <li><a href="#about" class="nav-link block p-3 rounded-lg">About & Credits</a></li>
                 </ul>
             </nav>
@@ -174,31 +174,31 @@
         <main class="main-content flex-1 p-6 md:p-10 overflow-y-auto mt-16 md:mt-0">
             <section id="home" class="content-section active">
                 <h1>Welcome to OopisOS!</h1>
-                <p class="text-lg mt-2 mb-6 text-zinc-400">The little browser-based Operating System that could (and does!). Version 1.8 is here!</p>
+                <p class="text-lg mt-2 mb-6 text-zinc-400">The little browser-based Operating System that could (and does!). Version 2.0 is here!</p>
 
                 <div class="terminal-example">
-                    <span class="prompt">Guest@OopisOs:/&gt;</span> <span class="command">echo "Hello, OopisOS v1.8 World!"</span><br>
-                    <span class="output">Hello, OopisOS v1.8 World!</span>
+                    <span class="prompt">Guest@OopisOs:/&gt;</span> <span class="command">echo "Hello, OopisOS v2.0 World!"</span><br>
+                    <span class="output">Hello, OopisOS v2.0 World!</span>
                 </div>
 
                 <h2>What is OopisOS?</h2>
-                <p>OopisOS (v1.8) is a fully persistent, self-contained operating system simulation that runs entirely within your web browser. Born from a collaborative effort between Andrew Edmark and Gemini Pro, it aims to recreate the feel and functionality of a classic command-line interface (CLI) environment, complete with a hierarchical file system, user management, a powerful text editor, a suite of useful commands, an AI interaction layer, and even an interactive text adventure game engine.</p>
-                <p>It's an educational tool, a nostalgic playground, and a testament to what can be achieved with JavaScript, IndexedDB for persistence, and a lot of creative coding. The entire system is primarily contained within <code>OopisOSv1_8.html</code> and its accompanying JavaScript files: <code>oopisos1_8.js</code> (core OS), <code>editor1_8.js</code> (text editor), <code>commexec1_8.js</code> (command execution and definitions), and <code>adventure1_8.js</code> (text adventure game engine).</p>
+                <p>OopisOS (v2.0) is a fully persistent, self-contained operating system simulation that runs entirely within your web browser. Born from a collaborative effort between Andrew Edmark and Gemini Pro, it aims to recreate the feel and functionality of a classic command-line interface (CLI) environment, complete with a hierarchical file system, user management with passwords, a powerful text editor, a suite of useful commands, an AI interaction layer, and even an interactive text adventure game engine.</p>
+                <p>It's an educational tool, a nostalgic playground, and a testament to what can be achieved with JavaScript, IndexedDB for persistence, and a lot of creative coding. The entire system is now modularized across <code>OopisOSv2_0.html</code> and its accompanying JavaScript files.</p>
 
                 <h2>Core Philosophy</h2>
                 <ul class="list-disc ml-6 space-y-2 my-4">
-                    <li><strong>Persistence is Key:</strong> Your files, user accounts, and session states are saved using IndexedDB, meaning your work remains even after closing the browser tab.</li>
+                    <li><strong>Persistence is Key:</strong> Your files, user accounts (with hashed passwords), and session states are saved using IndexedDB and localStorage, meaning your work remains even after closing the browser tab.</li>
                     <li><strong>Self-Contained:</strong> Everything runs client-side. No server needed (beyond serving the initial HTML/JS).</li>
                     <li><strong>Educational & Fun:</strong> Designed to be a learning experience for those interested in OS concepts, CLI interactions, and JavaScript module architecture. Includes AI interaction and gaming!</li>
                     <li><strong>Extensible:</strong> Built with modularity in mind, making it possible for developers to contribute new commands and features.</li>
                     <li><strong>POSIX-ish Familiarity:</strong> While not a strict POSIX implementation, many commands and concepts will feel familiar to users of Unix-like systems.</li>
                 </ul>
 
-                <h2>Key Features at a Glance (v1.8)</h2>
+                <h2>Key Features at a Glance (v2.0)</h2>
                 <ul class="list-disc ml-6 space-y-2 my-4">
                     <li><strong>Persistent File System:</strong> Create, edit, move, copy, and delete files and directories. Stored in IndexedDB. Commands include `mkdir`, `ls` (with flags like `-l`, `-a`, `-R`, `-t`, `-S`, `-d`), `cd`, `pwd`, `touch` (with `-c`, `-d`, `-t`), `cat`, `cp` (with `-r`, `-f`, `-p`, `-i`), `mv` (with `-f`, `-i`), `rm` (with `-r`, `-f`), `tree` (with `-L`, `-d`), `find` (with predicates like `-name`, `-type`, `-mtime`, `-user`, `-perm` and actions like `-print`, `-exec`, `-delete`).</li>
                     <li><strong>Advanced Command-Line Interface:</strong> Retro-styled terminal with history, tab completion, command pipelining (`|`), I/O redirection (`>`, `>>`), background processes (`&`), and command sequences (`;`).</li>
-                    <li><strong>User Management:</strong> Register multiple users (`useradd`/`register`), log in/out (`login`, `logout`), switch user (`su`, including to `root`), `whoami`, `listusers`, `removeuser` (with confirmation). Each user has an isolated home directory.</li>
+                    <li><strong>User Management with Passwords:</strong> Register multiple users (`useradd`/`register`) with secure password prompts, log in/out (`login`, `logout`), switch user (`su`, including to `root`), `whoami`, `listusers`, `removeuser` (with confirmation). Each user has an isolated home directory. Includes default users `Guest` (no password) and `userDiag` (password: `pantload`).</li>
                     <li><strong>Enhanced Text Editor (`edit`):** Supports plain text, Markdown, and HTML (with live preview). Features line numbers (gutter hides on word wrap), toggleable word wrap (persists), status bar, view modes (`Ctrl+P`), `Ctrl+S` (save/exit), `Ctrl+O` (exit/confirm discard via modal), a Markdown/HTML formatting toolbar (with shortcuts like `Ctrl+B` for bold, `Ctrl+I` for italic), and an HTML preview export function.</li>
                     <li><strong>AI Integration (`gemini`):</strong> Send prompts and file content to a Gemini AI model directly from the terminal. Can be used with a file path and a prompt, or with just a prompt string.</li>
                     <li><strong>Scripting Engine (`run`):</strong> Execute script files with comments (`#`), shebang support (ignored for interpreter, but line is skipped), and argument passing (`$1`, `$@`, `$#`). Includes `delay` for pauses and `check_fail` for basic test scripting.</li>
@@ -206,12 +206,12 @@
                     <li><strong>Utilities:</strong> `echo`, `date`, `help`, `clear`, `history -c`, `export` (download files from VFS), `upload` (upload files to VFS, with type checks and overwrite prompt), `chmod`, `chown`, `grep` (with `-i`, `-v`, `-n`, `-c`, `-R` for recursive search), and `printscreen <filepath>` (saves current terminal output to a specified file in the VFS).</li>
                     <li><strong>Interactive Text Adventure Game (`adventure`):</strong> Launch and play text-based adventure games, such as the included 'Quest for the Lost Semicolon,' within a dedicated modal window. Supports loading custom adventures from JSON files stored in the VFS.</li>
                 </ul>
-                <p>Dive in, explore, and see what you can create in the world of OopisOS v1.8!</p>
+                <p>Dive in, explore, and see what you can create in the world of OopisOS v2.0!</p>
             </section>
 
             <section id="user-guide" class="content-section">
-                <h1>OopisOS User Guide (v1.8)</h1>
-                <p>Welcome to your OopisOS journey! This guide will help you get started with the basics of version 1.8.</p>
+                <h1>OopisOS User Guide (v2.0)</h1>
+                <p>Welcome to your OopisOS journey! This guide will help you get started with the basics of version 2.0.</p>
 
                 <h2>The Terminal Interface</h2>
                 <p>OopisOS presents a classic terminal interface. Here's what you'll see:</p>
@@ -297,20 +297,38 @@
                     <span class="output">(Editor interface appears, ready to edit 'my_feature_article.md')</span>
                 </div>
 
-                <h2>Users and Permissions</h2>
-                <p>OopisOS supports multiple users. Each file and directory has an owner and permissions that determine who can read, write, or execute it.</p>
+                <h2>Users, Permissions, and Passwords</h2>
+                <p>OopisOS supports multiple users, each with their own home directory and saved session state. Each file and directory has an owner and permissions that determine who can read, write, or execute it.</p>
+                
+                <h3>User Accounts and The Superuser (`root`)</h3>
                 <ul class="list-disc ml-6 my-4 space-y-2">
-                    <li><code>register [username]</code> (or <code>useradd</code>): Create a new user account. Usernames have length and character restrictions.</li>
-                    <li><code>login [username]</code>: Log in as an existing user. This loads the user's specific file system and session state.</li>
-                    <li><code>logout</code>: Log out the current user and return to the Guest user session.</li>
-                    <li><code>su [username]</code>: Switch to another user account. If no username is provided, it switches to the `root` user. The `root` user can bypass all file permission checks, allowing for system-wide administrative tasks.</li>
+                    <li><strong>Default Users:</strong> OopisOS starts with three default users:
+                        <ul>
+                           <li><code>Guest</code>: The default user, has no password.</li>
+                           <li><code>root</code>: The superuser account, has no password by default. The `root` user can bypass all file permission checks, allowing for system-wide administrative tasks like deleting other users' files.</li>
+                           <li><code>userDiag</code>: A special user for testing purposes, pre-configured with the password `pantload`.</li>
+                        </ul>
+                    </li>
+                    <li><code>register [username]</code> (or <code>useradd</code>): Creates a new user account. You will be interactively prompted to set a password. If you press Enter at the password prompt, the user will be created without one.</li>
+                    <li><code>login [username] [password]</code>: Logs in as an existing user. If the user requires a password and you don't provide one, you will be prompted securely. The `login` command also accepts the password as a second argument for non-interactive scripting.</li>
+                    <li><code>logout</code>: Logs out the current user and returns to the Guest session.</li>
+                    <li><code>su [username]</code>: Switches the current user. If no username is given, it defaults to `root`. If the target user has a password, you will be prompted for it.</li>
                     <li><code>whoami</code>: See your current username.</li>
                     <li><code>listusers</code>: Show all registered user accounts.</li>
                     <li><code>removeuser [username]</code>: Deletes a user and all their associated data (files, saved sessions). This action requires confirmation.</li>
+                </ul>
+
+                <h3>Permissions and Ownership</h3>
+                <ul class="list-disc ml-6 my-4 space-y-2">
                     <li><code>chmod [mode] [path]</code>: Change the permissions of a file or directory. The mode is specified as two octal digits (e.g., <code>75</code> for rwxr-x, <code>64</code> for rw-r--). The first digit applies to the owner, the second to others. Each digit is a sum of: 4 (read), 2 (write), 1 (execute).</li>
                     <li><code>chown [new_owner] [path]</code>: Change the owner of a file or directory. Only the current owner of the item or the `root` user can change its ownership.</li>
+                    <li>Permissions are displayed in the long listing format of the <code>ls -l</code> command (e.g., <code>-rwxr-x---</code> where 'd' indicates a directory, followed by owner and other permissions).</li>
                 </ul>
-                <p>Permissions are displayed in the long listing format of the <code>ls -l</code> command (e.g., <code>-rwxr-x---</code> where 'd' indicates a directory, followed by owner and other permissions).</p>
+                <div class="terminal-example">
+                    <span class="prompt">Guest@OopisOs:/&gt;</span> <span class="command">login userDiag pantload</span><br>
+                    <span class="output">Logged in as userDiag.</span><br>
+                    <span class="prompt">userDiag@OopisOs:/home/userDiag&gt;</span> <span class="command">_</span>
+                </div>
 
                 <h2>Pipes, Redirection, and Command Sequences</h2>
                 <p>Like other shells, OopisOS supports features to control command input, output, and execution flow:</p>
@@ -328,187 +346,31 @@
                         <br>Example: <code>mkdir new_dir ; cd new_dir ; echo "I'm here" > file.txt</code>
                     </li>
                 </ul>
-                <p>This is just the beginning! Explore the <code>help</code> command and experiment to discover all that OopisOS v1.8 can do.</p>
+                <p>This is just the beginning! Explore the <code>help</code> command and experiment to discover all that OopisOS v2.0 can do.</p>
             </section>
-
-            <section id="how-it-works" class="content-section">
-                <h1>OopisOS v1.8: Under The Hood</h1>
-                <p>Curious about how OopisOS ticks? This section delves into the core architecture and key JavaScript modules that power this browser-based operating system.</p>
-
-                <h2>Overall Architecture</h2>
-                <p>OopisOS is a single-page application (SPA) built with vanilla JavaScript, structured into several key modules that manage different aspects of the OS simulation. It uses the browser's IndexedDB for persistent storage of file systems and user data, and localStorage for simpler session states and settings.</p>
-                <p>The user interacts primarily through a terminal interface (<code>OopisOSv1_8.html</code> provides the structure), and commands are processed by a dedicated execution pipeline. The core JavaScript logic is now cleanly split across four main files:</p>
-                    <ul>
-                        <li><code>oopisos1_8.js</code>: Contains core OS managers (Config, Utils, Timestamps, Output, Storage, IndexedDB, FileSystem, History, Confirmation, User, Session, TerminalUI, TabCompletion). This file lays the foundational framework.</li>
-                        <li><code>editor1_8.js</code>: Dedicated to the built-in text editor. It includes all editor-specific logic (EditorAppConfig, EditorUtils, EditorUI, EditorManager, and the EditorModal for confirmations).</li>
-                        <li><code>commexec1_8.js</code>: The command execution heart. It contains the `CommandExecutor` which houses the Lexer, Parser, all command definitions (handlers, descriptions, help text), and the logic for pipeline execution, redirection, background processes, and script running.</li>
-                        <li><code>adventure1_8.js</code>: Manages all aspects of the text adventure game feature, including its engine (`TextAdventureEngine`), modal UI (`TextAdventureModal`), and the sample game data.</li>
-                    </ul>
-
-                <h2>Core Modules Breakdown</h2>
-
-                <h3>From <code>oopisos1_8.js</code> (Core OS Infrastructure):</h3>
-                <ul class="list-disc ml-6 my-4 space-y-2">
-                    <li><strong>`Config`</strong>: A global object holding all static configuration values, constants, default messages, and CSS class names.</li>
-                    <li><strong>`Utils`</strong>: A collection of general-purpose utility functions used throughout the OS (e.g., DOM creation, argument validation, string formatting).</li>
-                    <li><strong>`TimestampParser`</strong>: Parses various timestamp string formats into ISO strings, used by commands like `touch`.</li>
-                    <li><strong>`OutputManager`</strong>: Handles all output to the terminal display, including overriding console methods to redirect their output.</li>
-                    <li><strong>`StorageManager`</strong>: A wrapper for `localStorage`, used for storing user credentials and simple session state information.</li>
-                    <li><strong>`IndexedDBManager`</strong>: Manages the connection and schema for the IndexedDB database, which is used for persistent storage of the unified file system.</li>
-                    <li><strong>`FileSystemManager`</strong>: The engine for the virtual file system. It manages the in-memory `fsData` object, handles path resolution, all node operations (create, read, update, delete), permission checking, and interactions with IndexedDB for saving and loading the unified file system.</li>
-                    <li><strong>`HistoryManager`</strong>: Manages the command history for the terminal.</li>
-                    <li><strong>`ConfirmationManager`</strong>: Provides a mechanism for prompting the user for confirmation (e.g., "Type YES to confirm") for potentially destructive operations, using terminal-based prompts.</li>
-                    <li><strong>`UserManager`</strong>: Handles user accounts, including registration, login, logout, `su` (user switching), and managing the current user context.</li>
-                    <li><strong>`SessionManager`</strong>: Manages the saving and loading of user sessions. This includes automatic state saving on login/logout and manual state saving/loading (which can include FS snapshots). Also handles full system reset.</li>
-                    <li><strong>`TerminalUI`</strong>: Controls aspects of the terminal's user interface, such as updating the prompt, managing input focus, and handling the contenteditable input field.</li>
-                    <li><strong>`TabCompletionManager`</strong>: Implements the logic for command name and file/directory path completion when the Tab key is pressed.</li>
-                </ul>
-
-                <h3>From <code>editor1_8.js</code> (Text Editor Suite):</h3>
-                <ul class="list-disc ml-6 my-4 space-y-2">
-                    <li><strong>`EditorAppConfig`</strong>: Holds configuration constants specific to the editor application (e.g., debounce delays, shortcut actions, supported modes).</li>
-                    <li><strong>`EditorUtils`</strong>: Contains utility functions tailored for the editor, such as determining file mode, generating preview CSS, and calculating status bar information.</li>
-                    <li><strong>`EditorUI`</strong>: Responsible for building, managing, and updating all DOM elements of the editor interface (textarea, preview pane, line gutter, controls, status bar, formatting toolbar).</li>
-                    <li><strong>`EditorManager`</strong>: The main controller for the editor. It handles the editor's lifecycle (entering/exiting), state management (current file, content, dirty status), event handling (input, keyboard shortcuts), view mode toggling, word wrap functionality, and interaction with `FileSystemManager` for saving files.</li>
-                    <li><strong>`EditorModal`</strong>: A specialized modal dialog component used within the editor for confirmations, like discarding unsaved changes.</li>
-                </ul>
-                
-                <h3>From <code>commexec1_8.js</code> (Command Execution Engine):</h3>
-                 <ul class="list-disc ml-6 my-4 space-y-2">
-                    <li><strong>`CommandExecutor`</strong>: The central module responsible for processing all user commands.
-                        <ul>
-                            <li><strong>Lexer & Parser:</strong> Internally, it uses a lexer to tokenize the raw input string and a parser to build an abstract syntax tree representing the command pipeline, including arguments, pipes, redirections, and background operators.</li>
-                            <li><strong>Command Dispatch:</strong> It looks up the command in its internal `commands` object and invokes the appropriate handler function.</li>
-                            <li><strong>Pipeline Execution:</strong> Manages the flow of data (stdin/stdout) between commands connected by pipes.</li>
-                            <li><strong>Redirection & Backgrounding:</strong> Implements I/O redirection (`>` and `>>`) to files in the VFS and simulates background processes (`&`).</li>
-                            <li><strong>Command Definitions:</strong> Contains the large `commands` object where each command (e.g., `ls`, `cat`, `edit`, `run`, `gemini`, `adventure`) is defined with its:
-                                <ul>
-                                    <li><code>handler</code>: An async function that implements the command's logic.</li>
-                                    <li><code>description</code>: A brief summary for the `help` command.</li>
-                                    <li><code>helpText</code>: Detailed usage information.</li>
-                                </ul>
-                            </li>
-                            <li><strong>Script Execution (`run` command):</strong> Parses script files line by line, handles comments and basic argument substitution (`$1`, `$@`, `$#`), and executes the OopisOS commands within.</li>
-                        </ul>
-                    </li>
-                </ul>
-
-                <h3>From <code>adventure1_8.js</code> (Text Adventure Game):</h3>
-                <ul class="list-disc ml-6 my-4 space-y-2">
-                    <li><strong>`TextAdventureModal`</strong>: Manages the dedicated modal user interface for the text adventure game, handling display of game output and capturing player input.</li>
-                    <li><strong>`TextAdventureEngine`</strong>: Contains the core logic for running text adventures. It parses player commands, manages game state (player location, inventory), interacts with the adventure data (rooms, items, exits), and checks for win conditions.</li>
-                    <li><strong>Sample Adventure Data:</strong> Includes the JSON data for the default game, 'Quest for the Lost Semicolon'.</li>
-                </ul>
-
-                <h3>Global Initialization (<code>window.onload</code> in <code>oopisos1_8.js</code>)</h3>
-                <p>This function in `oopisos1_8.js` orchestrates the entire startup sequence when the OopisOS page loads. It initializes DOM element references, sets up `OutputManager`'s console overrides, establishes the IndexedDB connection via `IndexedDBManager`, loads the unified file system, loads the default (Guest) user's session state, and attaches all necessary terminal event listeners.</p>
-
-                <p>This refined modular structure, with logic clearly separated into dedicated files, significantly improves the organization, maintainability, and scalability of OopisOS v1.8.</p>
-            </section>
-
-            <section id="developer-docs" class="content-section">
-                <h1>OopisOS v1.8 Developer Documentation</h1>
-                <p>Welcome, aspiring OopisOS contributor or module developer! This section provides insights into the codebase and how you can extend OopisOS v1.8.</p>
-
-                <h2>Code Structure Overview</h2>
-                <p>The primary logic for OopisOS is now split into four main JavaScript files, all referenced by <code>OopisOSv1_8.html</code>:</p>
-                <ul class="list-disc ml-6 my-4 space-y-2">
-                    <li><strong><code>oopisos1_8.js</code>:</strong> Contains the core OS infrastructure, including configuration, general utilities, and managers for Output, Storage (LocalStorage), IndexedDB, FileSystem, History, User accounts, Sessions, Terminal UI, and Tab Completion.</li>
-                    <li><strong><code>editor1_8.js</code>:</strong> Houses all logic related to the built-in text editor, including its specific configuration, utility functions, UI management, core manager, and modal dialogs.</li>
-                    <li><strong><code>commexec1_8.js</code>:</strong> Dedicated to command execution. It includes the Lexer for tokenizing input, the Parser for creating command pipelines, and the `CommandExecutor` module which contains the definitions and handlers for all built-in commands.</li>
-                    <li><strong><code>adventure1_8.js</code>:</strong> Contains all modules related to the text adventure game feature, including the game engine, modal interface, and the sample 'Quest for the Lost Semicolon' adventure data.</li>
-                </ul>
-                <p>Each file generally uses Immediately Invoked Function Expressions (IIFEs) to create modules, encapsulating logic and avoiding global namespace pollution. Key managers and utilities are exposed for inter-module use where necessary (e.g., `FileSystemManager` being used by commands in `commexec1_8.js`).</p>
-
-                <h2>Contributing to OopisOS</h2>
-                <p>The spirit of open source and learning is encouraged!</p>
-                <ol class="list-decimal ml-6 my-4 space-y-2">
-                    <li><strong>Understand the Code:</strong> Familiarize yourself with the modules in their respective files.
-                        <ul>
-                            <li>For general OS behavior, core APIs, and persistence: <code>oopisos1_8.js</code>.</li>
-                            <li>For command-related work (adding/modifying commands, parsing): <code>commexec1_8.js</code>.</li>
-                            <li>For editor enhancements: <code>editor1_8.js</code>.</li>
-                            <li>For the adventure game feature: <code>adventure1_8.js</code>.</li>
-                        </ul>
-                    </li>
-                    <li><strong>Identify an Area:</strong> Bug fix, command improvement, new command, editor feature, adventure game enhancement?</li>
-                    <li><strong>Modularity is Key:</strong> Strive to keep new features or fixes well-contained within the appropriate module or file.</li>
-                    <li><strong>Follow Patterns:</strong> Observe existing command definitions in <code>CommandExecutor.commands</code> (in <code>commexec1_8.js</code>) for structure (handler, description, helpText). Note how they use utilities from <code>oopisos1_8.js</code> (like <code>Utils.validateArguments</code>, <code>FileSystemManager.validatePath</code>).</li>
-                    <li><strong>User Experience:</strong> Ensure clear error messages via <code>OutputManager</code>. Use <code>ConfirmationManager</code> (from <code>oopisos1_8.js</code>) for terminal-based confirmations or <code>EditorModal</code> (from <code>editor1_8.js</code>) for confirmations within the editor context.</li>
-                    <li><strong>Persistence:</strong> Any changes to the file system must be saved using <code>FileSystemManager.save()</code>. Session or setting changes might use <code>StorageManager</code> or affect data saved by <code>SessionManager</code>.</li>
-                    <li><strong>Testing:</strong>
-                        <ul>
-                            <li>Thoroughly test your changes. Consider various inputs and edge cases.</li>
-                            <li>Leverage or extend existing test scripts (e.g., <code>diagnostic_tool1_8.sh</code>) or create new ones using the <code>run</code> command and <code>check_fail</code> for assertions.</li>
-                        </ul>
-                    </li>
-                    <li><strong>Documentation:</strong> Update the command's <code>description</code> and <code>helpText</code> within its definition in <code>commexec1_8.js</code>. If significant changes are made, consider updates to this HTML manual.</li>
-                </ol>
-
-                <h2>Developing New Commands</h2>
-                <p>Adding a new command involves defining it within the <code>commands</code> object in the <code>CommandExecutor</code> module (located inside <code>commexec1_8.js</code>). Here's the basic structure:</p>
-                <pre><code class="language-javascript">
-// Inside commexec1_8.js, within CommandExecutor IIFE, in the 'commands' object:
-"yournewcommand": {
-    handler: async (args, options) => {
-        // args: Array of string arguments from the parsed command line.
-        // options: Object containing:
-        //   - isInteractive: Boolean, true if command run directly in terminal.
-        //   - stdinContent: String or null, content from a pipe if applicable.
-        //   - explicitForce: Boolean, true if -f or --force was in args (convenience).
-
-        // 1. Validate arguments (use Utils.validateArguments from oopisos1_8.js)
-        //    Example: const valRes = Utils.validateArguments(args, { exact: 1 });
-        //             if (!valRes.isValid) return { success: false, error: `mycmd: ${valRes.errorDetail}` };
-
-        // 2. Parse flags if your command uses them (Utils.parseFlags from oopisos1_8.js)
-        //    Example: const { flags, remainingArgs } = Utils.parseFlags(args, [{name: "verbose", short: "-v"}]);
-
-        // 3. Implement your command's logic.
-        //    You can interact with modules like FileSystemManager, UserManager, OutputManager, etc.,
-        //    which are globally available from oopisos1_8.js.
-        //    Example: const pathInfo = FileSystemManager.validatePath("mycmd", remainingArgs[0]);
-        //             if (pathInfo.error) return { success: false, error: pathInfo.error };
-        //             OutputManager.appendToOutput(`Processing: ${pathInfo.resolvedPath}`);
-
-        // 4. Return a result object.
-        //    - success: Boolean (true if successful, false otherwise).
-        //    - output: String or null (text to display if successful and not redirected).
-        //    - error: String or null (error message if success is false).
-        //    - messageType: Optional string (CSS class from Config.CSS_CLASSES for output styling).
-        
-        return { success: true, output: `New command processed: ${args.join(' ')}`, messageType: Config.CSS_CLASSES.SUCCESS_MSG };
-    },
-    description: "A brief, one-line description of your new command for 'help'.",
-    helpText: "Usage: yournewcommand [options] [arguments]\\n\\nProvide detailed help here, including options, arguments, and examples. Explain what the command does."
-}
-                </code></pre>
-                <p>Refer to existing commands in <code>commexec1_8.js</code> for comprehensive examples of argument validation, flag parsing, interacting with the file system (including permission checks with <code>FileSystemManager.hasPermission</code>), handling piped input, and producing structured output.</p>
-                <p>Happy developing with OopisOS v1.8!</p>
-            </section>
-
+            
             <section id="advanced-topics" class="content-section">
-                <h1>OopisOS v1.8: Advanced Topics & Features</h1>
-                <p>Ready to delve deeper? This section explores some of the more advanced capabilities and concepts within OopisOS v1.8.</p>
+                <h1>OopisOS v2.0: Advanced Topics & Features</h1>
+                <p>Ready to delve deeper? This section explores some of the more advanced capabilities and concepts within OopisOS v2.0.</p>
 
                 <h2>Scripting with `run`</h2>
-                <p>OopisOS supports shell scripting via the <code>run</code> command (defined in <code>commexec1_8.js</code>). Create text files (e.g., <code>myscript.sh</code> using the <code>edit</code> command) containing a sequence of OopisOS commands, one per line.</p>
+                <p>OopisOS supports shell scripting via the <code>run</code> command (defined in <code>commexec2_0.js</code>). Create text files (e.g., <code>myscript.sh</code> using the <code>edit</code> command) containing a sequence of OopisOS commands, one per line.</p>
                 <pre><code class="language-bash">
-# Example: /scripts/myscript_v1_8.sh
+# Example: /scripts/myscript_v2_0.sh
 #!/bin/oopis_shell # Shebang line is read but interpreter isn't used; it's for convention.
-echo "Starting my OopisOS v1.8 script..."
+echo "Starting my OopisOS v2.0 script..."
 # This is a comment
-mkdir /test_data_v1_8
-echo "Hello from script v1.8, argument 1 was: $1" > /test_data_v1_8/script_output.txt
-ls /test_data_v1_8
+mkdir /test_data_v2_0
+echo "Hello from script v2.0, argument 1 was: $1" > /test_data_v2_0/script_output.txt
+ls /test_data_v2_0
 echo "All arguments: $@"
 echo "Number of arguments: $#"
 echo "Script finished."
                 </code></pre>
-                <p>To execute (assuming it's saved as <code>/scripts/myscript_v1_8.sh</code> and made executable):</p>
+                <p>To execute (assuming it's saved as <code>/scripts/myscript_v2_0.sh</code> and made executable):</p>
                 <div class="terminal-example">
-                    <span class="prompt">Guest@OopisOs:/&gt;</span> <span class="command">chmod 70 /scripts/myscript_v1_8.sh</span><br>
-                    <span class="prompt">Guest@OopisOs:/&gt;</span> <span class="command">run /scripts/myscript_v1_8.sh firstArg "second arg with spaces"</span>
+                    <span class="prompt">Guest@OopisOs:/&gt;</span> <span class="command">chmod 70 /scripts/myscript_v2_0.sh</span><br>
+                    <span class="prompt">Guest@OopisOs:/&gt;</span> <span class="command">run /scripts/myscript_v2_0.sh firstArg "second arg with spaces"</span>
                 </div>
 
                 <h3>Script Features:</h3>
@@ -530,49 +392,14 @@ echo "Script finished."
                         </ul>
                     </li>
                 </ul>
-                <p>Example test scripts like <code>inflatev1_8.sh</code> and <code>diagnostic_tool1_8.sh</code> are used to populate the file system with diverse dummy data and run a series of tests to verify command functionality and error conditions, respectively.</p>
-
 
                 <h2>Text Adventure Gaming (`adventure`)</h2>
-                <p>OopisOS v1.8 features a built-in text adventure game engine, allowing users to embark on interactive fiction journeys. This functionality is primarily managed by modules in <code>adventure1_8.js</code>.</p>
+                <p>OopisOS v2.0 features a built-in text adventure game engine, allowing users to embark on interactive fiction journeys. This functionality is primarily managed by modules in <code>adventure2_0.js</code>.</p>
                 <ul class="list-disc ml-6 my-4 space-y-2">
                     <li><strong>Launching:</strong> Type <code>adventure</code> to launch the default sample game, 'Quest for the Lost Semicolon.'</li>
                     <li><strong>Custom Adventures:</strong> You can load custom adventures by providing a path to a JSON file within the OopisOS VFS: <code>adventure /path/to/my_game.json</code>.</li>
                     <li><strong>Interface:</strong> The game plays out in a dedicated modal window, separate from the main terminal, offering an immersive experience with styled output for room names, descriptions, items, etc.</li>
                     <li><strong>Engine:</strong> The <code>TextAdventureEngine</code> handles command parsing (e.g., <code>look</code>, <code>go north</code>, <code>take key</code>), game state (player location, inventory), and interactions with the game world defined in the JSON data.</li>
-                </ul>
-
-                <h2>Permissions Deep Dive (`chmod`, `chown`, `su`)</h2>
-                <p>OopisOS implements a simplified Unix-like permission model for files and directories, managed by the <code>FileSystemManager</code> (in <code>oopisos1_8.js</code>). Permissions control read, write, and execute access for the owner of the item and for all other users.</p>
-                <ul class="list-disc ml-6 my-4 space-y-2">
-                    <li><strong><code>chmod [mode] [path]</code>:</strong> Changes the permissions of the specified path. The `mode` is a two-digit octal number:
-                        <ul>
-                            <li>The first digit represents the owner's permissions.</li>
-                            <li>The second digit represents other users' permissions.</li>
-                            <li>Each digit is a sum of: 4 (read), 2 (write), 1 (execute).</li>
-                            <li>Example: <code>chmod 75 myfile</code> sets owner permissions to rwx (4+2+1=7) and other permissions to r-x (4+0+1=5).</li>
-                        </ul>
-                    </li>
-                    <li><strong><code>chown [new_owner] [path]</code>:</strong> Changes the owner of the specified file or directory to `new_owner`. Only the current owner of an item or the `root` user can change its ownership.</li>
-                    <li><strong><code>su [username]</code>:</strong> Switches the current user. If the target is `root`, the new session will have superuser privileges, bypassing all file permission checks for all commands. This is useful for system administration.</li>
-                    <li>Permissions are visible in the output of <code>ls -l</code> (e.g., <code>-rwxr-x---</code> for a file, <code>drwxr-x---</code> for a directory).</li>
-                </ul>
-
-                <h2>Pipes, Redirection, and Command Sequences</h2>
-                <p>The `CommandExecutor` (in <code>commexec1_8.js</code>) parses and handles these standard shell features, allowing for powerful command combinations:</p>
-                <ul class="list-disc ml-6 my-4 space-y-2">
-                    <li><strong>Pipes (`|`):</strong> The standard output of the command on the left of the pipe is used as the standard input for the command on the right.
-                        <br>Example: <code>ls / | grep apps</code>
-                    </li>
-                    <li><strong>Output Redirection (`>`):</strong> Writes the standard output of a command to a specified file, overwriting it.
-                        <br>Example: <code>echo "System Report" > /reports/report.txt</code>
-                    </li>
-                    <li><strong>Append Output Redirection (`>>`):</strong> Appends the standard output of a command to a specified file.
-                        <br>Example: <code>date >> /system.log</code>
-                    </li>
-                     <li><strong>Command Separator (`;`):</strong> Run multiple commands in sequence on the same line, regardless of whether the previous command succeeded or failed.
-                        <br>Example: <code>mkdir new_dir ; cd new_dir</code>
-                    </li>
                 </ul>
 
                 <h2>Background Processes (`&`)</h2>
@@ -586,7 +413,7 @@ echo "Script finished."
                 </div>
                 
                 <h2>Recursive Grep (`grep -R`)</h2>
-                <p>The <code>grep</code> command in v1.8 supports the <code>-R</code> flag (or <code>--recursive</code>) for recursively searching through directories. This powerful option allows you to find patterns within files across an entire directory tree, not just in specified files or standard input.</p>
+                <p>The <code>grep</code> command in v2.0 supports the <code>-R</code> flag (or <code>--recursive</code>) for recursively searching through directories. This powerful option allows you to find patterns within files across an entire directory tree, not just in specified files or standard input.</p>
                 <div class="terminal-example">
                     <span class="prompt">Guest@OopisOs:/projects&gt;</span> <span class="command">grep -R "TODO" .</span><br>
                     <span class="output">./projectA/main.js: // TODO: Refactor this complex function</span><br>
@@ -595,31 +422,156 @@ echo "Script finished."
                 </div>
 
             </section>
+            
+            <section id="developer-docs" class="content-section">
+                <h1>OopisOS v2.0: Developer Documentation</h1>
+                <p>Welcome, aspiring OopisOS contributor or module developer! This section provides insights into the codebase and how you can extend OopisOS v2.0.</p>
+
+                <h2>Code Structure Overview</h2>
+                <p>The primary logic for OopisOS is now split into four main JavaScript files, all referenced by <code>index.html</code>:</p>
+                <ul class="list-disc ml-6 my-4 space-y-2">
+                    <li><strong><code>oopisos2_0.js</code>:</strong> Contains the core OS infrastructure, including configuration, general utilities, and managers for Output, Storage (LocalStorage), IndexedDB, FileSystem, History, Confirmation, User accounts (with Passwords), Sessions, Terminal UI, and Tab Completion.</li>
+                    <li><strong><code>editor2_0.js</code>:</strong> Houses all logic related to the built-in text editor, including its specific configuration, utility functions, UI management, core manager, and modal dialogs.</li>
+                    <li><strong><code>commexec2_0.js</code>:</strong> Dedicated to command execution. It includes the `CommandExecutor` module which contains the `Lexer`, `Parser`, and the definitions and handlers for all built-in commands.</li>
+                    <li><strong><code>adventure2_0.js</code>:</strong> Contains all modules related to the text adventure game feature, including the game engine, modal interface, and the sample adventure data.</li>
+                </ul>
+                <p>Each file generally uses Immediately Invoked Function Expressions (IIFEs) to create modules, encapsulating logic and avoiding global namespace pollution. Key managers and utilities are exposed for inter-module use where necessary (e.g., `FileSystemManager` being used by commands in `commexec2_0.js`).</p>
+
+                <h2>Contributing to OopisOS</h2>
+                <p>The spirit of open source and learning is encouraged!</p>
+                <ol class="list-decimal ml-6 my-4 space-y-2">
+                    <li><strong>Understand the Code:</strong> Familiarize yourself with the modules in their respective files.
+                        <ul>
+                            <li>For general OS behavior, core APIs, and persistence: <code>oopisos2_0.js</code>.</li>
+                            <li>For command-related work (adding/modifying commands, parsing): <code>commexec2_0.js</code>.</li>
+                            <li>For editor enhancements: <code>editor2_0.js</code>.</li>
+                            <li>For the adventure game feature: <code>adventure2_0.js</code>.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Identify an Area:</strong> Bug fix, command improvement, new command, editor feature, adventure game enhancement?</li>
+                    <li><strong>Modularity is Key:</strong> Strive to keep new features or fixes well-contained within the appropriate module or file.</li>
+                    <li><strong>Follow Patterns:</strong> Observe existing command definitions in <code>CommandExecutor.commands</code> (in <code>commexec2_0.js</code>) for structure (handler, description, helpText). Note how they use utilities from <code>oopisos2_0.js</code> (like <code>Utils.validateArguments</code>, <code>FileSystemManager.validatePath</code>).</li>
+                    <li><strong>User Experience:</strong> Ensure clear error messages via <code>OutputManager</code>. Use <code>ConfirmationManager</code> (from <code>oopisos2_0.js</code>) for terminal-based confirmations or <code>EditorModal</code> (from <code>editor2_0.js</code>) for confirmations within the editor context. For password entry, see the `PasswordPromptManager` in `oopisos2_0.js`.</li>
+                    <li><strong>Persistence:</strong> Any changes to the file system must be saved using <code>FileSystemManager.save()</code>. Session or setting changes might use <code>StorageManager</code> or affect data saved by <code>SessionManager</code>.</li>
+                    <li><strong>Testing:</strong>
+                        <ul>
+                            <li>Thoroughly test your changes. Consider various inputs and edge cases.</li>
+                            <li>Leverage or extend existing test scripts (e.g., <code>diag2_0.sh</code>) or create new ones using the <code>run</code> command and <code>check_fail</code> for assertions.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Documentation:</strong> Update the command's <code>description</code> and <code>helpText</code> within its definition in <code>commexec2_0.js</code>. If significant changes are made, consider updates to this HTML manual.</li>
+                </ol>
+
+                <h2>Developing New Commands</h2>
+                <p>Adding a new command involves defining it within the <code>commands</code> object in the <code>CommandExecutor</code> module (located inside <code>commexec2_0.js</code>). Here's the basic structure:</p>
+                <pre><code class="language-javascript">
+// Inside commexec2_0.js, within CommandExecutor IIFE, in the 'commands' object:
+"yournewcommand": {
+    handler: async (args, options) => {
+        // args: Array of string arguments from the parsed command line.
+        // options: Object containing:
+        //   - isInteractive: Boolean, true if command run directly in terminal.
+        //   - stdinContent: String or null, content from a pipe if applicable.
+        //   - explicitForce: Boolean, true if -f or --force was in args (convenience).
+
+        // 1. Validate arguments (use Utils.validateArguments from oopisos2_0.js)
+        //    Example: const valRes = Utils.validateArguments(args, { exact: 1 });
+        //             if (!valRes.isValid) return { success: false, error: `mycmd: ${valRes.errorDetail}` };
+
+        // 2. Parse flags if your command uses them (Utils.parseFlags from oopisos2_0.js)
+        //    Example: const { flags, remainingArgs } = Utils.parseFlags(args, [{name: "verbose", short: "-v"}]);
+
+        // 3. Implement your command's logic.
+        //    You can interact with modules like FileSystemManager, UserManager, OutputManager, etc.,
+        //    which are globally available from oopisos2_0.js.
+        //    Example: const pathInfo = FileSystemManager.validatePath("mycmd", remainingArgs[0]);
+        //             if (pathInfo.error) return { success: false, error: pathInfo.error };
+        //             OutputManager.appendToOutput(`Processing: ${pathInfo.resolvedPath}`);
+
+        // 4. Return a result object.
+        //    - success: Boolean (true if successful, false otherwise).
+        //    - output: String or null (text to display if successful and not redirected).
+        //    - error: String or null (error message if success is false).
+        //    - messageType: Optional string (CSS class from Config.CSS_CLASSES for output styling).
+        
+        return { success: true, output: `New command processed: ${args.join(' ')}`, messageType: Config.CSS_CLASSES.SUCCESS_MSG };
+    },
+    description: "A brief, one-line description of your new command for 'help'.",
+    helpText: "Usage: yournewcommand [options] [arguments]\\n\\nProvide detailed help here, including options, arguments, and examples. Explain what the command does."
+}
+                </code></pre>
+                <p>Refer to existing commands in <code>commexec2_0.js</code> for comprehensive examples of argument validation, flag parsing, interacting with the file system (including permission checks with <code>FileSystemManager.hasPermission</code>), handling piped input, and producing structured output.</p>
+                <p>Happy developing with OopisOS v2.0!</p>
+            </section>
+            
+            <section id="testing-env" class="content-section">
+                <h1>Testing & Showcase Environment</h1>
+                <p>OopisOS v2.0 includes two important shell scripts, <code>inflate2_0.sh</code> and <code>diag2_0.sh</code>, designed to streamline testing and provide a rich user experience out of the box. You can execute them using the <code>run</code> command.</p>
+
+                <h2>Showcase Data with `inflate2_0.sh`</h2>
+                <p>The <code>inflate2_0.sh</code> script is a "Test Drive Population Script." Its purpose is to populate a fresh file system with a diverse and interesting set of files and directories. This creates a showcase environment where new users can immediately begin experimenting with commands like <code>ls</code>, <code>grep</code>, <code>find</code>, <code>tree</code>, `gemini`, and `adventure` without needing to create all the content themselves.</p>
+                <p>To use it, simply run:</p>
+                <div class="terminal-example">
+                    <span class="prompt">Guest@OopisOs:/&gt;</span> <span class="command">run /inflate2_0.sh</span>
+                </div>
+                <h3>What it Creates:</h3>
+                <ul class="list-disc ml-6 my-4 space-y-2">
+                    <li>A root-level `README.md` explaining the test drive environment.</li>
+                    <li>A `/docs` directory with sample documentation.</li>
+                    <li>A `/src` directory with simulated source code files.</li>
+                    <li>A `/data` directory with text files perfect for `grep` practice.</li>
+                    <li>A `/reports` directory containing a sample financial report for use with the `gemini` command.</li>
+                    <li>A `/games` directory with the `quest_for_the_semicolon.json` adventure file.</li>
+                    <li>Hidden files (e.g., `.env`) for `ls -a` and `find` discovery.</li>
+                    <li>Files with specific past timestamps for testing `touch` and `ls -t`.</li>
+                </ul>
+                <p>This script makes it easy to demonstrate the full capabilities of OopisOS to new users or for developers to quickly set up a populated testbed.</p>
+                
+                <h2>Core Diagnostics with `diag2_0.sh`</h2>
+                <p>The <code>diag2_0.sh</code> script is a non-interactive test suite designed to rigorously verify the core functionality of OopisOS commands. It's an essential tool for developers to ensure that changes to the codebase haven't introduced regressions.</p>
+                <p>This script automatically performs a sequence of operations, printing its actions and expected outcomes, and uses the special `check_fail` command to assert that error conditions are handled correctly.</p>
+                <h3>Key Test Phases:</h3>
+                <ul class="list-disc ml-6 my-4 space-y-2">
+                    <li><strong>Workspace Setup:</strong> Logs in as the special `userDiag` user (password: `pantload`) and creates a clean `diag_workspace` directory.</li>
+                    <li><strong>File System Tests:</strong> Verifies `mkdir`, `touch`, `ls`, `pwd`, and `cd`, including error cases like trying to create a directory that already exists.</li>
+                    <li><strong>File Content Tests:</strong> Checks `echo`, `cat`, and I/O redirection (`>` and `>>`) and pipelining (`|`).</li>
+                    <li><strong>Advanced `ls` Flags:</strong> Tests all sorting and formatting flags of the `ls` command.</li>
+                    <li><strong>Permissions & Ownership:</strong> Runs a complex scenario involving `chmod`, `chown`, switching between `userDiag` and `Guest` users to verify that read/write/execute permissions are enforced correctly.</li>
+                    <li><strong>File Management:</strong> Tests `rm`, `cp`, and `mv`, including recursive and force operations.</li>
+                    <li><strong>`find` Command:</strong> Sets up a test directory structure and verifies `find` with various predicates (`-name`, `-type`, `-user`) and actions (`-exec`, `-delete`).</li>
+                    <li><strong>`run` Command:</strong> Tests the script runner itself with argument passing.</li>
+                    <li><strong>Cleanup:</strong> Switches to the `root` user to delete the diagnostic workspace and restores the system to a clean state.</li>
+                </ul>
+                <p>Running <code>diag2_0.sh</code> is a great way to see a wide range of OopisOS features in action and to verify the health of the system.</p>
+                 <div class="terminal-example">
+                    <span class="prompt">Guest@OopisOs:/&gt;</span> <span class="command">run /diag2_0.sh</span>
+                </div>
+            </section>
 
             <section id="about" class="content-section">
-                <h1>About OopisOS (v1.8)</h1>
-                <p>OopisOS Version 1.8 continues its evolution as a browser-based operating system simulation, offering an enriched experience with new features and refinements.</p>
+                <h1>About OopisOS (v2.0)</h1>
+                <p>OopisOS Version 2.0 continues its evolution as a browser-based operating system simulation, offering an enriched experience with new features and refinements.</p>
                 
                 <h2>The Creators</h2>
                 <p>This digital marvel was brought into existence through the dedicated and often caffeine-fueled collaboration of:</p>
                 <ul class="list-disc ml-6 my-4 space-y-2">
                     <li><strong>Andrew Edmark</strong></li>
-                    <li><strong>Gemini Pro</strong> (That's me, providing AI-assisted development and documentation support for v1.8 features!)</li>
+                    <li><strong>Gemini Pro</strong> (That's me, providing AI-assisted development and documentation support for v2.0 features!)</li>
                 </ul>
                 <p>Our joint efforts involved countless hours of design, coding, debugging, and refining the myriad components that make up OopisOS. The copyright notice <code>Copyright (c) 2025 Andrew Edmark and Gemini. (MIT Licensed)</code> reflects this partnership.</p>
 
-                <h2>The Journey to 1.8</h2>
-                <p>Version 1.8 builds upon the solid foundation of previous releases, introducing key enhancements such as:</p>
+                <h2>The Journey to 2.0</h2>
+                <p>Version 2.0 builds upon the solid foundation of previous releases, introducing key enhancements such as:</p>
                 <ul class="list-disc ml-6 my-4 space-y-2">
                     <li>An exciting integrated <strong>Text Adventure game engine and modal interface</strong> (<code>adventure</code> command).</li>
-                    <li>The administrative <strong>`su` command</strong> to switch to the `root` user, enabling superuser privileges.</li>
+                    <li>A robust <strong>user management system with passwords</strong> and the administrative <strong>`su` command</strong> to switch to the `root` user for superuser privileges.</li>
                     <li>A more capable <strong>Text Editor</strong> with a formatting toolbar, additional keyboard shortcuts (<code>Ctrl+B</code>, <code>Ctrl+I</code>), and improved modal confirmations for unsaved changes.</li>
                     <li>The <strong>`printscreen` command</strong> to save terminal output directly to a file within the VFS.</li>
                     <li>The <strong>`gemini` command</strong> for AI interaction, now supporting both file-based and direct prompt queries.</li>
                     <li>Refinements to command functionalities, including <strong>recursive `grep -R`</strong> and new predicates for `find` (`-user`, `-perm`).</li>
-                    <li>Improved code organization by splitting logic into four main JavaScript files: <code>oopisos1_8.js</code>, <code>editor1_8.js</code>, <code>commexec1_8.js</code>, and <code>adventure1_8.js</code> for better maintainability and clarity.</li>
+                    <li>Improved code organization by splitting logic into four main JavaScript files: <code>oopisos2_0.js</code>, <code>editor2_0.js</code>, <code>commexec2_0.js</code>, and <code>adventure2_0.js</code> for better maintainability and clarity.</li>
                 </ul>
-                <p>The creation of updated tools like <code>inflatev1_8.sh</code> and <code>diagnostic_tool1_8.sh</code> are integral to ensuring the stability and correctness of these new features during development.</p>
+                <p>The creation of updated tools like <code>inflate2_0.sh</code> and <code>diag2_0.sh</code> are integral to ensuring the stability and correctness of these new features during development.</p>
 
                 <h2>Philosophy Revisited</h2>
                 <p>OopisOS was built with a few core ideas in mind:</p>
@@ -652,13 +604,13 @@ echo "Script finished."
 
 
                 <h2>Future</h2>
-                <p>Who knows what the future holds for OopisOS? Perhaps a GUI? Networking simulations? More in-OS games or educational modules? The modular architecture is designed to welcome such expansions. For now, we hope you enjoy exploring and using OopisOS v1.8!</p>
-                <p>If you're interested in the nitty-gritty, feel free to explore the source code and the HTML structure (<code>OopisOSv1_8.html</code>).</p>
-                <p class="mt-6"><em>"OopisOS v1.8: Even Oopisier, Now with Adventures and AI!"</em></p>
+                <p>Who knows what the future holds for OopisOS? Perhaps a GUI? Networking simulations? More in-OS games or educational modules? The modular architecture is designed to welcome such expansions. For now, we hope you enjoy exploring and using OopisOS v2.0!</p>
+                <p>If you're interested in the nitty-gritty, feel free to explore the source code and the HTML structure (<code>index.html</code>).</p>
+                <p class="mt-6"><em>"OopisOS v2.0: Even Oopisier, Now with Adventures and AI!"</em></p>
             </section>
 
             <footer class="footer text-center">
-                <p>&copy; 2025 Andrew Edmark & Gemini. OopisOS Educational Portal (v1.8).</p>
+                <p>&copy; 2025 Andrew Edmark & Gemini. OopisOS Educational Portal (v2.0).</p>
             </footer>
         </main>
     </div>

@@ -1,8 +1,8 @@
 /*
 File: terminal.css
-Description: Stylesheet OopisOS v1.8
+Description: Stylesheet OopisOS v2.0
 Author: Andrew Edmark & Gemini Pro v2.5
-Date: June 5, 2025
+Date: June 6, 2025
 */
 
 html {
@@ -29,7 +29,6 @@ inset 0 0 10px rgba(0, 0, 0, 0.5),
 box-shadow: inset 0 0 15px rgba(0, 255, 0, 0.15);
 }
 
-/* Added position: relative for #terminal */
 #terminal {
 position: relative;
 scrollbar-width: thin;
@@ -242,28 +241,27 @@ outline: 1px solid #b50a0a;
 outline-offset: 1px;
 }
 
-/* --- Text Adventure Modal Styles --- */
 #adventure-modal {
-/* Changed from fixed to absolute */
+
 position: absolute;
 top: 0;
 left: 0;
-width: 100%; /* Will fill its parent (#terminal) */
-height: 100%; /* Will fill its parent (#terminal) */
-background-color: rgba(0,0,0,0.85); /* Slightly more opaque overlay */
-z-index: 998; /* Ensure it's above terminal content but below editor modal if both were somehow active */
+width: 100%;
+height: 100%;
+background-color: rgba(0,0,0,0.85);
+z-index: 998;
 display: flex;
 align-items: center;
 justify-content: center;
-padding: 10px; /* Add some padding so container doesn't touch edges */
+padding: 10px;
 box-sizing: border-box;
 }
 #adventure-container {
-/* Adjust width and height to be relative or fit well */
-width: 95%; /* Percentage of the #adventure-modal (which is 100% of #terminal) */
-max-width: 100%; /* Ensure it doesn't exceed parent */
-height: 95%; /* Percentage of the #adventure-modal */
-max-height: 100%; /* Ensure it doesn't exceed parent */
+
+width: 95%;
+max-width: 100%;
+height: 95%;
+max-height: 100%;
 background-color: #0A0A0A;
 border: 2px solid #00FF00;
 border-radius: 0.75rem;

@@ -1,4 +1,4 @@
-// commexec.js - OopisOS Command Executor v1.8
+// commexec.js - OopisOS Command Executor v2.0
 
 const CommandExecutor = (() => {
   "use strict";
@@ -2311,9 +2311,7 @@ Copies <source_path> to <destination_path>, or one or more <source_path>(s) to <
     },
     useradd: {
       handler: async (args, options) => {
-        const validationResult = Utils.validateArguments(args, {
-          exact: 1
-        });
+        const validationResult = Utils.validateArguments(args, { exact: 1 });
         if (!validationResult.isValid) {
           return {
             success: false,
@@ -2322,53 +2320,138 @@ Copies <source_path> to <destination_path>, or one or more <source_path>(s) to <
           };
         }
         const username = args[0];
-        const result = await UserManager.register(username);
 
-        if (result.success) {
-          return {
-            success: true,
-            output: result.message,
-            messageType: Config.CSS_CLASSES.SUCCESS_MSG,
-          };
-        } else {
-          return {
-            success: false,
-            error: result.error,
-            messageType: Config.CSS_CLASSES.ERROR_MSG,
-          };
-        }
+        return new Promise(async (resolve) => {
+          const userCheck = StorageManager.loadItem(Config.STORAGE_KEYS.USER_CREDENTIALS, "User list", {});
+          if (userCheck[username]) {
+              return resolve({ success: false, error: `User '${username}' already exists.`, messageType: Config.CSS_CLASSES.ERROR_MSG });
+          }
+    
+          let firstPassword = null;
+          let confirmedPassword = null;
+    
+          // Step 1: Prompt for first password
+          PasswordPromptManager.requestPassword(
+            Config.MESSAGES.PASSWORD_PROMPT,
+            async (pwd1) => {
+              firstPassword = pwd1;
+
+              // The command now handles the policy for empty passwords.
+              if (firstPassword.trim() === '') {
+                  OutputManager.appendToOutput("Registering user with no password.", { typeClass: Config.CSS_CLASSES.CONSOLE_LOG_MSG });
+                  const result = await UserManager.register(username, null);
+                  resolve({
+                    success: result.success,
+                    output: result.message,
+                    error: result.error,
+                    messageType: result.success ? Config.CSS_CLASSES.SUCCESS_MSG : Config.CSS_CLASSES.ERROR_MSG,
+                  });
+                  return; // Stop execution for this path.
+              }
+    
+              // Step 2: If the first password was not empty, prompt for confirmation.
+              PasswordPromptManager.requestPassword(
+                Config.MESSAGES.PASSWORD_CONFIRM_PROMPT,
+                async (pwd2) => {
+                  confirmedPassword = pwd2;
+                  if (firstPassword === confirmedPassword) {
+                    const result = await UserManager.register(username, firstPassword);
+                    resolve({
+                      success: result.success,
+                      output: result.message,
+                      error: result.error,
+                      messageType: result.success ? Config.CSS_CLASSES.SUCCESS_MSG : Config.CSS_CLASSES.ERROR_MSG,
+                    });
+                  } else {
+                    OutputManager.appendToOutput(Config.MESSAGES.PASSWORD_MISMATCH, { typeClass: Config.CSS_CLASSES.ERROR_MSG });
+                    resolve({ success: false, error: Config.MESSAGES.PASSWORD_MISMATCH, messageType: Config.CSS_CLASSES.ERROR_MSG });
+                  }
+                },
+                () => { // User cancelled confirmation
+                  resolve({ success: true, output: Config.MESSAGES.OPERATION_CANCELLED, messageType: Config.CSS_CLASSES.CONSOLE_LOG_MSG });
+                },
+                true // isConfirmPassword flag
+              );
+            },
+            () => { // User cancelled initial password prompt
+              resolve({ success: true, output: Config.MESSAGES.OPERATION_CANCELLED, messageType: Config.CSS_CLASSES.CONSOLE_LOG_MSG });
+            }
+          );
+        });
       },
       description: "Creates a new user account.",
-      helpText: "Usage: useradd <username>\n\nCreates a new user account with the specified username. Usernames must be between 3 and 20 characters, alphanumeric, and cannot be a reserved name (e.g., guest, root).",
+      helpText: "Usage: useradd <username>\n\nCreates a new user account with the specified username. Will prompt for a password. Usernames must be between 3 and 20 characters, alphanumeric, and cannot be a reserved name (e.g., guest, root).",
     },
     login: {
       handler: async (args, options) => {
-        const validationResult = Utils.validateArguments(args, {
-          exact: 1
-        });
-        if (!validationResult.isValid)
-          return {
-            success: false,
-            error: `login: ${validationResult.errorDetail}`,
-          };
-        const username = args[0];
-        const result = await UserManager.login(username);
-        if (result.success && !result.noAction) {
-          OutputManager.clearOutput();
-          OutputManager.appendToOutput(
-            `${Config.MESSAGES.WELCOME_PREFIX}${username}${Config.MESSAGES.WELCOME_SUFFIX}`,
-          );
+        // --- UPDATED LOGIC ---
+        const validationResult = Utils.validateArguments(args, { min: 1, max: 2 });
+        if (!validationResult.isValid) {
+          return { success: false, error: `login: ${validationResult.errorDetail}` };
         }
-        return {
-          success: result.success,
-          output: result.message,
-          error: result.success ? undefined : result.error || "Login failed.",
-          messageType: result.success ?
-            Config.CSS_CLASSES.SUCCESS_MSG : Config.CSS_CLASSES.ERROR_MSG,
-        };
+
+        const username = args[0];
+        const providedPassword = args.length === 2 ? args[1] : null;
+
+        // If a password is provided via arguments, attempt a direct login.
+        if (providedPassword !== null) {
+          const result = await UserManager.login(username, providedPassword);
+          if (result.success && !result.noAction) {
+             OutputManager.clearOutput();
+             OutputManager.appendToOutput(`${Config.MESSAGES.WELCOME_PREFIX}${username}${Config.MESSAGES.WELCOME_SUFFIX}`);
+          }
+          return {
+            success: result.success,
+            output: result.message,
+            error: result.success ? undefined : result.error || "Login failed.",
+            messageType: result.success ? Config.CSS_CLASSES.SUCCESS_MSG : Config.CSS_CLASSES.ERROR_MSG,
+          };
+        }
+
+        // If no password is provided, proceed with the interactive prompt logic.
+        return new Promise(async (resolve) => {
+          const initialLoginAttempt = await UserManager.login(username, null);
+    
+          if (initialLoginAttempt.requiresPasswordPrompt) {
+            PasswordPromptManager.requestPassword(
+              Config.MESSAGES.PASSWORD_PROMPT,
+              async (password) => {
+                const finalLoginResult = await UserManager.login(username, password);
+                if (finalLoginResult.success && !finalLoginResult.noAction) {
+                  OutputManager.clearOutput();
+                  OutputManager.appendToOutput(`${Config.MESSAGES.WELCOME_PREFIX}${username}${Config.MESSAGES.WELCOME_SUFFIX}`);
+                }
+                resolve({
+                  success: finalLoginResult.success,
+                  output: finalLoginResult.message,
+                  error: finalLoginResult.success ? undefined : finalLoginResult.error || "Login failed.",
+                  messageType: finalLoginResult.success ? Config.CSS_CLASSES.SUCCESS_MSG : Config.CSS_CLASSES.ERROR_MSG,
+                });
+              },
+              () => {
+                resolve({
+                  success: true,
+                  output: Config.MESSAGES.OPERATION_CANCELLED,
+                  messageType: Config.CSS_CLASSES.CONSOLE_LOG_MSG,
+                });
+              }
+            );
+          } else {
+            if (initialLoginAttempt.success && !initialLoginAttempt.noAction) {
+              OutputManager.clearOutput();
+              OutputManager.appendToOutput(`${Config.MESSAGES.WELCOME_PREFIX}${username}${Config.MESSAGES.WELCOME_SUFFIX}`);
+            }
+            resolve({
+              success: initialLoginAttempt.success,
+              output: initialLoginAttempt.message,
+              error: initialLoginAttempt.success ? undefined : initialLoginAttempt.error || "Login failed.",
+              messageType: initialLoginAttempt.success ? Config.CSS_CLASSES.SUCCESS_MSG : Config.CSS_CLASSES.ERROR_MSG,
+            });
+          }
+        });
       },
       description: "Logs in as a specified user.",
-      helpText: "Usage: login <username>\n\nLogs in as the specified user. This will save the current user's session and load the new user's session and file system.",
+      helpText: "Usage: login <username> [password]\n\nLogs in as the specified user. If [password] is not provided and one is required, you will be prompted interactively. This saves the current session and loads the new user's session.",
     },
     logout: {
       handler: async (args, options) => {
@@ -2839,25 +2922,48 @@ Copies <source_path> to <destination_path>, or one or more <source_path>(s) to <
         if (currentUser === targetUser) {
           return { success: true, output: `Already user '${currentUser}'.`, messageType: Config.CSS_CLASSES.CONSOLE_LOG_MSG };
         }
-
-        // In a real system, this would have complex permission checks.
-        // For OopisOS, we allow switching to root freely as an administrative action.
-        const result = await UserManager.login(targetUser);
-
-        if (result.success && !result.noAction) {
-          OutputManager.clearOutput();
-          OutputManager.appendToOutput(`Switched to user: ${targetUser}`);
-          OutputManager.appendToOutput(`${Config.MESSAGES.WELCOME_PREFIX}${targetUser}${Config.MESSAGES.WELCOME_SUFFIX}`);
-        }
-        
-        return { 
-          success: result.success,
-          output: result.message,
-          error: result.success ? undefined : result.error || `Could not switch to user ${targetUser}.`,
-        };
+return new Promise(async (resolve) => {
+            const initialLoginAttempt = await UserManager.login(targetUser, null); // Initial check, no password provided yet
+    
+            if (initialLoginAttempt.requiresPasswordPrompt) {
+                PasswordPromptManager.requestPassword(
+                    Config.MESSAGES.PASSWORD_PROMPT,
+                    async (password) => {
+                        const finalLoginResult = await UserManager.login(targetUser, password);
+                        if (finalLoginResult.success && !finalLoginResult.noAction) {
+                            OutputManager.clearOutput();
+                            OutputManager.appendToOutput(`Switched to user: ${targetUser}`);
+                            OutputManager.appendToOutput(`{Config.MESSAGES.WELCOME_PREFIX}{targetUser}${Config.MESSAGES.WELCOME_SUFFIX}`);
+                        }
+                        resolve({
+                            success: finalLoginResult.success,
+                            output: finalLoginResult.message,
+                            error: finalLoginResult.success ? undefined : finalLoginResult.error || `Could not switch to user ${targetUser}.`,
+                            messageType: finalLoginResult.success ? Config.CSS_CLASSES.SUCCESS_MSG : Config.CSS_CLASSES.ERROR_MSG,
+                        });
+                    },
+                    () => { // User cancelled
+                        resolve({ success: true, output: Config.MESSAGES.OPERATION_CANCELLED, messageType: Config.CSS_CLASSES.CONSOLE_LOG_MSG });
+                    }
+                );
+            } else {
+                // No password prompt needed (e.g., target is Guest/root, or already failed for other reasons)
+                if (initialLoginAttempt.success && !initialLoginAttempt.noAction) {
+                    OutputManager.clearOutput();
+                    OutputManager.appendToOutput(`Switched to user: ${targetUser}`);
+                    OutputManager.appendToOutput(`${Config.MESSAGES.WELCOME_PREFIX}${targetUser}${Config.MESSAGES.WELCOME_SUFFIX}`);
+                }
+                resolve({
+                    success: initialLoginAttempt.success,
+                    output: initialLoginAttempt.message,
+                    error: initialLoginAttempt.success ? undefined : initialLoginAttempt.error || `Could not switch to user ${targetUser}.`,
+                    messageType: initialLoginAttempt.success ? Config.CSS_CLASSES.SUCCESS_MSG : Config.CSS_CLASSES.ERROR_MSG,
+                });
+            }
+        });
       },
       description: "Substitute user identity.",
-      helpText: "Usage: su [username]\n\nSwitches the current user to [username]. If no username is provided, it defaults to 'root'. The 'root' user has administrative privileges to bypass all file permissions."
+      helpText: "Usage: su [username]\n\nSwitches the current user to [username]. If no username is provided, it defaults to 'root'. Will prompt for password if required. The 'root' user has administrative privileges to bypass all file permissions."
     },
     clearfs: {
       handler: async (args, options) => {
@@ -3533,18 +3639,15 @@ Example: find . -name "*.js" -not -user Guest -o -type d -print
             }
         }
 
-        // Clear session states
-        SessionManager.clearUserSessionStates(usernameToRemove);
-
-        // Remove from user list
-        if (users.hasOwnProperty(usernameToRemove)) {
-          delete users[usernameToRemove];
-          StorageManager.saveItem(Config.STORAGE_KEYS.USER_CREDENTIALS, users, "User list");
+        if (!SessionManager.clearUserSessionStates(usernameToRemove)) {
+            allDeletionsSuccessful = false;
+            errorMessages.push("Failed to clear user session states and credentials.");
         }
-        
-        // Save the filesystem changes
+        // --- END MODIFIED ---
+    
+        // Save the filesystem changes (if home dir was removed)
         await FileSystemManager.save();
-
+    
         if (allDeletionsSuccessful) {
           return { success: true, output: `User '${usernameToRemove}' and all associated data have been removed.`, messageType: Config.CSS_CLASSES.SUCCESS_MSG };
         } else {
