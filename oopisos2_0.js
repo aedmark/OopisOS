@@ -109,7 +109,7 @@ const Config = (() => {
       BACKGROUND_PROCESS_STARTED_SUFFIX: "] Backgrounded.",
       BACKGROUND_PROCESS_OUTPUT_SUPPRESSED: "[Output suppressed for background process]",
       PIPELINE_ERROR_PREFIX: "Pipeline error in command: ",
-	  PASSWORD_PROMPT: "Enter password:",
+    PASSWORD_PROMPT: "Enter password:",
       PASSWORD_CONFIRM_PROMPT: "Confirm password:",
       PASSWORD_MISMATCH: "Passwords do not match. User registration cancelled.",
       INVALID_PASSWORD: "Incorrect password. Please try again.",
@@ -793,7 +793,7 @@ const FileSystemManager = (() => {
   let fsData = {};
   let currentPath = Config.FILESYSTEM.ROOT_PATH;
 
-  async function initialize(guestUsername) {
+  async function initialize(guestUsername) { // guestUsername param is now effectively just Config.USER.DEFAULT_NAME
         const nowISO = new Date().toISOString();
         fsData = {
           [Config.FILESYSTEM.ROOT_PATH]: {
@@ -812,18 +812,10 @@ const FileSystemManager = (() => {
             mtime: nowISO
           }
         };
-    // Ensure root and home dir are set up for root user (always present)
+        // This function now ONLY sets up the directory structure.
+        // User credential setup is handled separately.
         await createUserHomeDirectory('root');
-    
-        // Ensure Guest user is created with no password and has a home directory
-        await UserManager.register(guestUsername, null); // Guest has no password
-        await createUserHomeDirectory(guestUsername);
-		// --- NEW: Create userDiag with default password 'pantload' ---
-        // Check if userDiag already exists to avoid overwriting password if it was changed
-        const users = StorageManager.loadItem(Config.STORAGE_KEYS.USER_CREDENTIALS, "User list", {});
-        if (!users['userDiag']) {
-            await UserManager.register('userDiag', 'pantload'); // userDiag has password 'pantload'
-        }
+        await createUserHomeDirectory(guestUsername); // which is 'Guest'
         await createUserHomeDirectory('userDiag');
   }
 
@@ -1215,6 +1207,84 @@ const FileSystemManager = (() => {
     return str;
   }
 
+  // *** NEW: Centralized Recursive Deletion Utility ***
+  async function deleteNodeRecursive(path, options = {}) {
+    const { force = false, currentUser } = options;
+    const pathValidation = validatePath("delete", path, { disallowRoot: true });
+
+    if (pathValidation.error) {
+      // With 'force', we ignore "not found" errors, just like `rm -f`.
+      if (force && !pathValidation.node) {
+        return { success: true, messages: [] };
+      }
+      return { success: false, messages: [pathValidation.error] };
+    }
+
+    const node = pathValidation.node;
+    const resolvedPath = pathValidation.resolvedPath;
+    const parentPath = resolvedPath.substring(0, resolvedPath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR)) || Config.FILESYSTEM.ROOT_PATH;
+    const parentNode = getNodeByPath(parentPath);
+    const itemName = resolvedPath.substring(resolvedPath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR) + 1);
+    const nowISO = new Date().toISOString();
+    let messages = [];
+    let anyChangeMade = false;
+
+    // Check for write permission in the parent directory, which is required to delete an item.
+    if (!parentNode || !hasPermission(parentNode, currentUser, "write")) {
+      const permError = `cannot remove '${path}'${Config.MESSAGES.PERMISSION_DENIED_SUFFIX}`;
+      // In force mode, permission errors are suppressed.
+      return { success: force, messages: force ? [] : [permError] };
+    }
+
+    if (node.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE) {
+      // Recursively delete children first (post-order traversal)
+      const childrenNames = Object.keys(node.children || {});
+      for (const childName of childrenNames) {
+        const childPath = getAbsolutePath(childName, resolvedPath);
+        const result = await deleteNodeRecursive(childPath, options);
+        messages.push(...result.messages);
+        if (!result.success) {
+          // If any child deletion fails, the entire operation fails.
+          return { success: false, messages };
+        }
+      }
+    }
+
+    // After handling children (if any), delete the node itself.
+    delete parentNode.children[itemName];
+    parentNode.mtime = nowISO;
+    anyChangeMade = true;
+
+    // The 'save' call should be handled by the command handler after all operations for a command are complete.
+    // This function now returns a status and does not save itself.
+    return { success: true, messages, anyChangeMade };
+  }
+
+  function _createNewFileNode(filename, content, owner) {
+    if (!filename || typeof owner === 'undefined') {
+        console.error("_createNewFileNode: filename and owner are required.");
+        return null; // Or throw an error
+    }
+  
+    const fileExt = Utils.getFileExtension(filename);
+    // In OopisOS, only .sh files are considered executable by default upon creation
+    const isExecutable = fileExt === "sh";
+  
+    // Determine the correct file mode based on the extension
+    const newFileMode = isExecutable
+        ? Config.FILESYSTEM.DEFAULT_SCRIPT_MODE // e.g., 0o70 (rwx---)
+        : Config.FILESYSTEM.DEFAULT_FILE_MODE;  // e.g., 0o60 (rw----)
+  
+    // Return the standardized file node object
+    return {
+        type: Config.FILESYSTEM.DEFAULT_FILE_TYPE,
+        content: content || "",
+        owner: owner,
+        mode: newFileMode,
+        mtime: new Date().toISOString(),
+    };
+  }
+
   return {
     initialize,
     createUserHomeDirectory,
@@ -1233,7 +1303,9 @@ const FileSystemManager = (() => {
     hasPermission,
     formatModeToString,
     _updateNodeAndParentMtime,
-    _ensurePermissionsAndMtimeRecursive
+    _ensurePermissionsAndMtimeRecursive,
+    _createNewFileNode,
+    deleteNodeRecursive, // Expose the new function
   };
 })();
 
@@ -1471,7 +1543,7 @@ const UserManager = (() => {
   let currentUser = {
     name: Config.USER.DEFAULT_NAME
   };
-	function _hashPassword(password) {
+  function _hashPassword(password) {
         // IMPORTANT: This is a very simple, non-cryptographic hash for simulation purposes.
         // DO NOT use this for real-world password storage!
         if (!password || typeof password !== 'string' || password.trim() === '') {
@@ -1529,7 +1601,7 @@ const UserManager = (() => {
       noAction: true
     };
     const users = StorageManager.loadItem(Config.STORAGE_KEYS.USER_CREDENTIALS, "User list", {});
-	
+  
     const userEntry = users[username]; // Get the user entry
     
         // --- NEW: Password verification logic ---
@@ -1607,11 +1679,39 @@ const UserManager = (() => {
     };
   }
 
+  async function initializeDefaultUsers() {
+    const users = StorageManager.loadItem(Config.STORAGE_KEYS.USER_CREDENTIALS, "User list", {});
+    let changesMade = false;
+
+    // Ensure root user exists with the specified password 'mcgoopis'
+    if (!users['root']) {
+      users['root'] = { passwordHash: _hashPassword('mcgoopis') };
+      changesMade = true;
+    }
+
+    // Ensure Guest user exists (no password)
+    if (!users[Config.USER.DEFAULT_NAME]) {
+        users[Config.USER.DEFAULT_NAME] = { passwordHash: null };
+        changesMade = true;
+    }
+
+    // Ensure userDiag exists for testing
+    if (!users['userDiag']) {
+        users['userDiag'] = { passwordHash: _hashPassword('pantload') };
+        changesMade = true;
+    }
+
+    if (changesMade) {
+        StorageManager.saveItem(Config.STORAGE_KEYS.USER_CREDENTIALS, users, "User list");
+    }
+  }
+
   return {
     getCurrentUser,
     register,
     login,
-    logout
+    logout,
+    initializeDefaultUsers
   };
 })();
 
@@ -1769,7 +1869,7 @@ const SessionManager = (() => {
     try {
       StorageManager.removeItem(_getAutomaticSessionStateKey(username));
       StorageManager.removeItem(_getManualUserTerminalStateKey(username));
-	  const users = StorageManager.loadItem(Config.STORAGE_KEYS.USER_CREDENTIALS, "User list", {});
+    const users = StorageManager.loadItem(Config.STORAGE_KEYS.USER_CREDENTIALS, "User list", {});
           if (users.hasOwnProperty(username)) {
             delete users[username];
             StorageManager.saveItem(Config.STORAGE_KEYS.USER_CREDENTIALS, users, "User list");
@@ -1928,8 +2028,8 @@ const TerminalUI = (() => {
           if (!isEditable) DOM.editableInputDiv.blur();
         }
       }
-		
-	function getIsObscuredInputMode() {
+    
+  function getIsObscuredInputMode() {
         return _isObscuredInputMode;
       }
   function setIsNavigatingHistory(status) {
@@ -2318,7 +2418,11 @@ window.onload = async () => {
 
   try {
     await IndexedDBManager.init();
-    await FileSystemManager.load();
+    await FileSystemManager.load(); // This creates the FS structure if it's the first time.
+    
+    // Initialize default user credentials (incl. root password) after FS is ready.
+    await UserManager.initializeDefaultUsers(); 
+    
     SessionManager.loadAutomaticState(Config.USER.DEFAULT_NAME);
 
     const guestHome = `/home/${Config.USER.DEFAULT_NAME}`;

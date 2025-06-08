@@ -5,10 +5,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>OopisOS Version 2.0</title>
-  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet" />
-  <script src="https://cdn.tailwindcss.com"></script>
   <script src="./marked.min.js"></script>
   <link rel="stylesheet" href="./terminal.css">
+  <link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#34d399">
 </head>
 
 <body class="bg-neutral-900 text-green-500 m-0 p-5 flex flex-col items-center justify-center min-h-screen overflow-x-hidden">
@@ -48,8 +48,7 @@
       </div>
     </div>
   </div>
-  <h1 class="text-xl text-green-500 font-['VT323'] mt-4 mb-4"> OopisOS v2.0 | Copyright ©2025 Andrew Edmark & Gemini |
-    MIT Licensed </h1>
+  <h1 class="text-xl text-green-500 font-['VT323'] mt-4 mb-4">Copyright ©2025 | Edmark & Gemini | <a class="text-green-500" href="./guide.html">OopisOS v2.0 User Guide</a> | <a class="text-green-500" href="./LICENSE.txt">MIT License</a> </h1>
 
 
   <script src="./oopisos2_0.js"></script>
@@ -57,6 +56,19 @@
   <script src="./lexpar2_0.js"></script>
   <script src="./commexec2_0.js"></script>
   <script src="./adventure2_0.js"></script>
+  <script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then(registration => {
+          console.log('Service Worker registered with scope: ', registration.scope);
+        })
+        .catch(err => {
+          console.error('Service Worker registration failed: ', err);
+        });
+    });
+  }
+</script>
 </body>
 
 </html>

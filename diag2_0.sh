@@ -285,7 +285,7 @@ echo "---------------------------------------------------------------------"
 echo ""
 echo "--- Final Cleanup ---"
 cd / 
-su root
+login root mcgoopis
 delay 300
 echo "Current user for cleanup (expected: root):"; whoami
 delay 300

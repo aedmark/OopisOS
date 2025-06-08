@@ -4,6 +4,56 @@ const CommandExecutor = (() => {
   "use strict";
   let scriptExecutionInProgress = false;
   let backgroundProcessIdCounter = 0;
+  
+  // --- NEW: Unified internal function for handling user switching ---
+  async function _handleUserSwitch(commandName, targetUser, providedPassword) {
+    // This function encapsulates the shared logic for both 'login' and 'su'.
+    return new Promise(async (resolve) => {
+        const initialLoginAttempt = await UserManager.login(targetUser, providedPassword);
+
+        if (initialLoginAttempt.requiresPasswordPrompt) {
+            // Password is required but was not provided, so we prompt for it.
+            PasswordPromptManager.requestPassword(
+                Config.MESSAGES.PASSWORD_PROMPT,
+                async (password) => {
+                    const finalLoginResult = await UserManager.login(targetUser, password);
+                    if (finalLoginResult.success && !finalLoginResult.noAction) {
+                        OutputManager.clearOutput();
+                        const welcomeMsg = commandName === 'login' ? `${Config.MESSAGES.WELCOME_PREFIX}${targetUser}${Config.MESSAGES.WELCOME_SUFFIX}` : `Switched to user: ${targetUser}`;
+                        OutputManager.appendToOutput(welcomeMsg);
+                    }
+                    resolve({
+                        success: finalLoginResult.success,
+                        output: finalLoginResult.message,
+                        error: finalLoginResult.success ? undefined : finalLoginResult.error || "Login failed.",
+                        messageType: finalLoginResult.success ? Config.CSS_CLASSES.SUCCESS_MSG : Config.CSS_CLASSES.ERROR_MSG,
+                    });
+                },
+                () => { // User cancelled the password prompt
+                    resolve({
+                        success: true, // Cancellation is not a failure of the command itself
+                        output: Config.MESSAGES.OPERATION_CANCELLED,
+                        messageType: Config.CSS_CLASSES.CONSOLE_LOG_MSG,
+                    });
+                }
+            );
+        } else {
+            // No password prompt needed (e.g., passwordless account, or already failed for other reasons)
+            if (initialLoginAttempt.success && !initialLoginAttempt.noAction) {
+                OutputManager.clearOutput();
+                const welcomeMsg = commandName === 'login' ? `${Config.MESSAGES.WELCOME_PREFIX}${targetUser}${Config.MESSAGES.WELCOME_SUFFIX}` : `Switched to user: ${targetUser}`;
+                OutputManager.appendToOutput(welcomeMsg);
+            }
+            resolve({
+                success: initialLoginAttempt.success,
+                output: initialLoginAttempt.message,
+                error: initialLoginAttempt.success ? undefined : initialLoginAttempt.error || "Login failed.",
+                messageType: initialLoginAttempt.success ? Config.CSS_CLASSES.SUCCESS_MSG : Config.CSS_CLASSES.ERROR_MSG,
+            });
+        }
+    });
+  }
+
 
   const commands = {
     gemini: {
@@ -910,41 +960,28 @@ Options:
               allSuccess = false;
               continue;
             }
-            if (
-              !FileSystemManager.hasPermission(parentNode, currentUser, "write")
-            ) {
-              messages.push(
-                `touch: cannot create file in '${parentPath}'${Config.MESSAGES.PERMISSION_DENIED_SUFFIX}`,
-              );
-              allSuccess = false;
-              continue;
-            }
             const fileName = resolvedPath.substring(
-              resolvedPath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR) + 1,
-            );
-            if (fileName === "") { // Should be caught by disallowRoot or validatePath earlier
-              messages.push(
-                `touch: cannot create file with empty name (path resolved to '${resolvedPath}').`,
-              );
-              allSuccess = false;
-              continue;
-            }
-			const fileExt = fileName.substring(fileName.lastIndexOf(".")).toLowerCase();
-            const isExecutable = fileExt === ".sh";
-            const newFileMode = isExecutable
-                ? Config.FILESYSTEM.DEFAULT_SCRIPT_MODE
-                : Config.FILESYSTEM.DEFAULT_FILE_MODE;
+        resolvedPath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR) + 1,
+    );
 
-            parentNode.children[fileName] = {
-              type: Config.FILESYSTEM.DEFAULT_FILE_TYPE,
-              content: "",
-              owner: currentUser,
-              mode: newFileMode,
-              mtime: timestampToUse,
-            };
-            parentNode.mtime = nowActualISO; // Update parent dir's mtime because its content changed
-            changesMade = true;
-            messages.push(`'${pathArg}'${Config.MESSAGES.FILE_CREATED_SUFFIX}`);
+    if (fileName === "") {
+        messages.push(`touch: cannot create file with empty name (path resolved to '${resolvedPath}').`);
+        allSuccess = false;
+        continue;
+    }
+            const newFileNode = FileSystemManager._createNewFileNode(fileName, "", currentUser);
+
+            if (newFileNode) {
+              // 'touch' has special timestamp handling, so we override the default mtime.
+              newFileNode.mtime = timestampToUse;
+              parentNode.children[fileName] = newFileNode;
+              parentNode.mtime = nowActualISO; // Update parent dir's mtime
+              changesMade = true;
+              messages.push(`'${pathArg}'${Config.MESSAGES.FILE_CREATED_SUFFIX}`);
+            } else {
+              messages.push(`touch: internal error creating node for '${fileName}'.`);
+              allSuccess = false;
+            }
           }
         }
 
@@ -1060,30 +1097,15 @@ Options:
     },
     rm: {
       handler: async (args, options) => {
-        const {
-          flags,
-          remainingArgs
-        } = Utils.parseFlags(args, [{
-            name: "recursive",
-            short: "-r",
-            long: "--recursive"
-          },
-          {
-            name: "recursiveAlias",
-            short: "-R"
-          },
-          {
-            name: "force",
-            short: "-f",
-            long: "--force"
-          }
-        ]);
+        const flagDefinitions = [
+          { name: "recursive", short: "-r", long: "--recursive" },
+          { name: "recursiveAlias", short: "-R" },
+          { name: "force", short: "-f", long: "--force" }
+        ];
+        const { flags, remainingArgs } = Utils.parseFlags(args, flagDefinitions);
 
         if (remainingArgs.length === 0) {
-            return {
-                success: false,
-                error: "rm: missing operand"
-            };
+          return { success: false, error: "rm: missing operand" };
         }
 
         const isRecursiveOpt = flags.recursive || flags.recursiveAlias;
@@ -1093,93 +1115,66 @@ Options:
         let anyChangeMade = false;
         const messages = [];
         const currentUser = UserManager.getCurrentUser().name;
-        const nowISO = new Date().toISOString();
-
-        async function removeItemRecursively(itemResolvedPath, itemNode, originalPathArg) {
-          const parentPath = itemResolvedPath.substring(0, itemResolvedPath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR)) || Config.FILESYSTEM.ROOT_PATH;
-          const parentNode = FileSystemManager.getNodeByPath(parentPath);
-
-          if (!parentNode || !FileSystemManager.hasPermission(parentNode, currentUser, "write")) {
-            if (!isForceOpt) messages.push(`rm: cannot remove '${originalPathArg}': Permission denied`);
-            return false;
-          }
-
-          if (itemNode.type === Config.FILESYSTEM.DEFAULT_FILE_TYPE) {
-            let confirmed = isForceOpt;
-            if (!confirmed) {
-              confirmed = await new Promise((resolve) => {
-                ConfirmationManager.request([`Remove file '${originalPathArg}'?`], null, () => resolve(true), () => resolve(false));
-              });
-            }
-
-            if (confirmed) {
-              const itemName = itemResolvedPath.substring(itemResolvedPath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR) + 1);
-              delete parentNode.children[itemName];
-              parentNode.mtime = nowISO;
-              anyChangeMade = true;
-              return true;
-            } else {
-              messages.push(`${Config.MESSAGES.REMOVAL_CANCELLED_PREFIX}'${originalPathArg}'${Config.MESSAGES.REMOVAL_CANCELLED_SUFFIX}`);
-              return false; // User cancelled
-            }
-          } else if (itemNode.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE) {
-            if (!isRecursiveOpt) {
-              if (!isForceOpt) messages.push(`rm: cannot remove '${originalPathArg}': Is a directory (specify -r)`);
-              return false;
-            }
-
-            const childrenNames = Object.keys(itemNode.children || {});
-            for (const childName of childrenNames) {
-              const childNode = itemNode.children[childName];
-              const childResolvedPath = FileSystemManager.getAbsolutePath(childName, itemResolvedPath);
-              if (!(await removeItemRecursively(childResolvedPath, childNode, childResolvedPath))) {
-                return false;
-              }
-            }
-
-            const dirName = itemResolvedPath.substring(itemResolvedPath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR) + 1);
-            delete parentNode.children[dirName];
-            parentNode.mtime = nowISO;
-            anyChangeMade = true;
-            return true;
-          }
-          return false;
-        }
 
         for (const pathArg of remainingArgs) {
           const pathValidation = FileSystemManager.validatePath("rm", pathArg, { disallowRoot: true });
 
+          // With -f, "no such file" is not an error.
+          if (isForceOpt && !pathValidation.node) {
+            continue;
+          }
           if (pathValidation.error) {
-            if (isForceOpt && pathValidation.node === null) continue;
             messages.push(pathValidation.error);
             allSuccess = false;
             continue;
           }
-          
-          if (!(await removeItemRecursively(pathValidation.resolvedPath, pathValidation.node, pathArg))) {
+          const node = pathValidation.node;
+
+          // Check if -r is needed for a directory
+          if (node.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE && !isRecursiveOpt) {
+            messages.push(`rm: cannot remove '${pathArg}': Is a directory (use -r)`);
             allSuccess = false;
+            continue;
+          }
+
+          let confirmed = isForceOpt;
+          if (!confirmed) {
+            const promptMsg = node.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE 
+              ? `Recursively remove directory '${pathArg}'?`
+              : `Remove file '${pathArg}'?`;
+            confirmed = await new Promise((resolve) => {
+              ConfirmationManager.request([promptMsg], null, () => resolve(true), () => resolve(false));
+            });
+          }
+
+          if (confirmed) {
+            // Call the centralized deletion utility
+            const deleteResult = await FileSystemManager.deleteNodeRecursive(pathArg, {
+              force: true, // It's "forced" now because user already confirmed
+              currentUser,
+            });
+
+            if (deleteResult.success) {
+              if(deleteResult.anyChangeMade) anyChangeMade = true;
+            } else {
+              allSuccess = false;
+              messages.push(...deleteResult.messages);
+            }
+          } else {
+            messages.push(`${Config.MESSAGES.REMOVAL_CANCELLED_PREFIX}'${pathArg}'${Config.MESSAGES.REMOVAL_CANCELLED_SUFFIX}`);
+            // Cancellation is not a failure for pipeline purposes
           }
         }
 
         if (anyChangeMade) {
           await FileSystemManager.save();
         }
-
+        
         const finalOutput = messages.filter((m) => m).join("\n");
-        
-        // Treat cancellation as a non-error state for the pipeline
-        if (!allSuccess && finalOutput.includes("cancelled")) {
-            return {
-                success: true, // It's not a script-halting error
-                output: finalOutput,
-                messageType: Config.CSS_CLASSES.CONSOLE_LOG_MSG
-            }
-        }
-        
         return {
-            success: allSuccess,
-            output: finalOutput,
-            error: allSuccess ? null : (finalOutput || "Unknown error during rm operation.")
+          success: allSuccess,
+          output: finalOutput,
+          error: allSuccess ? null : (finalOutput || "Unknown error during rm operation.")
         };
       },
       description: "Removes files or directories.",
@@ -2382,76 +2377,21 @@ Copies <source_path> to <destination_path>, or one or more <source_path>(s) to <
       description: "Creates a new user account.",
       helpText: "Usage: useradd <username>\n\nCreates a new user account with the specified username. Will prompt for a password. Usernames must be between 3 and 20 characters, alphanumeric, and cannot be a reserved name (e.g., guest, root).",
     },
+    // --- REFACTORED: `login` handler now uses the unified switch function ---
     login: {
-      handler: async (args, options) => {
-        // --- UPDATED LOGIC ---
-        const validationResult = Utils.validateArguments(args, { min: 1, max: 2 });
-        if (!validationResult.isValid) {
-          return { success: false, error: `login: ${validationResult.errorDetail}` };
-        }
-
-        const username = args[0];
-        const providedPassword = args.length === 2 ? args[1] : null;
-
-        // If a password is provided via arguments, attempt a direct login.
-        if (providedPassword !== null) {
-          const result = await UserManager.login(username, providedPassword);
-          if (result.success && !result.noAction) {
-             OutputManager.clearOutput();
-             OutputManager.appendToOutput(`${Config.MESSAGES.WELCOME_PREFIX}${username}${Config.MESSAGES.WELCOME_SUFFIX}`);
-          }
-          return {
-            success: result.success,
-            output: result.message,
-            error: result.success ? undefined : result.error || "Login failed.",
-            messageType: result.success ? Config.CSS_CLASSES.SUCCESS_MSG : Config.CSS_CLASSES.ERROR_MSG,
-          };
-        }
-
-        // If no password is provided, proceed with the interactive prompt logic.
-        return new Promise(async (resolve) => {
-          const initialLoginAttempt = await UserManager.login(username, null);
-    
-          if (initialLoginAttempt.requiresPasswordPrompt) {
-            PasswordPromptManager.requestPassword(
-              Config.MESSAGES.PASSWORD_PROMPT,
-              async (password) => {
-                const finalLoginResult = await UserManager.login(username, password);
-                if (finalLoginResult.success && !finalLoginResult.noAction) {
-                  OutputManager.clearOutput();
-                  OutputManager.appendToOutput(`${Config.MESSAGES.WELCOME_PREFIX}${username}${Config.MESSAGES.WELCOME_SUFFIX}`);
-                }
-                resolve({
-                  success: finalLoginResult.success,
-                  output: finalLoginResult.message,
-                  error: finalLoginResult.success ? undefined : finalLoginResult.error || "Login failed.",
-                  messageType: finalLoginResult.success ? Config.CSS_CLASSES.SUCCESS_MSG : Config.CSS_CLASSES.ERROR_MSG,
-                });
-              },
-              () => {
-                resolve({
-                  success: true,
-                  output: Config.MESSAGES.OPERATION_CANCELLED,
-                  messageType: Config.CSS_CLASSES.CONSOLE_LOG_MSG,
-                });
-              }
-            );
-          } else {
-            if (initialLoginAttempt.success && !initialLoginAttempt.noAction) {
-              OutputManager.clearOutput();
-              OutputManager.appendToOutput(`${Config.MESSAGES.WELCOME_PREFIX}${username}${Config.MESSAGES.WELCOME_SUFFIX}`);
+        handler: async (args, options) => {
+            const validationResult = Utils.validateArguments(args, { min: 1, max: 2 });
+            if (!validationResult.isValid) {
+                return { success: false, error: `login: ${validationResult.errorDetail}` };
             }
-            resolve({
-              success: initialLoginAttempt.success,
-              output: initialLoginAttempt.message,
-              error: initialLoginAttempt.success ? undefined : initialLoginAttempt.error || "Login failed.",
-              messageType: initialLoginAttempt.success ? Config.CSS_CLASSES.SUCCESS_MSG : Config.CSS_CLASSES.ERROR_MSG,
-            });
-          }
-        });
-      },
-      description: "Logs in as a specified user.",
-      helpText: "Usage: login <username> [password]\n\nLogs in as the specified user. If [password] is not provided and one is required, you will be prompted interactively. This saves the current session and loads the new user's session.",
+            const username = args[0];
+            const providedPassword = args.length === 2 ? args[1] : null;
+            
+            // Call the unified user switch handler
+            return _handleUserSwitch('login', username, providedPassword);
+        },
+        description: "Logs in as a specified user.",
+        helpText: "Usage: login <username> [password]\n\nLogs in as the specified user. If [password] is not provided and one is required, you will be prompted interactively. This saves the current session and loads the new user's session.",
     },
     logout: {
       handler: async (args, options) => {
@@ -2670,11 +2610,26 @@ Copies <source_path> to <destination_path>, or one or more <source_path>(s) to <
         });
 
         try {
-          const filesToUpload = await fileSelectionPromise; // This is a FileList
-          anyFileProcessed = true;
+  const filesToUpload = await fileSelectionPromise; // This is a FileList
+  anyFileProcessed = true;
 
-          for (const file of filesToUpload) { // Iterate through the FileList
-            try {
+  // --- New De-duplication Logic ---
+  const uniqueFilesMap = new Map();
+  // This loop creates a Map where each filename can only appear once.
+  // If a file is selected multiple times, the last one in the list wins.
+  for (const file of filesToUpload) {
+      uniqueFilesMap.set(file.name, file);
+  }
+  const uniqueFiles = Array.from(uniqueFilesMap.values()); // Convert the unique files back to an array
+
+  // Optionally, inform the user that duplicates were found and ignored.
+  if (filesToUpload.length > uniqueFiles.length) {
+      operationMessages.push(`Note: ${filesToUpload.length - uniqueFiles.length} duplicate file(s) were ignored.`);
+  }
+  // --- End of New De-duplication Logic ---
+
+  for (const file of uniqueFiles) { // <-- The loop now uses the de-duplicated list
+    try {
               const allowedExt = [".txt", ".md", ".html", ".sh", ".js", ".css", ".json"]; // Added .json
               const fileExt = file.name.substring(file.name.lastIndexOf(".")).toLowerCase();
               if (!allowedExt.includes(fileExt))
@@ -2712,20 +2667,16 @@ Copies <source_path> to <destination_path>, or one or more <source_path>(s) to <
                 }
               }
 
-              const isExecutable = fileExt === ".sh";
-              const newFileMode = isExecutable
-                ? Config.FILESYSTEM.DEFAULT_SCRIPT_MODE
-                : Config.FILESYSTEM.DEFAULT_FILE_MODE;
+              const newFileNode = FileSystemManager._createNewFileNode(newFileName, content, currentUser);
 
-              parentNode.children[newFileName] = {
-                type: Config.FILESYSTEM.DEFAULT_FILE_TYPE,
-                content: content,
-                owner: currentUser,
-                mode: newFileMode, // Apply the conditional mode here
-                mtime: nowISO,
-              };
+              if (newFileNode) {
+                parentNode.children[newFileName] = newFileNode;
+                parentNode.mtime = nowISO;
+                operationMessages.push(`${Config.MESSAGES.UPLOAD_SUCCESS_PREFIX}'${file.name}'${Config.MESSAGES.UPLOAD_SUCCESS_MIDDLE}'${targetDirPath}'${Config.MESSAGES.UPLOAD_SUCCESS_SUFFIX}`);
+              } else {
+                throw new Error(`Internal error creating file node for '${newFileName}'.`);
+              }
               parentNode.mtime = nowISO;
-              operationMessages.push(`${Config.MESSAGES.UPLOAD_SUCCESS_PREFIX}'${file.name}'${Config.MESSAGES.UPLOAD_SUCCESS_MIDDLE}'${targetDirPath}'${Config.MESSAGES.UPLOAD_SUCCESS_SUFFIX}`);
             } catch (fileError) {
               operationMessages.push(`Error uploading '${file.name}': ${fileError.message}`);
               allFilesSuccess = false;
@@ -2910,60 +2861,26 @@ Copies <source_path> to <destination_path>, or one or more <source_path>(s) to <
       description: "Manually saves the current user's file system state.",
       helpText: "Usage: savefs\n\nManually triggers a save of the current user's file system to persistent storage. This is useful to ensure changes are saved before any critical operations or if automatic saving is a concern.",
     },
-	su: {
-      handler: async (args, options) => {
-        let targetUser = 'root'; // Default to root if no user is specified
-
-        if (args.length > 0) {
-          targetUser = args[0];
-        }
-
-        const currentUser = UserManager.getCurrentUser().name;
-        if (currentUser === targetUser) {
-          return { success: true, output: `Already user '${currentUser}'.`, messageType: Config.CSS_CLASSES.CONSOLE_LOG_MSG };
-        }
-return new Promise(async (resolve) => {
-            const initialLoginAttempt = await UserManager.login(targetUser, null); // Initial check, no password provided yet
-    
-            if (initialLoginAttempt.requiresPasswordPrompt) {
-                PasswordPromptManager.requestPassword(
-                    Config.MESSAGES.PASSWORD_PROMPT,
-                    async (password) => {
-                        const finalLoginResult = await UserManager.login(targetUser, password);
-                        if (finalLoginResult.success && !finalLoginResult.noAction) {
-                            OutputManager.clearOutput();
-                            OutputManager.appendToOutput(`Switched to user: ${targetUser}`);
-                            OutputManager.appendToOutput(`{Config.MESSAGES.WELCOME_PREFIX}{targetUser}${Config.MESSAGES.WELCOME_SUFFIX}`);
-                        }
-                        resolve({
-                            success: finalLoginResult.success,
-                            output: finalLoginResult.message,
-                            error: finalLoginResult.success ? undefined : finalLoginResult.error || `Could not switch to user ${targetUser}.`,
-                            messageType: finalLoginResult.success ? Config.CSS_CLASSES.SUCCESS_MSG : Config.CSS_CLASSES.ERROR_MSG,
-                        });
-                    },
-                    () => { // User cancelled
-                        resolve({ success: true, output: Config.MESSAGES.OPERATION_CANCELLED, messageType: Config.CSS_CLASSES.CONSOLE_LOG_MSG });
-                    }
-                );
-            } else {
-                // No password prompt needed (e.g., target is Guest/root, or already failed for other reasons)
-                if (initialLoginAttempt.success && !initialLoginAttempt.noAction) {
-                    OutputManager.clearOutput();
-                    OutputManager.appendToOutput(`Switched to user: ${targetUser}`);
-                    OutputManager.appendToOutput(`${Config.MESSAGES.WELCOME_PREFIX}${targetUser}${Config.MESSAGES.WELCOME_SUFFIX}`);
-                }
-                resolve({
-                    success: initialLoginAttempt.success,
-                    output: initialLoginAttempt.message,
-                    error: initialLoginAttempt.success ? undefined : initialLoginAttempt.error || `Could not switch to user ${targetUser}.`,
-                    messageType: initialLoginAttempt.success ? Config.CSS_CLASSES.SUCCESS_MSG : Config.CSS_CLASSES.ERROR_MSG,
-                });
+    // --- REFACTORED: `su` handler now uses the unified switch function ---
+    su: {
+        handler: async (args, options) => {
+            const validationResult = Utils.validateArguments(args, { max: 1 });
+             if (!validationResult.isValid) {
+                return { success: false, error: `su: ${validationResult.errorDetail}` };
             }
-        });
-      },
-      description: "Substitute user identity.",
-      helpText: "Usage: su [username]\n\nSwitches the current user to [username]. If no username is provided, it defaults to 'root'. Will prompt for password if required. The 'root' user has administrative privileges to bypass all file permissions."
+
+            const targetUser = args.length > 0 ? args[0] : 'root';
+            const currentUser = UserManager.getCurrentUser().name;
+
+            if (currentUser === targetUser) {
+                return { success: true, output: `Already user '${currentUser}'.`, messageType: Config.CSS_CLASSES.CONSOLE_LOG_MSG };
+            }
+
+            // Call the unified user switch handler
+            return _handleUserSwitch('su', targetUser, null);
+        },
+        description: "Substitute user identity.",
+        helpText: "Usage: su [username]\n\nSwitches the current user to [username]. If no username is provided, it defaults to 'root'. Will prompt for password if required. The 'root' user has administrative privileges to bypass all file permissions."
     },
     clearfs: {
       handler: async (args, options) => {
@@ -3357,15 +3274,26 @@ system and other users' data intact.
             }
             return true;
           },
-          "-delete": async (node, path) => { 
-            let rmArgs = []; if (node.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE) rmArgs.push("-r");
-            rmArgs.push("-f"); rmArgs.push(path);
-            const rmCommand = CommandExecutor.getCommands().rm;
-            if (rmCommand) {
-              const result = await rmCommand.handler(rmArgs, { isInteractive: false });
-              if (!result.success) { OutputManager.appendToOutput(`find: -delete: ${path}: ${result.error || "failed to delete"}`, { typeClass: Config.CSS_CLASSES.WARNING_MSG }); filesProcessedSuccessfully = false; return false; }
-              return true;
-            } else { OutputManager.appendToOutput(`find: -delete: 'rm' command not available`, { typeClass: Config.CSS_CLASSES.ERROR_MSG }); overallSuccess = false; filesProcessedSuccessfully = false; return false; }
+          "-delete": async (node, path) => {
+            // NEW: Directly call the centralized, non-interactive core utility.
+            // This is non-interactive and should behave like `rm -rf`.
+            const result = await FileSystemManager.deleteNodeRecursive(path, {
+              force: true, // -delete is always non-interactive and forced
+              currentUser: UserManager.getCurrentUser().name,
+            });
+            
+            if (!result.success) {
+              const errorMsg = result.messages.join('; ') || `failed to delete '${path}'`;
+              OutputManager.appendToOutput(`find: -delete: ${errorMsg}`, { typeClass: Config.CSS_CLASSES.WARNING_MSG });
+              filesProcessedSuccessfully = false; // Mark that a sub-operation failed
+              return false; // Action failed
+            }
+            // A change was made, the final 'save' will be handled once after 'find' completes.
+            // For now, we just need to ensure the caller knows a change happened.
+            if(result.anyChangeMade) {
+                anyChangeMadeDuringFind = true; // Use a flag in find's scope
+            }
+            return true; // Action succeeded
           },
         };
 
@@ -3461,7 +3389,13 @@ system and other users' data intact.
             if (!processSelfFirst) { matches = await evaluateExpressionForNode(node, currentResolvedPath); if (matches) await performActions(node, currentResolvedPath); }
         }
 
+        let anyChangeMadeDuringFind = false; // Flag to track if any delete/exec action made a change
         await recurseFind(startPathValidation.resolvedPath);
+
+        if (anyChangeMadeDuringFind) {
+            await FileSystemManager.save();
+        }
+
         return { success: (overallSuccess && filesProcessedSuccessfully), output: outputLines.join("\n") };
       },
       description: " Searches for files in a directory hierarchy based on expressions.",
@@ -3571,23 +3505,6 @@ Example: find . -name "*.js" -not -user Guest -o -type d -print
       },
       description: "Tests if a given command string fails, as expected for negative test cases.",
       helpText: 'Usage: check_fail "<command_string>"\n\nExecutes the <command_string>. If <command_string> fails, check_fail succeeds (and the script continues).\nIf <command_string> succeeds, check_fail fails (and the script halts), reporting the unexpected success.',
-    },
-    register: {
-      handler: async (args, options) => {
-        // This is an alias for useradd. Call useradd's handler.
-        if (commands.useradd?.handler) {
-          // console.log("Register command calling useradd handler with args:", args);
-          return commands.useradd.handler(args, options);
-        }
-        // Fallback if useradd somehow isn't defined (should not happen)
-        return {
-          success: false,
-          error: "register: useradd command not found.",
-          messageType: Config.CSS_CLASSES.ERROR_MSG,
-        };
-      },
-      description: "Alias for useradd.",
-      helpText: "Usage: register <username>\n\nCreates a new user account. This is an alias for the 'useradd' command. Refer to 'help useradd' for more details.",
     },
     removeuser: {
       handler: async (args, options) => {
@@ -4149,9 +4066,19 @@ If the file exists, it will be overwritten. If the path does not exist, parent d
         exContent = finalParentNodeForFile.children[fName].content || "";
         if (exContent && !exContent.endsWith("\n") && outputToRedir) exContent += "\n";
       }
-      const owner = targetNode ? targetNode.owner : user;
-      const mode = targetNode ? targetNode.mode : Config.FILESYSTEM.DEFAULT_FILE_MODE;
-      finalParentNodeForFile.children[fName] = { type: Config.FILESYSTEM.DEFAULT_FILE_TYPE, content: exContent + outputToRedir, owner: owner, mode: mode, mtime: nowISO };
+      if (targetNode) {
+        // Node exists, just update its content
+        targetNode.content = exContent + outputToRedir;
+      } else {
+        // Node doesn't exist, create it using the utility
+        const newFileNode = FileSystemManager._createNewFileNode(fName, exContent + outputToRedir, user);
+        if (newFileNode) {
+          finalParentNodeForFile.children[fName] = newFileNode;
+        } else {
+         if (!pipeline.isBackground) await OutputManager.appendToOutput(`Redirection error: internal failure creating new file node for '${redirFile}'.`, { typeClass: Config.CSS_CLASSES.ERROR_MSG });
+          return { success: false, error: "internal redirection error" };
+        }
+      }
       FileSystemManager._updateNodeAndParentMtime(absRedirPath, nowISO);
       if (!(await FileSystemManager.save(user))) {
         if (!pipeline.isBackground) await OutputManager.appendToOutput(`Failed to save redir to '${redirFile}'.`, { typeClass: Config.CSS_CLASSES.ERROR_MSG });
