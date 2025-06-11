@@ -1,13 +1,13 @@
-const CACHE_NAME = 'oopisos-cache-v1';
+const CACHE_NAME = 'oopisos-cache-v2.2';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './terminal.css',
-  './oopisos2_0.js',
-  './editor2_0.js',
-  './lexpar2_0.js',
-  './commexec2_0.js',
-  './adventure2_0.js',
+  './oopisos2_2.js',
+  './editor2_2.js',
+  './lexpar2_2.js',
+  './commexec2_2.js',
+  './adventure2_2.js',
   './marked.min.js',
   'https://fonts.googleapis.com/css2?family=VT323&display=swap',
   // You might also need to cache the font files the above CSS requests

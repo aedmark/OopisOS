@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OopisOS v2.0 - The Educational Portal</title>
+    <title>OopisOS v2.2 - The User-Friendly Manual</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=VT323&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -32,7 +32,7 @@
         h1 { color: #34d399; /* emerald-400 */ margin-bottom: 0.75rem; }
         h2 { color: #60a5fa; /* blue-400 */ border-bottom: 1px solid #52525b; /* zinc-600 */ padding-bottom: 0.25rem; margin-top: 1.75rem; margin-bottom: 1.25rem; }
         h3 { color: #facc15; /* yellow-400 */ margin-top: 1.25rem; margin-bottom: 0.75rem; }
-        h4 { color: #fb923c; /* orange-400 */ margin-top: 1rem; margin-bottom: 0.5rem; }
+        h4 { color: #fb923c; /* orange-400 */ margin-top: 1rem; margin-bottom: 0.5rem;}
 
         .content-section p,
         .content-section li {
@@ -174,443 +174,370 @@
         <main class="main-content flex-1 p-6 md:p-10 overflow-y-auto mt-16 md:mt-0">
             <section id="home" class="content-section active">
                 <h1>Welcome to OopisOS!</h1>
-                <p class="text-lg mt-2 mb-6 text-zinc-400">The little browser-based Operating System that could (and does!). Version 2.0 is here!</p>
+                <p class="text-lg mt-2 mb-6 text-zinc-400">The little browser-based Operating System that could. Now at Version 2.2 and more powerful than ever!</p>
 
                 <div class="terminal-example">
-                    <span class="prompt">Guest@OopisOs:/&gt;</span> <span class="command">echo "Hello, OopisOS v2.0 World!"</span><br>
-                    <span class="output">Hello, OopisOS v2.0 World!</span>
+                    <span class="prompt">Guest@OopisOs:/&gt;</span> <span class="command">echo "Look behind you, a three-headed monkey!"</span><br>
+                    <span class="output">Look behind you, a three-headed monkey!</span>
                 </div>
 
-                <h2>What is OopisOS?</h2>
-                <p>OopisOS (v2.0) is a fully persistent, self-contained operating system simulation that runs entirely within your web browser. Born from a collaborative effort between Andrew Edmark and Gemini Pro, it aims to recreate the feel and functionality of a classic command-line interface (CLI) environment, complete with a hierarchical file system, user management with passwords, a powerful text editor, a suite of useful commands, an AI interaction layer, and even an interactive text adventure game engine.</p>
-                <p>It's an educational tool, a nostalgic playground, and a testament to what can be achieved with JavaScript, IndexedDB for persistence, and a lot of creative coding. The entire system is now modularized across <code>OopisOSv2_0.html</code> and its accompanying JavaScript files.</p>
+                <h2>What is this place?</h2>
+                <p>Glad you asked! OopisOS (v2.2) is a fully persistent, self-contained operating system simulation that runs entirely within your web browser. It's a love letter to the command-line interfaces of yore, but with a modern twist. Think of it as a digital terrarium where you can poke around, learn about OS concepts, and generally cause harmless digital mayhem without setting your actual computer on fire. It was lovingly crafted by Andrew Edmark and his trusty AI sidekick, Gemini.</p>
+                <p>The entire system is a showcase of what's possible with modern JavaScript and a dash of nostalgia. Your files, users, and even your command history will be here waiting for you the next time you visit, thanks to the magic of IndexedDB and localStorage.</p>
 
                 <h2>Core Philosophy</h2>
                 <ul class="list-disc ml-6 space-y-2 my-4">
-                    <li><strong>Persistence is Key:</strong> Your files, user accounts (with hashed passwords), and session states are saved using IndexedDB and localStorage, meaning your work remains even after closing the browser tab.</li>
-                    <li><strong>Self-Contained:</strong> Everything runs client-side. No server needed (beyond serving the initial HTML/JS).</li>
-                    <li><strong>Educational & Fun:</strong> Designed to be a learning experience for those interested in OS concepts, CLI interactions, and JavaScript module architecture. Includes AI interaction and gaming!</li>
-                    <li><strong>Extensible:</strong> Built with modularity in mind, making it possible for developers to contribute new commands and features.</li>
-                    <li><strong>POSIX-ish Familiarity:</strong> While not a strict POSIX implementation, many commands and concepts will feel familiar to users of Unix-like systems.</li>
+                    <li><strong>Look, Don't Touch (Your Real Stuff):</strong> A safe sandbox to learn and experiment. Your real files are safe. Probably.</li>
+                    <li><strong>Meow-nificently Self-Contained:</strong> Everything runs on your machine. No servers, no cloud, just pure client-side goodness. You could run this on a spaceship to Xenon, no internet required.</li>
+                    <li><strong>Learn & Laugh:</strong> It's an educational tool, but who said learning can't be fun? We have an AI and video games. Your move, calculus.</li>
+                    <li><strong>More Modular Than a Space Station:</strong> Built with discrete components, making it easier for brave developers to add new features or, more likely, new and exciting bugs.</li>
+                    <li><strong>UNIX-ish... ish:</strong> If you've used a Linux or Mac terminal, you'll feel right at home. The commands might not ask you for your papers, but they'll respect your authority.</li>
                 </ul>
 
-                <h2>Key Features at a Glance (v2.0)</h2>
+                <h2>Key Features at a Glance (v2.2)</h2>
                 <ul class="list-disc ml-6 space-y-2 my-4">
-                    <li><strong>Persistent File System:</strong> Create, edit, move, copy, and delete files and directories. Stored in IndexedDB. Commands include `mkdir`, `ls` (with flags like `-l`, `-a`, `-R`, `-t`, `-S`, `-d`), `cd`, `pwd`, `touch` (with `-c`, `-d`, `-t`), `cat`, `cp` (with `-r`, `-f`, `-p`, `-i`), `mv` (with `-f`, `-i`), `rm` (with `-r`, `-f`), `tree` (with `-L`, `-d`), `find` (with predicates like `-name`, `-type`, `-mtime`, `-user`, `-perm` and actions like `-print`, `-exec`, `-delete`).</li>
-                    <li><strong>Advanced Command-Line Interface:</strong> Retro-styled terminal with history, tab completion, command pipelining (`|`), I/O redirection (`>`, `>>`), background processes (`&`), and command sequences (`;`).</li>
-                    <li><strong>User Management with Passwords:</strong> Register multiple users (`useradd`/`register`) with secure password prompts, log in/out (`login`, `logout`), switch user (`su`, including to `root`), `whoami`, `listusers`, `removeuser` (with confirmation). Each user has an isolated home directory. Includes default users `Guest` (no password) and `userDiag` (password: `pantload`).</li>
-                    <li><strong>Enhanced Text Editor (`edit`):** Supports plain text, Markdown, and HTML (with live preview). Features line numbers (gutter hides on word wrap), toggleable word wrap (persists), status bar, view modes (`Ctrl+P`), `Ctrl+S` (save/exit), `Ctrl+O` (exit/confirm discard via modal), a Markdown/HTML formatting toolbar (with shortcuts like `Ctrl+B` for bold, `Ctrl+I` for italic), and an HTML preview export function.</li>
-                    <li><strong>AI Integration (`gemini`):</strong> Send prompts and file content to a Gemini AI model directly from the terminal. Can be used with a file path and a prompt, or with just a prompt string.</li>
-                    <li><strong>Scripting Engine (`run`):</strong> Execute script files with comments (`#`), shebang support (ignored for interpreter, but line is skipped), and argument passing (`$1`, `$@`, `$#`). Includes `delay` for pauses and `check_fail` for basic test scripting.</li>
-                    <li><strong>Session Management:</strong> Automatic session saving, manual `savestate`/`loadstate` (with FS snapshot and confirmation), `backup`/`restore` via JSON (with confirmation), `clearfs` (user's home directory wipe with confirmation), and full `reset` (all data wipe with confirmation).</li>
-                    <li><strong>Utilities:</strong> `echo`, `date`, `help`, `clear`, `history -c`, `export` (download files from VFS), `upload` (upload files to VFS, with type checks and overwrite prompt), `chmod`, `chown`, `grep` (with `-i`, `-v`, `-n`, `-c`, `-R` for recursive search), and `printscreen <filepath>` (saves current terminal output to a specified file in the VFS).</li>
-                    <li><strong>Interactive Text Adventure Game (`adventure`):</strong> Launch and play text-based adventure games, such as the included 'Quest for the Lost Semicolon,' within a dedicated modal window. Supports loading custom adventures from JSON files stored in the VFS.</li>
+                    <li><strong>A File System That Remembers:</strong> Create, edit, and manage files and directories that actually stick around! Commands include `mkdir`, `ls` (with flags like `-l`, `-a`, `-R`, `-t`, `-S`, `-d`), `cd`, `pwd`, `touch` (with `-c`, `-d`, `-t`), `cat` (you can't `cat` a real kitty, but you can `cat` a file about one), `cp` (with `-r`, `-f`, `-p`, `-i`), `mv` (with `-f`, `-i`), `rm` (with `-r`, `-f`), `tree` (with `-L`, `-d`), and the mighty `find`.</li>
+                    <li><strong>A Command-Line for the Connoisseur:</strong> A beautiful retro terminal with history (up/down arrows), tab completion, command pipelining (`|`), I/O redirection (`>` for overwrite, `>>` for append), background processes (`&`), and command sequences (`;`).</li>
+                    <li><strong>Multi-User Mayhem:</strong> Register multiple users (`useradd`) with secure password prompts, `login`, `logout`, switch users with `su` (including to the all-powerful `root`), see `whoami`, `listusers`, and even `removeuser`. Each user gets their own private corner of the hard drive.</li>
+                    <li><strong>The 'edit' Command - Now More Luxurious:</strong> A souped-up text editor that handles plain text, Markdown, and HTML with a live preview. Features include line numbers, toggleable word wrap, a status bar, multiple view modes (`Ctrl+P`), and a formatting toolbar with shortcuts (`Ctrl+B`, `Ctrl+I`). Save & exit with `Ctrl+S`, or rage-quit with `Ctrl+O` (we'll ask if you're sure).</li>
+                    <li><strong>An AI in the Shell (`gemini`):</strong> Chat with the Gemini AI directly from your terminal. Ask it to write a poem, summarize a file, or explain why cats are the superior life form.</li>
+                    <li><strong>Scripting for the Masses (`run`):</strong> Write your own command scripts! Supports comments (`#`), argument passing (`$1`, `$@`, `$#`), and includes handy tools like `delay` and `check_fail` for crafting your own diagnostic epics.</li>
+                    <li><strong>Save Your Progress! (No, really):</strong> Automatic session saving per user, plus manual `savestate`/`loadstate` and `backup`/`restore` commands. `clearfs` lets you clean your home directory, and `reset` is the big red button that nukes everything (don't worry, we'll ask first).</li>
+                    <li><strong>A Grab-Bag of Utilities:</strong> `echo`, `date`, `help`, `clear`, `history`, `export` (download files), `upload` (upload files), `chmod`, `chown`, `grep` (now with `-R` for recursive searching!), and `printscreen` to save your terminal's glorious output to a file.</li>
+                    <li><strong>It's a Video Game, Too! (`adventure`):</strong> Tired of being productive? Launch a text-based adventure game! Explore the 'Quest for the Lost Semicolon' or load your own custom JSON-based adventures.</li>
                 </ul>
-                <p>Dive in, explore, and see what you can create in the world of OopisOS v2.0!</p>
+                <p>Go on, get your hands dirty. The world of OopisOS v2.2 awaits!</p>
             </section>
 
             <section id="user-guide" class="content-section">
-                <h1>OopisOS User Guide (v2.0)</h1>
-                <p>Welcome to your OopisOS journey! This guide will help you get started with the basics of version 2.0.</p>
+                <h1>OopisOS User Guide (v2.2)</h1>
+                <p>So, you've decided to venture forth. Excellent! You have selected the path of a true adventurer. This guide is your map and spellbook for the realm of OopisOS v2.2.</p>
 
                 <h2>The Terminal Interface</h2>
-                <p>OopisOS presents a classic terminal interface. Here's what you'll see:</p>
+                <p>This is your window into the soul of the machine. Your command center. Your... well, it's a terminal.</p>
                 <div class="terminal-example">
                     <span class="prompt">Guest@OopisOs:/&gt;</span> <span class="command">_</span>
                 </div>
                 <ul class="list-disc ml-6 my-4 space-y-2">
-                    <li><strong>Prompt:</strong> Shows `username@hostname:current_path&gt;`. For example, <code>Guest@OopisOs:/&gt;</code>.</li>
-                    <li><strong>Input Area:</strong> Where you type your commands.</li>
-                    <li><strong>Output Area:</strong> Where command results and messages appear.</li>
+                    <li><strong>The Prompt:</strong> This tells you who you are, where you are, and that the system is ready for your brilliant commands. It follows the format: `username@hostname:current_path>`.</li>
+                    <li><strong>The Input Area:</strong> The blinking cursor is your cue. Type your incantations here.</li>
+                    <li><strong>The Output Area:</strong> The results of your digital wizardry (and the occasional error message) will appear here.</li>
                 </ul>
 
                 <h2>Essential Commands</h2>
-                <p>Here are some fundamental commands to get you started. For a full list, type <code>help</code>. For help on a specific command, type <code>help [command_name]</code>.</p>
+                <p>These are the fundamental spells in your arsenal. For a full grimoire, type `help`. For the nitty-gritty on a single command, type `help [command_name]`.</p>
                 <table class="min-w-full divide-y divide-zinc-700">
                     <thead>
                         <tr>
                             <th class="px-4 py-2">Command</th>
-                            <th class="px-4 py-2">Description</th>
-                            <th class="px-4 py-2">Example</th>
+                            <th class="px-4 py-2">What It Does (In Plain English)</th>
+                            <th class="px-4 py-2">Try This!</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-zinc-800">
-                        <tr><td><code>help</code></td><td>Displays available commands or help for a specific command.</td><td><code>help ls</code></td></tr>
-                        <tr><td><code>ls</code></td><td>Lists directory contents. Supports flags like <code>-l</code> (long), <code>-a</code> (all), <code>-R</code> (recursive), <code>-t</code> (sort by time), <code>-S</code> (sort by size), <code>-d</code> (list directory entry itself).</td><td><code>ls -la /docs</code></td></tr>
-                        <tr><td><code>cd [directory]</code></td><td>Changes the current directory.</td><td><code>cd /docs</code></td></tr>
-                        <tr><td><code>pwd</code></td><td>Prints the current working directory path.</td><td><code>pwd</code></td></tr>
-                        <tr><td><code>mkdir [directory_name]</code></td><td>Creates a new directory. Use <code>-p</code> to create parent directories if they don't exist.</td><td><code>mkdir -p my_project/src</code></td></tr>
-                        <tr><td><code>cat [file_path]</code></td><td>Displays the content of a file.</td><td><code>cat /README.md</code></td></tr>
-                        <tr><td><code>echo [text]</code></td><td>Displays text or writes it to a file using redirection.</td><td><code>echo "Hello Oopis" > /greeting.txt</code></td></tr>
-                        <tr><td><code>edit [file_path]</code></td><td>Opens a file in the text editor. Creates the file if it doesn't exist. Supports Markdown/HTML preview, formatting toolbar. Shortcuts: Ctrl+S (Save & Exit), Ctrl+O (Exit, confirm discard), Ctrl+P (Toggle Preview), Ctrl+B (Bold), Ctrl+I (Italic).</td><td><code>edit my_notes.md</code></td></tr>
-                        <tr><td><code>touch [file_path]</code></td><td>Creates an empty file or updates file/directory timestamps. Flags: <code>-c</code> (no-create), <code>-d DATETIME</code> (use string), <code>-t STAMP</code> (use [[CC]YY]MMDDhhmm[.ss]).</td><td><code>touch -t 202301010000 oldfile.log</code></td></tr>
-                        <tr><td><code>rm [item]</code></td><td>Removes a file or directory. By default, it's interactive for files. Flags: <code>-r</code> or <code>-R</code> (recursive for directories), <code>-f</code> (force, suppress errors, no prompt).</td><td><code>rm -rf old_project</code></td></tr>
-                        <tr><td><code>cp [source] [dest]</code></td><td>Copies files or directories. Flags: <code>-r</code> or <code>-R</code> (recursive), <code>-f</code> (force), <code>-p</code> (preserve metadata), <code>-i</code> (interactive).</td><td><code>cp -r /docs /backup/docs_copy</code></td></tr>
-                        <tr><td><code>mv [source] [dest]</code></td><td>Moves or renames files or directories. Flags: <code>-f</code> (force), <code>-i</code> (interactive).</td><td><code>mv old_name.txt new_name.txt</code></td></tr>
-                        <tr><td><code>grep [pattern] [file...]</code></td><td>Searches for patterns in files or input. Flags: <code>-i</code> (ignore case), <code>-v</code> (invert match), <code>-n</code> (line numbers), <code>-c</code> (count matches), <code>-R</code> (recursive).</td><td><code>grep -R "config" /etc</code></td></tr>
-                        <tr><td><code>find [path] [expression]</code></td><td>Searches for files/directories. Tests: <code>-name</code>, <code>-type</code>, <code>-user</code>, <code>-perm</code>, <code>-mtime</code>. Actions: <code>-print</code>, <code>-exec CMD {} \;</code>, <code>-delete</code>. Operators: <code>-not</code>, <code>-and</code>, <code>-or</code>.</td><td><code>find / -name "*.log" -mtime +7 -delete</code></td></tr>
-                        <tr><td><code>printscreen [filepath]</code></td><td>Saves the current visible terminal output to the specified file in the VFS.</td><td><code>printscreen /logs/session_output.txt</code></td></tr>
-                        <tr><td><code>adventure [adv.json]</code></td><td>Starts a text adventure game. Loads a sample game if no file is specified. Custom games can be loaded from the VFS.</td><td><code>adventure /games/quest_for_the_semicolon.json</code></td></tr>
-                        <tr><td><code>gemini [filepath] "[prompt]"</code></td><td>Sends a prompt (with optional file content) to Gemini AI for a response.</td><td><code>gemini /reports/financials_q2.txt "Summarize this"</code></td></tr>
-                        <tr><td><code>whoami</code></td><td>Displays your current username.</td><td><code>whoami</code></td></tr>
-                        <tr><td><code>su [username]</code></td><td>Switch user. Defaults to `root` if no username is given. `root` has full system permissions.</td><td><code>su root</code></td></tr>
-                        <tr><td><code>clear</code></td><td>Clears the terminal screen.</td><td><code>clear</code></td></tr>
-                        <tr><td><code>run [script_path] [args...]</code></td><td>Executes a script file containing OopisOS commands.</td><td><code>run /scripts/setup.sh</code></td></tr>
-                        <tr><td><code>upload [-f] [dest_dir]</code></td><td>Uploads file(s) from your computer to the VFS. <code>-f</code> forces overwrite.</td><td><code>upload /uploads</code></td></tr>
-                        <tr><td><code>export [file_path]</code></td><td>Downloads a file from the VFS to your computer.</td><td><code>export /important_data.txt</code></td></tr>
+                        <tr><td><code>help</code></td><td>Your friendly neighborhood guide. Ask it about other commands.</td><td><code>help find</code></td></tr>
+                        <tr><td><code>ls</code></td><td>"Look.". Shows you what's in the current room (directory). Use flags like <code>-l</code> (long details), <code>-a</code> (see secret stuff), <code>-R</code> (recursive), <code>-t</code> (newest first), <code>-S</code> (biggest first).</td><td><code>ls -la /</code></td></tr>
+                        <tr><td><code>cd [directory]</code></td><td>Change directory. Or, "Go north."</td><td><code>cd /home</code></td></tr>
+                        <tr><td><code>pwd</code></td><td>"Where am I?!" Prints your current location.</td><td><code>pwd</code></td></tr>
+                        <tr><td><code>mkdir [directory_name]</code></td><td>Creates a new, empty directory. A blank canvas for your genius. Use <code>-p</code> to make a whole path at once.</td><td><code>mkdir -p my_epic_quest/maps</code></td></tr>
+                        <tr><td><code>cat [file_path]</code></td><td>Reads the contents of a file aloud to the screen. Does not work on actual cats, we tried.</td><td><code>cat /README.md</code></td></tr>
+                        <tr><td><code>echo [text]</code></td><td>Shouts text into the void, or into a file if you use `>` or `>>`.</td><td><code>echo "Feed the kitty" > /notes/todo.txt</code></td></tr>
+                        <tr><td><code>edit [file_path]</code></td><td>Opens the powerful text editor. Your gateway to creating masterpieces (or just grocery lists). Use it for <code>.md</code> or <code>.html</code> to see the live preview magic. Shortcuts: Ctrl+S (Save & Exit), Ctrl+O (Exit), Ctrl+P (Preview), Ctrl+B (Bold), Ctrl+I (Italic).</td><td><code>edit my_journal.md</code></td></tr>
+                        <tr><td><code>touch [file_path]</code></td><td>Creates an empty file or updates its "last touched" timestamp. Great for faking that you've been working. Flags: <code>-c</code>, <code>-d</code>, <code>-t</code>.</td><td><code>touch evidence_i_was_working.log</code></td></tr>
+                        <tr><td><code>rm [item]</code></td><td>Removes things. Permanently. Be careful. Use <code>-r</code> for directories and <code>-f</code> to be extra forceful (and skip the nagging).</td><td><code>rm -rf /point_of_no_return</code></td></tr>
+                        <tr><td><code>cp [source] [dest]</code></td><td>Copies files or directories. Use <code>-r</code> for directories.</td><td><code>cp my_masterpiece.txt masterpiece_backup.txt</code></td></tr>
+                        <tr><td><code>mv [source] [dest]</code></td><td>Moves or renames files. One command, two jobs!</td><td><code>mv draft.txt final_version.txt</code></td></tr>
+                        <tr><td><code>grep [pattern] [file...]</code></td><td>Finds text within files. A digital detective. Use <code>-i</code> to ignore case and <code>-R</code> to search everywhere.</td><td><code>grep -iR "kitty" /</code></td></tr>
+                        <tr><td><code>find [path] [expression]</code></td><td>A more powerful detective than grep. Finds files based on name, type, owner, etc. Can even perform actions on what it finds.</td><td><code>find / -name "*.log" -delete</code></td></tr>
+                        <tr><td><code>printscreen [filepath]</code></td><td>Saves everything you see on the terminal screen to a file. "I have proof!"</td><td><code>printscreen /logs/what_i_did.txt</code></td></tr>
+                        <tr><td><code>adventure [adv.json]</code></td><td>Time for a break! Starts a text adventure game. Can load custom games from your VFS.</td><td><code>adventure /games/quest_for_the_semicolon.json</code></td></tr>
+                        <tr><td><code>gemini [filepath] "[prompt]"</code></td><td>Consult the oracle. Sends a prompt, with or without a file, to the Gemini AI.</td><td><code>gemini "Write a poem about a lazy cat"</code></td></tr>
+                        <tr><td><code>whoami</code></td><td>In case of amnesia, this command reminds you of your username.</td><td><code>whoami</code></td></tr>
+                        <tr><td><code>su [username]</code></td><td>"Substitute User." Become someone else, like the all-powerful `root`.</td><td><code>su root</code></td></tr>
+                        <tr><td><code>clear</code></td><td>Cleans the screen, giving you a fresh slate.</td><td><code>clear</code></td></tr>
+                        <tr><td><code>run [script_path] [args...]</code></td><td>Executes a script file full of OopisOS commands. Automate the boring stuff!</td><td><code>run /inflate2_2.sh</code></td></tr>
+                        <tr><td><code>upload [-f] [dest_dir]</code></td><td>Beams files from your physical computer into OopisOS. <code>-f</code> forces overwrite.</td><td><code>upload /home/Guest/my_files</code></td></tr>
+                        <tr><td><code>export [file_path]</code></td><td>Downloads a file from OopisOS back to the real world.</td><td><code>export /notes/master_plan.txt</code></td></tr>
                     </tbody>
                 </table>
 
                 <h2>The File System</h2>
-                <p>OopisOS has a hierarchical file system, much like Linux or macOS.</p>
+                <p>OopisOS has a file system not unlike the ones you know. It's a tree, and you're a digital squirrel.</p>
                 <ul class="list-disc ml-6 my-4 space-y-2">
-                    <li>The root directory is <code>/</code>.</li>
-                    <li>Paths are separated by <code>/</code>.</li>
-                    <li><code>.</code> refers to the current directory.</li>
-                    <li><code>..</code> refers to the parent directory.</li>
-                    <li>Hidden files and directories start with a <code>.</code> (e.g., <code>.config</code>) and are not shown by <code>ls</code> unless <code>-a</code> is used.</li>
+                    <li>The very top is the root directory, <code>/</code>.</li>
+                    <li>Paths are your branches, separated by <code>/</code>.</li>
+                    <li><code>.</code> means "right here."</li>
+                    <li><code>..</code> means "go back one branch."</li>
+                    <li>Files starting with a <code>.</code> are shy; use <code>ls -a</code> to see them.</li>
                 </ul>
-                <p>You can navigate using <code>cd</code>, list contents with <code>ls</code>, and create directories with <code>mkdir</code>.</p>
 
                 <h2>The Editor (`edit` command)</h2>
-                <p>OopisOS includes a powerful text editor accessible via the <code>edit</code> command. It's designed for both simple text editing and authoring Markdown or HTML with live preview capabilities.</p>
+                <p>The `edit` command is your passage to a world of creation. It's more than a notepad; it's a multi-tool for text.</p>
                 <ul class="list-disc ml-6 my-4 space-y-2">
-                    <li><strong>Modes:</strong> Supports plain text, Markdown, and HTML. The mode is automatically detected based on the file extension (e.g., <code>.md</code> for Markdown, <code>.html</code> or <code>.htm</code> for HTML).</li>
-                    <li><strong>Live Preview:</strong> For Markdown and HTML files, a preview pane can be toggled to see rendered output in real-time.</li>
-                    <li><strong>Formatting Toolbar:</strong> When editing Markdown or HTML files, a toolbar appears with buttons for common formatting actions like bold, italic, lists, code blocks, etc.</li>
-                    <li><strong>Word Wrap:</strong> Can be toggled on/off. This setting is saved and persists across sessions. When word wrap is off, horizontal scrolling is enabled for the textarea. The line number gutter is hidden when word wrap is active.</li>
-                    <li><strong>Status Bar:</strong> Displays information like current line/column, total lines, word count, and character count.</li>
-                    <li><strong>Export Preview:</strong> For Markdown or HTML files, the rendered preview can be exported and downloaded as an HTML file.</li>
-                    <li><strong>Keyboard Shortcuts:</strong>
+                    <li><strong>File Types:</strong> It understands plain text, Markdown (`.md`), and HTML (`.html`). Give it a recognized file extension, and it'll unlock special features.</li>
+                    <li><strong>Live Preview:</strong> For Markdown and HTML, a magical preview pane shows you what your code looks like, updated in real time.</li>
+                    <li><strong>Formatting Toolbar:</strong> Why remember Markdown syntax when you can click buttons? Bold, italic, lists, code blocks - it's all there for `.md` and `.html` files.</li>
+                    <li><strong>Word Wrap:</strong> Toggle it on for prose, off for code. Your preference is saved for next time.</li>
+                    <li><strong>Shortcuts to Glory:</strong>
                         <ul>
-                            <li><code>Ctrl+S</code>: Save the current file and exit the editor.</li>
-                            <li><code>Ctrl+O</code>: Exit the editor. If there are unsaved changes, a modal dialog will prompt for confirmation to discard them.</li>
-                            <li><code>Ctrl+P</code>: Toggle the preview mode (cycles through Split View, Edit Only, Preview Only for Markdown/HTML files).</li>
-                            <li><code>Ctrl+B</code>: Apply/remove bold formatting (in Markdown/HTML modes).</li>
-                            <li><code>Ctrl+I</code>: Apply/remove italic formatting (in Markdown/HTML modes).</li>
-                            <li><code>Tab</code>: Inserts spaces for indentation.</li>
+                            <li><code>Ctrl+S</code>: Save & Exit. The hero's exit.</li>
+                            <li><code>Ctrl+O</code>: Exit. If you haven't saved, we'll ask before you discard your genius.</li>
+                            <li><code>Ctrl+P</code>: Toggle Preview. Cycle through split-screen, code-only, and preview-only views.</li>
+                            <li><code>Ctrl+B</code> / <code>Ctrl+I</code>: Make text **bold** or *italic* in compatible files.</li>
+                            <li><code>Tab</code>: Indent your code like a pro.</li>
                         </ul>
                     </li>
                 </ul>
-                <div class="terminal-example">
-                    <span class="prompt">Guest@OopisOs:/&gt;</span> <span class="command">edit my_feature_article.md</span><br>
-                    <span class="output">(Editor interface appears, ready to edit 'my_feature_article.md')</span>
-                </div>
 
                 <h2>Users, Permissions, and Passwords</h2>
-                <p>OopisOS supports multiple users, each with their own home directory and saved session state. Each file and directory has an owner and permissions that determine who can read, write, or execute it.</p>
+                <p>OopisOS isn't a free-for-all. It's a sophisticated society of users with rules and private property.</p>
                 
-                <h3>User Accounts and The Superuser (`root`)</h3>
+                <h3>User Accounts & The Superuser (`root`)</h3>
                 <ul class="list-disc ml-6 my-4 space-y-2">
-                    <li><strong>Default Users:</strong> OopisOS starts with three default users:
+                    <li><strong>Default Population:</strong> OopisOS comes with a few residents:
                         <ul>
-                           <li><code>Guest</code>: The default user, has no password.</li>
-                           <li><code>root</code>: The superuser account, has no password by default. The `root` user can bypass all file permission checks, allowing for system-wide administrative tasks like deleting other users' files.</li>
-                           <li><code>userDiag</code>: A special user for testing purposes, pre-configured with the password `pantload`.</li>
+                           <li><code>Guest</code>: Your default identity. No password needed.</li>
+                           <li><code>root</code>: The system administrator. The superuser. The big cheese. The `root` user can do anything. The default password is `mcgoopis`.</li>
+                           <li><code>userDiag</code>: A special user for running tests, with the password `pantload`.</li>
                         </ul>
                     </li>
-                    <li><code>register [username]</code> (or <code>useradd</code>): Creates a new user account. You will be interactively prompted to set a password. If you press Enter at the password prompt, the user will be created without one.</li>
-                    <li><code>login [username] [password]</code>: Logs in as an existing user. If the user requires a password and you don't provide one, you will be prompted securely. The `login` command also accepts the password as a second argument for non-interactive scripting.</li>
-                    <li><code>logout</code>: Logs out the current user and returns to the Guest session.</li>
-                    <li><code>su [username]</code>: Switches the current user. If no username is given, it defaults to `root`. If the target user has a password, you will be prompted for it.</li>
-                    <li><code>whoami</code>: See your current username.</li>
-                    <li><code>listusers</code>: Show all registered user accounts.</li>
-                    <li><code>removeuser [username]</code>: Deletes a user and all their associated data (files, saved sessions). This action requires confirmation.</li>
+                    <li><code>useradd [username]</code>: Create a new user. You'll be prompted to create a password.</li>
+                    <li><code>login [username] [password]</code>: Log in as someone else. The password can be provided directly or entered in a secure prompt.</li>
+                    <li><code>logout</code>: Return to the safety of the Guest account.</li>
+                    <li><code>su [username]</code>: Switch to another user, assuming you know their password (or you're `root`). Defaults to `root`.</li>
                 </ul>
 
                 <h3>Permissions and Ownership</h3>
                 <ul class="list-disc ml-6 my-4 space-y-2">
-                    <li><code>chmod [mode] [path]</code>: Change the permissions of a file or directory. The mode is specified as two octal digits (e.g., <code>75</code> for rwxr-x, <code>64</code> for rw-r--). The first digit applies to the owner, the second to others. Each digit is a sum of: 4 (read), 2 (write), 1 (execute).</li>
-                    <li><code>chown [new_owner] [path]</code>: Change the owner of a file or directory. Only the current owner of the item or the `root` user can change its ownership.</li>
-                    <li>Permissions are displayed in the long listing format of the <code>ls -l</code> command (e.g., <code>-rwxr-x---</code> where 'd' indicates a directory, followed by owner and other permissions).</li>
+                    <li><code>chmod [mode] [path]</code>: Change a file's permissions. Mode is two digits (e.g., <code>75</code>). First digit is for the owner, second is for everyone else. Permissions are: 4 (read), 2 (write), 1 (execute). Add them up!</li>
+                    <li><code>chown [new_owner] [path]</code>: Change who owns a file. Only the owner or `root` can do this.</li>
+                    <li>See permissions with <code>ls -l</code>. They look like <code>-rwxr-x---</code>. The first character is `d` if it's a directory.</li>
                 </ul>
-                <div class="terminal-example">
-                    <span class="prompt">Guest@OopisOs:/&gt;</span> <span class="command">login userDiag pantload</span><br>
-                    <span class="output">Logged in as userDiag.</span><br>
-                    <span class="prompt">userDiag@OopisOs:/home/userDiag&gt;</span> <span class="command">_</span>
-                </div>
 
                 <h2>Pipes, Redirection, and Command Sequences</h2>
-                <p>Like other shells, OopisOS supports features to control command input, output, and execution flow:</p>
+                <p>Chain your commands together for ultimate power!</p>
                 <ul class="list-disc ml-6 my-4 space-y-2">
-                    <li><strong>Pipes <code>|</code></strong>: Send the output of one command as input to another.
-                        <br>Example: <code>ls -a / | grep docs</code>
-                    </li>
-                    <li><strong>Output Redirection <code>></code></strong>: Write command output to a file, overwriting it if it exists.
-                        <br>Example: <code>echo "My important data" > data.txt</code>
-                    </li>
-                    <li><strong>Append Output <code>>></code></strong>: Append command output to a file.
-                        <br>Example: <code>date >> /system.log</code>
-                    </li>
-                    <li><strong>Command Separator <code>;</code></strong>: Run multiple commands in sequence on the same line.
-                        <br>Example: <code>mkdir new_dir ; cd new_dir ; echo "I'm here" > file.txt</code>
-                    </li>
+                    <li><strong>Pipes <code>|</code></strong>: Take the output of the command on the left and "pipe" it as the input for the command on the right. <br>Example: `history | grep "sudo"`</li>
+                    <li><strong>Output Redirection <code>></code></strong>: Send a command's output into a file, overwriting whatever was there. <br>Example: `ls -l > file_list.txt`</li>
+                    <li><strong>Append Output <code>>></code></strong>: Add a command's output to the end of a file. <br>Example: `echo "A new event happened!" >> activity.log`</li>
+                    <li><strong>Command Separator <code>;</code></strong>: Run several commands, one after the other, on a single line. <br>Example: `cd / ; ls ; pwd`</li>
                 </ul>
-                <p>This is just the beginning! Explore the <code>help</code> command and experiment to discover all that OopisOS v2.0 can do.</p>
             </section>
             
             <section id="advanced-topics" class="content-section">
-                <h1>OopisOS v2.0: Advanced Topics & Features</h1>
-                <p>Ready to delve deeper? This section explores some of the more advanced capabilities and concepts within OopisOS v2.0.</p>
+                <h1>OopisOS v2.2: Advanced Topics & Features</h1>
+                <p>You've mastered the basics. You feel the power coursing through your veins. Now, let's get dangerous.</p>
 
                 <h2>Scripting with `run`</h2>
-                <p>OopisOS supports shell scripting via the <code>run</code> command (defined in <code>commexec2_0.js</code>). Create text files (e.g., <code>myscript.sh</code> using the <code>edit</code> command) containing a sequence of OopisOS commands, one per line.</p>
+                <p>Why type commands one by one like a peasant? Automate your reign with the <code>run</code> command. Create a text file (e.g., `world_domination.sh`) and fill it with your orders.</p>
                 <pre><code class="language-bash">
-# Example: /scripts/myscript_v2_0.sh
-#!/bin/oopis_shell # Shebang line is read but interpreter isn't used; it's for convention.
-echo "Starting my OopisOS v2.0 script..."
-# This is a comment
-mkdir /test_data_v2_0
-echo "Hello from script v2.0, argument 1 was: $1" > /test_data_v2_0/script_output.txt
-ls /test_data_v2_0
-echo "All arguments: $@"
-echo "Number of arguments: $#"
-echo "Script finished."
+# Example: /scripts/myscript_v2_2.sh
+#!/bin/oopis_shell # This is just for show, but it looks cool, right?
+echo "Executing master plan v2.2..."
+# This is a comment, where I hide my secrets.
+mkdir /kittens
+echo "Greetings, agent $1. Your mission, should you choose to accept it, is in this file." > /kittens/secret_mission.txt
+echo "All operatives: $@"
+echo "Total operatives: $#"
+echo "Plan complete. Awaiting your command."
                 </code></pre>
-                <p>To execute (assuming it's saved as <code>/scripts/myscript_v2_0.sh</code> and made executable):</p>
+                <p>To unleash it upon your system (make it executable first!):</p>
                 <div class="terminal-example">
-                    <span class="prompt">Guest@OopisOs:/&gt;</span> <span class="command">chmod 70 /scripts/myscript_v2_0.sh</span><br>
-                    <span class="prompt">Guest@OopisOs:/&gt;</span> <span class="command">run /scripts/myscript_v2_0.sh firstArg "second arg with spaces"</span>
+                    <span class="prompt">Guest@OopisOs:/&gt;</span> <span class="command">chmod 70 /scripts/myscript_v2_2.sh</span><br>
+                    <span class="prompt">Guest@OopisOs:/&gt;</span> <span class="command">run /scripts/myscript_v2_2.sh AgentK "Mr. Bigglesworth"</span>
                 </div>
 
-                <h3>Script Features:</h3>
+                <h3>Scripting Superpowers:</h3>
                 <ul class="list-disc ml-6 my-4 space-y-2">
-                    <li><strong>Comments:</strong> Lines starting with <code>#</code> (outside of quotes) are ignored.</li>
-                    <li><strong>Shebang:</strong> Lines starting with <code>#!</code> are recognized and the line is skipped; the specified interpreter is not actually used.</li>
+                    <li><strong>Comments:</strong> Lines starting with <code>#</code> are your private thoughts, ignored by the executor.</li>
                     <li><strong>Argument Passing:</strong>
                         <ul>
-                            <li><code>$1</code>, <code>$2</code>, ...: Access positional arguments passed to the script.</li>
-                            <li><code>$@</code>: Represents all arguments passed to the script, as a single string with spaces between them.</li>
-                            <li><code>$#</code>: Represents the total number of arguments passed to the script.</li>
+                            <li><code>$1</code>, <code>$2</code>, ...: Use the arguments you passed to the script.</li>
+                            <li><code>$@</code>: All the arguments in one glorious string.</li>
+                            <li><code>$#</code>: The number of arguments.</li>
                         </ul>
                     </li>
-                    <li><strong>Error Handling:</strong> If any command in the script fails (returns `success: false`), the script will terminate at that point.</li>
-                    <li><strong>Utilities for Scripting:</strong>
+                    <li><strong>Error Handling:</strong> If a command fails, the script stops. No questions asked.</li>
+                    <li><strong>Scripting Tools:</strong>
                         <ul>
-                            <li><code>delay [milliseconds]</code>: Pauses script execution.</li>
-                            <li><code>check_fail "[command_string]"</code>: Executes the provided command string. If the command string fails, <code>check_fail</code> succeeds. If the command string succeeds, <code>check_fail</code> fails (halting the script). Useful for automated testing.</li>
+                            <li><code>delay [milliseconds]</code>: For dramatic pauses.</li>
+                            <li><code>check_fail "[command]"</code>: A special tool for testing. It succeeds only if the command inside it *fails*.</li>
                         </ul>
                     </li>
                 </ul>
 
                 <h2>Text Adventure Gaming (`adventure`)</h2>
-                <p>OopisOS v2.0 features a built-in text adventure game engine, allowing users to embark on interactive fiction journeys. This functionality is primarily managed by modules in <code>adventure2_0.js</code>.</p>
+                <p>All work and no play makes Guest a dull user. OopisOS v2.2 includes a text adventure game engine to satisfy your inner Roberta Williams or Scott Adams.</p>
                 <ul class="list-disc ml-6 my-4 space-y-2">
-                    <li><strong>Launching:</strong> Type <code>adventure</code> to launch the default sample game, 'Quest for the Lost Semicolon.'</li>
-                    <li><strong>Custom Adventures:</strong> You can load custom adventures by providing a path to a JSON file within the OopisOS VFS: <code>adventure /path/to/my_game.json</code>.</li>
-                    <li><strong>Interface:</strong> The game plays out in a dedicated modal window, separate from the main terminal, offering an immersive experience with styled output for room names, descriptions, items, etc.</li>
-                    <li><strong>Engine:</strong> The <code>TextAdventureEngine</code> handles command parsing (e.g., <code>look</code>, <code>go north</code>, <code>take key</code>), game state (player location, inventory), and interactions with the game world defined in the JSON data.</li>
+                    <li><strong>Start Your Quest:</strong> Simply type `adventure` to begin the epic 'Quest for the Lost Semicolon.'</li>
+                    <li><strong>Bring Your Own Adventure:</strong> Got a story to tell? Write it in the specified JSON format, `upload` it, and run it with `adventure /path/to/your_game.json`.</li>
+                    <li><strong>Immersive Interface:</strong> The game runs in a dedicated modal window, freeing you from the distractions of the terminal.</li>
                 </ul>
 
                 <h2>Background Processes (`&`)</h2>
-                <p>You can run a command or a pipeline asynchronously in the background by appending an ampersand (<code>&</code>) to the end of the command line. The `CommandExecutor` handles this, allowing you to continue using the terminal while the background task completes. OopisOS will assign a job ID to the backgrounded process and notify you when it starts and finishes (or if it encounters an error).</p>
+                <p>Some tasks take time. You have better things to do than wait. Add an ampersand (`&`) to the end of your command to run it in the background. OopisOS will give you a job ID and let you know when it's done, while you get on with your life.</p>
                 <div class="terminal-example">
                     <span class="prompt">Guest@OopisOs:/&gt;</span> <span class="command">delay 5000 &</span><br>
                     <span class="output">[1] Backgrounded.</span><br>
-                    <span class="prompt">Guest@OopisOs:/&gt;</span> <span class="command">echo "I can still type!"</span><br>
-                    <span class="output">I can still type!</span><br>
-                    <span class="output">(After approximately 5 seconds, a message like "[Job 1 finished]" will appear)</span>
+                    <span class="prompt">Guest@OopisOs:/&gt;</span> <span class="command">echo "I'm already doing something else."</span><br>
+                    <span class="output">I'm already doing something else.</span><br>
+                    <span class="output">(A few seconds later...)</span><br>
+                    <span class="output">[Job 1 finished]</span>
                 </div>
                 
                 <h2>Recursive Grep (`grep -R`)</h2>
-                <p>The <code>grep</code> command in v2.0 supports the <code>-R</code> flag (or <code>--recursive</code>) for recursively searching through directories. This powerful option allows you to find patterns within files across an entire directory tree, not just in specified files or standard input.</p>
+                <p>The `grep` command's `-R` flag is your all-seeing eye. It recursively searches through directories to find what you're looking for, no matter how deep it's buried.</p>
                 <div class="terminal-example">
-                    <span class="prompt">Guest@OopisOs:/projects&gt;</span> <span class="command">grep -R "TODO" .</span><br>
-                    <span class="output">./projectA/main.js: // TODO: Refactor this complex function</span><br>
-                    <span class="output">./projectB/docs/readme.txt: - TODO: Add examples for advanced usage</span><br>
-                    <span class="output">... (and so on for all matches containing "TODO" in the current directory and its subdirectories)</span>
+                    <span class="prompt">Guest@OopisOs:/&gt;</span> <span class="command">grep -R "catnip" /</span><br>
+                    <span class="output">/home/Guest/notes/shopping_list.txt: - More catnip for Mittens</span><br>
+                    <span class="output">/home/Guest/diary/day_42.txt: The catnip incident will not be spoken of again.</span>
                 </div>
 
             </section>
             
             <section id="developer-docs" class="content-section">
-                <h1>OopisOS v2.0: Developer Documentation</h1>
-                <p>Welcome, aspiring OopisOS contributor or module developer! This section provides insights into the codebase and how you can extend OopisOS v2.0.</p>
+                <h1>OopisOS v2.2: Developer Documentation</h1>
+                <p>So, you want to look under the hood? Pop it open. Let's see what makes this thing purr.</p>
 
                 <h2>Code Structure Overview</h2>
-                <p>The primary logic for OopisOS is now split into four main JavaScript files, all referenced by <code>index.html</code>:</p>
+                <p>The logic of OopisOS is organized into several key JavaScript files, all loaded by `index.html`:</p>
                 <ul class="list-disc ml-6 my-4 space-y-2">
-                    <li><strong><code>oopisos2_0.js</code>:</strong> Contains the core OS infrastructure, including configuration, general utilities, and managers for Output, Storage (LocalStorage), IndexedDB, FileSystem, History, Confirmation, User accounts (with Passwords), Sessions, Terminal UI, and Tab Completion.</li>
-                    <li><strong><code>editor2_0.js</code>:</strong> Houses all logic related to the built-in text editor, including its specific configuration, utility functions, UI management, core manager, and modal dialogs.</li>
-                    <li><strong><code>commexec2_0.js</code>:</strong> Dedicated to command execution. It includes the `CommandExecutor` module which contains the `Lexer`, `Parser`, and the definitions and handlers for all built-in commands.</li>
-                    <li><strong><code>adventure2_0.js</code>:</strong> Contains all modules related to the text adventure game feature, including the game engine, modal interface, and the sample adventure data.</li>
+                    <li><strong>`oopisos2_1.js`:</strong> The heart and soul. Contains core infrastructure, configs, utilities, and managers for the file system, users, sessions, terminal UI, and more.</li>
+                    <li><strong>`lexpar2_1.js`:</strong> The brainy part. Contains the Lexer and Parser that translate your typed commands into something the machine can understand.</li>
+                    <li><strong>`commexec2_1.js`:</strong> The muscle. This is the Command Executor, containing the definitions and handlers for every single command in the OS.</li>
+                    <li><strong>`editor2_1.js`:</strong> The artist's studio. All logic for the `edit` command's powerful text editor lives here.</li>
+                    <li><strong>`adventure2_1.js`:</strong> The dungeon master's screen. Contains the text adventure engine, UI modal, and sample game data.</li>
                 </ul>
-                <p>Each file generally uses Immediately Invoked Function Expressions (IIFEs) to create modules, encapsulating logic and avoiding global namespace pollution. Key managers and utilities are exposed for inter-module use where necessary (e.g., `FileSystemManager` being used by commands in `commexec2_0.js`).</p>
+                <p>We use Immediately Invoked Function Expressions (IIFEs) to keep things tidy and modular, preventing a global namespace catastrophe.</p>
 
-                <h2>Contributing to OopisOS</h2>
-                <p>The spirit of open source and learning is encouraged!</p>
+                <h2>How to Contribute</h2>
+                <p>Thinking of adding your own flair? Fantastic! Here’s the adventurer's guide to contributing:</p>
                 <ol class="list-decimal ml-6 my-4 space-y-2">
-                    <li><strong>Understand the Code:</strong> Familiarize yourself with the modules in their respective files.
-                        <ul>
-                            <li>For general OS behavior, core APIs, and persistence: <code>oopisos2_0.js</code>.</li>
-                            <li>For command-related work (adding/modifying commands, parsing): <code>commexec2_0.js</code>.</li>
-                            <li>For editor enhancements: <code>editor2_0.js</code>.</li>
-                            <li>For the adventure game feature: <code>adventure2_0.js</code>.</li>
-                        </ul>
-                    </li>
-                    <li><strong>Identify an Area:</strong> Bug fix, command improvement, new command, editor feature, adventure game enhancement?</li>
-                    <li><strong>Modularity is Key:</strong> Strive to keep new features or fixes well-contained within the appropriate module or file.</li>
-                    <li><strong>Follow Patterns:</strong> Observe existing command definitions in <code>CommandExecutor.commands</code> (in <code>commexec2_0.js</code>) for structure (handler, description, helpText). Note how they use utilities from <code>oopisos2_0.js</code> (like <code>Utils.validateArguments</code>, <code>FileSystemManager.validatePath</code>).</li>
-                    <li><strong>User Experience:</strong> Ensure clear error messages via <code>OutputManager</code>. Use <code>ConfirmationManager</code> (from <code>oopisos2_0.js</code>) for terminal-based confirmations or <code>EditorModal</code> (from <code>editor2_0.js</code>) for confirmations within the editor context. For password entry, see the `PasswordPromptManager` in `oopisos2_0.js`.</li>
-                    <li><strong>Persistence:</strong> Any changes to the file system must be saved using <code>FileSystemManager.save()</code>. Session or setting changes might use <code>StorageManager</code> or affect data saved by <code>SessionManager</code>.</li>
-                    <li><strong>Testing:</strong>
-                        <ul>
-                            <li>Thoroughly test your changes. Consider various inputs and edge cases.</li>
-                            <li>Leverage or extend existing test scripts (e.g., <code>diag2_0.sh</code>) or create new ones using the <code>run</code> command and <code>check_fail</code> for assertions.</li>
-                        </ul>
-                    </li>
-                    <li><strong>Documentation:</strong> Update the command's <code>description</code> and <code>helpText</code> within its definition in <code>commexec2_0.js</code>. If significant changes are made, consider updates to this HTML manual.</li>
+                    <li><strong>Study the Ancient Scrolls:</strong> Read the code. Understand how the modules in the different files talk to each other.</li>
+                    <li><strong>Choose Your Quest:</strong> Will you fix a bug, enhance a command, or forge a new one entirely?</li>
+                    <li><strong>Respect the Modularity:</strong> Keep your changes contained within the appropriate file. A new command goes in `commexec2_1.js`. An editor tweak goes in `editor2_1.js`.</li>
+                    <li><strong>Follow the Pattern:</strong> When creating a command, copy the structure of an existing one in `CommandExecutor.commands`. It has everything you need: a `handler`, a `description`, and `helpText`.</li>
+                    <li><strong>Be a Good Citizen:</strong> Use the provided managers! `OutputManager` for messages, `ConfirmationManager` for scary decisions, `PasswordPromptManager` for secrets.</li>
+                    <li><strong>Test Your Mettle:</strong> Run your changes through the wringer. Use the `diag2_2.sh` script, or better yet, write your own test script with `check_fail` to prove your code is worthy.</li>
+                    <li><strong>Document Your Deeds:</strong> Update the `description` and `helpText` for any command you touch. If you add a major feature, this manual will need an update too!</li>
                 </ol>
 
-                <h2>Developing New Commands</h2>
-                <p>Adding a new command involves defining it within the <code>commands</code> object in the <code>CommandExecutor</code> module (located inside <code>commexec2_0.js</code>). Here's the basic structure:</p>
+                <h2>Forging a New Command (The v2.2 Way)</h2>
+                <p>Your journey begins in `commexec2_1.js`, inside the `commands` object. Thanks to the new `createCommandHandler` factory, adding commands is easier and safer than ever.</p>
                 <pre><code class="language-javascript">
-// Inside commexec2_0.js, within CommandExecutor IIFE, in the 'commands' object:
-"yournewcommand": {
-    handler: async (args, options) => {
-        // args: Array of string arguments from the parsed command line.
-        // options: Object containing:
-        //   - isInteractive: Boolean, true if command run directly in terminal.
-        //   - stdinContent: String or null, content from a pipe if applicable.
-        //   - explicitForce: Boolean, true if -f or --force was in args (convenience).
+// In commexec2_1.js:
 
-        // 1. Validate arguments (use Utils.validateArguments from oopisos2_0.js)
-        //    Example: const valRes = Utils.validateArguments(args, { exact: 1 });
-        //             if (!valRes.isValid) return { success: false, error: `mycmd: ${valRes.errorDetail}` };
+const myNewCmdDefinition = {
+  commandName: "mycmd",
+  // 1. Define validation rules
+  argValidation: { min: 1, error: "mycmd needs at least one argument!" },
+  pathValidation: [{ argIndex: 0, options: { expectedType: 'file' } }],
+  permissionChecks: [{ pathArgIndex: 0, permissions: ['read'] }],
+  
+  // 2. Write the core logic, knowing the inputs are already vetted!
+  coreLogic: async (context) => {
+    const { args, options, currentUser, validatedPaths } = context;
+    const pathInfo = validatedPaths[0]; // Guaranteed to be a valid, readable file.
+    
+    return { success: true, output: `Successfully processed ${pathInfo.resolvedPath}` };
+  }
+};
 
-        // 2. Parse flags if your command uses them (Utils.parseFlags from oopisos2_0.js)
-        //    Example: const { flags, remainingArgs } = Utils.parseFlags(args, [{name: "verbose", short: "-v"}]);
-
-        // 3. Implement your command's logic.
-        //    You can interact with modules like FileSystemManager, UserManager, OutputManager, etc.,
-        //    which are globally available from oopisos2_0.js.
-        //    Example: const pathInfo = FileSystemManager.validatePath("mycmd", remainingArgs[0]);
-        //             if (pathInfo.error) return { success: false, error: pathInfo.error };
-        //             OutputManager.appendToOutput(`Processing: ${pathInfo.resolvedPath}`);
-
-        // 4. Return a result object.
-        //    - success: Boolean (true if successful, false otherwise).
-        //    - output: String or null (text to display if successful and not redirected).
-        //    - error: String or null (error message if success is false).
-        //    - messageType: Optional string (CSS class from Config.CSS_CLASSES for output styling).
-        
-        return { success: true, output: `New command processed: ${args.join(' ')}`, messageType: Config.CSS_CLASSES.SUCCESS_MSG };
+// 3. Add it to the main commands object
+const commands = {
+    // ... other commands
+    mycmd: {
+        handler: createCommandHandler(myNewCmdDefinition),
+        description: "A one-line summary for the 'help' command.",
+        helpText: "Usage: mycmd [file]\\n\\nExplain your command in detail here."
     },
-    description: "A brief, one-line description of your new command for 'help'.",
-    helpText: "Usage: yournewcommand [options] [arguments]\\n\\nProvide detailed help here, including options, arguments, and examples. Explain what the command does."
-}
+    // ... more commands
+};
                 </code></pre>
-                <p>Refer to existing commands in <code>commexec2_0.js</code> for comprehensive examples of argument validation, flag parsing, interacting with the file system (including permission checks with <code>FileSystemManager.hasPermission</code>), handling piped input, and producing structured output.</p>
-                <p>Happy developing with OopisOS v2.0!</p>
+                <p>This declarative pattern handles all the boilerplate error checking for you. Now go forth and create!</p>
             </section>
             
             <section id="testing-env" class="content-section">
                 <h1>Testing & Showcase Environment</h1>
-                <p>OopisOS v2.0 includes two important shell scripts, <code>inflate2_0.sh</code> and <code>diag2_0.sh</code>, designed to streamline testing and provide a rich user experience out of the box. You can execute them using the <code>run</code> command.</p>
+                <p>OopisOS v2.2 comes with two powerful scripts, `inflate2_2.sh` and `diag2_2.sh`, to make life easier for testers and newcomers.</p>
 
-                <h2>Showcase Data with `inflate2_0.sh`</h2>
-                <p>The <code>inflate2_0.sh</code> script is a "Test Drive Population Script." Its purpose is to populate a fresh file system with a diverse and interesting set of files and directories. This creates a showcase environment where new users can immediately begin experimenting with commands like <code>ls</code>, <code>grep</code>, <code>find</code>, <code>tree</code>, `gemini`, and `adventure` without needing to create all the content themselves.</p>
-                <p>To use it, simply run:</p>
+                <h2>The Showcase: `inflate2_2.sh`</h2>
+                <p>Want a fully furnished world to explore from the get-go? The `inflate2_2.sh` script populates your file system with a rich set of examples. It's like a demo disk for OopisOS!</p>
+                <p>Just run this command to set it all up:</p>
                 <div class="terminal-example">
-                    <span class="prompt">Guest@OopisOs:/&gt;</span> <span class="command">run /inflate2_0.sh</span>
+                    <span class="prompt">Guest@OopisOs:/&gt;</span> <span class="command">run /inflate2_2.sh</span>
                 </div>
-                <h3>What it Creates:</h3>
+                <h3>What's in the box?</h3>
                 <ul class="list-disc ml-6 my-4 space-y-2">
-                    <li>A root-level `README.md` explaining the test drive environment.</li>
-                    <li>A `/docs` directory with sample documentation.</li>
-                    <li>A `/src` directory with simulated source code files.</li>
-                    <li>A `/data` directory with text files perfect for `grep` practice.</li>
-                    <li>A `/reports` directory containing a sample financial report for use with the `gemini` command.</li>
-                    <li>A `/games` directory with the `quest_for_the_semicolon.json` adventure file.</li>
-                    <li>Hidden files (e.g., `.env`) for `ls -a` and `find` discovery.</li>
-                    <li>Files with specific past timestamps for testing `touch` and `ls -t`.</li>
+                    <li>A `README.md` file to get you started.</li>
+                    <li>Directories like `/docs`, `/src`, `/data`, `/reports`, `/games`, and `/vault`, all filled with tasty sample files.</li>
+                    <li>Content specifically designed for practicing with `grep`, `find`, `gemini`, and `adventure`.</li>
+                    <li>Secret hidden files for you to discover with `ls -a`.</li>
                 </ul>
-                <p>This script makes it easy to demonstrate the full capabilities of OopisOS to new users or for developers to quickly set up a populated testbed.</p>
                 
-                <h2>Core Diagnostics with `diag2_0.sh`</h2>
-                <p>The <code>diag2_0.sh</code> script is a non-interactive test suite designed to rigorously verify the core functionality of OopisOS commands. It's an essential tool for developers to ensure that changes to the codebase haven't introduced regressions.</p>
-                <p>This script automatically performs a sequence of operations, printing its actions and expected outcomes, and uses the special `check_fail` command to assert that error conditions are handled correctly.</p>
+                <h2>The Gauntlet: `diag2_2.sh`</h2>
+                <p>This is the ultimate test of OopisOS's core strength. The `diag2_2.sh` script is a non-interactive test suite that runs a barrage of commands to ensure everything is working exactly as it should. It's the developer's best friend for catching bugs before they creep out of the woodwork.</p>
                 <h3>Key Test Phases:</h3>
                 <ul class="list-disc ml-6 my-4 space-y-2">
-                    <li><strong>Workspace Setup:</strong> Logs in as the special `userDiag` user (password: `pantload`) and creates a clean `diag_workspace` directory.</li>
-                    <li><strong>File System Tests:</strong> Verifies `mkdir`, `touch`, `ls`, `pwd`, and `cd`, including error cases like trying to create a directory that already exists.</li>
-                    <li><strong>File Content Tests:</strong> Checks `echo`, `cat`, and I/O redirection (`>` and `>>`) and pipelining (`|`).</li>
-                    <li><strong>Advanced `ls` Flags:</strong> Tests all sorting and formatting flags of the `ls` command.</li>
-                    <li><strong>Permissions & Ownership:</strong> Runs a complex scenario involving `chmod`, `chown`, switching between `userDiag` and `Guest` users to verify that read/write/execute permissions are enforced correctly.</li>
-                    <li><strong>File Management:</strong> Tests `rm`, `cp`, and `mv`, including recursive and force operations.</li>
-                    <li><strong>`find` Command:</strong> Sets up a test directory structure and verifies `find` with various predicates (`-name`, `-type`, `-user`) and actions (`-exec`, `-delete`).</li>
-                    <li><strong>`run` Command:</strong> Tests the script runner itself with argument passing.</li>
-                    <li><strong>Cleanup:</strong> Switches to the `root` user to delete the diagnostic workspace and restores the system to a clean state.</li>
+                    <li><strong>Login and Setup:</strong> Logs in as the `userDiag` user (password: `pantload`) and prepares a clean workspace.</li>
+                    <li><strong>Core FS Commands:</strong> Brutally tests `mkdir`, `touch`, `ls`, `pwd`, and `cd`.</li>
+                    <li><strong>Content & Redirection:</strong> Verifies that `echo`, `cat`, pipes (`|`), and redirection (`>`, `>>`) are all behaving.</li>
+                    <li><strong>Permissions & Users:</strong> A complex dance of `chmod`, `chown`, `login`, and `logout` to ensure the security model is sound.</li>
+                    <li><strong>File Management:</strong> Puts `rm`, `cp`, and `mv` through their paces.</li>
+                    <li><strong>Advanced Commands:</strong> Verifies that `find` and the `run` command itself are working correctly.</li>
+                    <li><strong>Cleanup:</strong> Switches to `root` and cleans up after itself, leaving the system tidy.</li>
                 </ul>
-                <p>Running <code>diag2_0.sh</code> is a great way to see a wide range of OopisOS features in action and to verify the health of the system.</p>
+                <p>Running `diag2_2.sh` is a fantastic way to see a whirlwind tour of OopisOS features.</p>
                  <div class="terminal-example">
-                    <span class="prompt">Guest@OopisOs:/&gt;</span> <span class="command">run /diag2_0.sh</span>
+                    <span class="prompt">Guest@OopisOs:/&gt;</span> <span class="command">run /diag2_2.sh</span>
                 </div>
             </section>
 
             <section id="about" class="content-section">
-                <h1>About OopisOS (v2.0)</h1>
-                <p>OopisOS Version 2.0 continues its evolution as a browser-based operating system simulation, offering an enriched experience with new features and refinements.</p>
+                <h1>About OopisOS (v2.2)</h1>
+                <p>OopisOS Version 2.2 is the latest and greatest evolution of our little browser-based world, packed with more features and even more personality.</p>
                 
                 <h2>The Creators</h2>
-                <p>This digital marvel was brought into existence through the dedicated and often caffeine-fueled collaboration of:</p>
+                <p>This project is the result of a tireless, caffeine-fueled collaboration between:</p>
                 <ul class="list-disc ml-6 my-4 space-y-2">
-                    <li><strong>Andrew Edmark</strong></li>
-                    <li><strong>Gemini Pro</strong> (That's me, providing AI-assisted development and documentation support for v2.0 features!)</li>
+                    <li><strong>Andrew Edmark</strong> (The Human Element)</li>
+                    <li><strong>Gemini</strong> (The AI Assistant, and your humble narrator)</li>
                 </ul>
-                <p>Our joint efforts involved countless hours of design, coding, debugging, and refining the myriad components that make up OopisOS. The copyright notice <code>Copyright (c) 2025 Andrew Edmark and Gemini. (MIT Licensed)</code> reflects this partnership.</p>
+                <p>Together, we navigated the treacherous dungeons of JavaScript, debugged the fiercest of race conditions, and documented our journey for all to see. The copyright notice `Copyright (c) 2025 Andrew Edmark and Gemini. (MIT Licensed)` reflects this grand alliance.</p>
 
-                <h2>The Journey to 2.0</h2>
-                <p>Version 2.0 builds upon the solid foundation of previous releases, introducing key enhancements such as:</p>
+                <h2>The Journey to 2.2</h2>
+                <p>Version 2.2 builds upon the solid foundation of 2.1, adding key refinements and features:</p>
                 <ul class="list-disc ml-6 my-4 space-y-2">
-                    <li>An exciting integrated <strong>Text Adventure game engine and modal interface</strong> (<code>adventure</code> command).</li>
-                    <li>A robust <strong>user management system with passwords</strong> and the administrative <strong>`su` command</strong> to switch to the `root` user for superuser privileges.</li>
-                    <li>A more capable <strong>Text Editor</strong> with a formatting toolbar, additional keyboard shortcuts (<code>Ctrl+B</code>, <code>Ctrl+I</code>), and improved modal confirmations for unsaved changes.</li>
-                    <li>The <strong>`printscreen` command</strong> to save terminal output directly to a file within the VFS.</li>
-                    <li>The <strong>`gemini` command</strong> for AI interaction, now supporting both file-based and direct prompt queries.</li>
-                    <li>Refinements to command functionalities, including <strong>recursive `grep -R`</strong> and new predicates for `find` (`-user`, `-perm`).</li>
-                    <li>Improved code organization by splitting logic into four main JavaScript files: <code>oopisos2_0.js</code>, <code>editor2_0.js</code>, <code>commexec2_0.js</code>, and <code>adventure2_0.js</code> for better maintainability and clarity.</li>
+                    <li>A more robust and secure <strong>user management system</strong> with hashed passwords and proper permission checks.</li>
+                    <li>The powerful `find` command, with predicates like `-name`, `-type`, `-user`, `-perm`, and `-mtime`, and actions like `-print`, `-exec`, and `-delete`.</li>
+                    <li>A more sophisticated `ls` command with advanced sorting and formatting options.</li>
+                    <li>Full scripting support with argument passing (`$1`, `$@`, `$#`).</li>
+                    <li>Numerous under-the-hood improvements for stability, security, and performance, including a major refactor of the command execution engine.</li>
+                    <li>An even smarter `gemini` command and a more enchanting `adventure` engine.</li>
+                    <li>A codebase thoughtfully reorganized into logical modules (`oopisos2_1.js`, `editor2_1.js`, `commexec2_1.js`, etc.) for easier maintenance.</li>
                 </ul>
-                <p>The creation of updated tools like <code>inflate2_0.sh</code> and <code>diag2_0.sh</code> are integral to ensuring the stability and correctness of these new features during development.</p>
 
-                <h2>Philosophy Revisited</h2>
-                <p>OopisOS was built with a few core ideas in mind:</p>
-                <ul class="list-disc ml-6 my-4 space-y-2">
-                    <li><strong>Learning by Doing:</strong> To provide a hands-on environment for understanding OS concepts, command-line interaction, and even basic game engine design.</li>
-                    <li><strong>The Power of the Browser:</strong> To demonstrate that complex, stateful applications with persistence can thrive entirely client-side.</li>
-                    <li><strong>A Touch of Nostalgia:</strong> For those who appreciate the elegance and power of the command line and classic text adventures.</li>
-                    <li><strong>Collaborative Innovation:</strong> As a testament to human-AI teamwork in creative coding and educational tool development.</li>
-                </ul>
-                
                 <h2>License Information: MIT License (AI Assisted) - OopisOS License Agreement</h2>
                 <h3>Preamble</h3>
-                <p>This Software, OopisOS, represents a collaborative endeavor between human direction and artificial intelligence. The following terms and conditions apply to its use, modification, and distribution, reflecting the spirit of open access, shared innovation, and transparent acknowledgment of the novel means of its creation.</p>
+                <p>This Software, OopisOS, represents a collaborative endeavor between human direction and artificial intelligence.</p>
                 <p><strong>Copyright (c) 2025 Andrew Edmark (hereinafter referred to as the "Curator")</strong></p>
-
                 <h3>Authorship and Contribution Acknowledgment</h3>
-                <p>This Software was developed by the Curator through a process of interactive collaboration with Google's Gemini, an artificial intelligence language model (hereinafter referred to as the "AI Assistant").</p>
-                <p>The Curator provided the initial concepts, creative direction, iterative prompts, critical review, testing, and the selection of the final form of the Software. The AI Assistant, under the explicit direction and oversight of the Curator, contributed to the generation, drafting, and composition of portions of the code and associated documentation.</p>
-                <p>While the Curator is identified as the licensor for the purposes of granting the permissions herein (based on the Curator's original contributions and the arrangement of the final work), this acknowledgment serves to transparently declare the significant collaborative role of the AI Assistant in the Software's creation.</p>
-                <p>The intent of the Curator in offering this Software under the terms below is to encourage the broadest possible use, study, modification, and distribution thereof. The Curator does not assert exclusive personal authorship over the specific code sequences generated by the AI Assistant in a manner that would contradict or limit the permissive terms of this license. The primary aim is to ensure the Software remains open and accessible, fostering learning and further innovation in the spirit of a combined human-AI collaborative effort.</p>
-
+                <p>This Software was developed by the Curator through a process of interactive collaboration with Google's Gemini. The Curator provided the initial concepts, creative direction, and critical review. The AI Assistant contributed to the generation, drafting, and composition of portions of the code and associated documentation.</p>
                 <h3>License Grant</h3>
                 <p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</p>
                 <ul class="list-disc ml-6 my-2">
                     <li>The above copyright notice, the Authorship and Contribution Acknowledgment, and this permission notice shall be included in all copies or substantial portions of the Software.</li>
                 </ul>
-
                 <h3>Disclaimer of Warranty</h3>
-                <p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS (INCLUDING THE CURATOR) OR COPYRIGHT HOLDERS (TO THE EXTENT APPLICABLE UNDER LAW REGARDING AI-ASSISTED WORKS) BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
+                <p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
 
-
-                <h2>Future</h2>
-                <p>Who knows what the future holds for OopisOS? Perhaps a GUI? Networking simulations? More in-OS games or educational modules? The modular architecture is designed to welcome such expansions. For now, we hope you enjoy exploring and using OopisOS v2.0!</p>
-                <p>If you're interested in the nitty-gritty, feel free to explore the source code and the HTML structure (<code>index.html</code>).</p>
-                <p class="mt-6"><em>"OopisOS v2.0: Even Oopisier, Now with Adventures and AI!"</em></p>
+                <h2>The Future?</h2>
+                <p>What's next for OopisOS? A graphical user interface? Simulated networking? A command to generate pictures of cats? The possibilities are as vast as your imagination. The modular architecture is ready for it.</p>
+                <p class="mt-6"><em>"OopisOS v2.2: Now with 22% more Oopis!"</em></p>
             </section>
 
             <footer class="footer text-center">
-                <p>&copy; 2025 Andrew Edmark & Gemini. OopisOS Educational Portal (v2.0).</p>
+                <p>&copy; 2025 Andrew Edmark & Gemini. OopisOS User-Friendly Manual (v2.2).</p>
             </footer>
         </main>
     </div>

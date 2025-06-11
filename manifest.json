@@ -1,5 +1,5 @@
 {
-  "name": "OopisOS v2.0",
+  "name": "OopisOS v2.2",
   "short_name": "OopisOS",
   "description": "A browser-based OS simulation with a terminal, file system, and text editor.",
   "start_url": "./index.html",

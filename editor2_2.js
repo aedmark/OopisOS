@@ -1,101 +1,4 @@
-// editor.js - OopisOS Live Markdown Text Editor v2.0
-
-const EditorModal = (() => {
-  "use strict";
-  let modalElement = null;
-  let overlayElement = null;
-  let resolvePromise = null;
-  let focusedBeforeModal = null;
-
-  function _createModalElements(message, confirmText = "Discard", cancelText = "Cancel") {
-    if (modalElement) _hide();
-
-    focusedBeforeModal = document.activeElement;
-
-    const messageP = Utils.createElement('p', {
-      textContent: message,
-    });
-
-    const confirmBtn = Utils.createElement('button', {
-      id: 'editor-modal-confirm-btn',
-      textContent: confirmText,
-      eventListeners: {
-        click: () => _handleAction(true)
-      },
-      className: "btn-editor-modal btn-confirm",
-    });
-
-    const cancelBtn = Utils.createElement('button', {
-      id: 'editor-modal-cancel-btn',
-      textContent: cancelText,
-      eventListeners: {
-        click: () => _handleAction(false)
-      },
-      className: "btn-editor-modal btn-cancel",
-    });
-
-    const buttonDiv = Utils.createElement('div', {
-      className: "editor-modal-buttons"
-    }, confirmBtn, cancelBtn);
-
-    modalElement = Utils.createElement('div', {
-      id: 'editor-modal-dialog',
-    }, messageP, buttonDiv);
-
-    const editorContainer = EditorUI.elements.editorContainer || document.getElementById('editor-container');
-    if (editorContainer) {
-      if (window.getComputedStyle(editorContainer).position === 'static') {
-        editorContainer.style.position = 'relative';
-      }
-      editorContainer.appendChild(modalElement);
-    } else {
-      console.warn("EditorModal: Editor container not found. Appending modal to body.");
-      document.body.appendChild(modalElement);
-    }
-
-    confirmBtn.focus();
-  }
-
-  function _handleAction(confirmed) {
-    if (resolvePromise) {
-      resolvePromise(confirmed);
-    }
-    _hide();
-  }
-
-  function _hide() {
-    if (modalElement && modalElement.parentNode) {
-      modalElement.parentNode.removeChild(modalElement);
-    }
-    modalElement = null;
-    overlayElement = null;
-    resolvePromise = null;
-
-    if (focusedBeforeModal && typeof focusedBeforeModal.focus === 'function') {
-      focusedBeforeModal.focus();
-    } else if (typeof EditorUI !== 'undefined' && EditorUI.setEditorFocus) {
-      EditorUI.setEditorFocus();
-    }
-    focusedBeforeModal = null;
-  }
-
-  function request(message, confirmButtonText = "Discard", cancelButtonText = "Cancel") {
-    return new Promise((resolve) => {
-      resolvePromise = resolve;
-      _createModalElements(message, confirmButtonText, cancelButtonText);
-    });
-  }
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && modalElement) {
-      _handleAction(false);
-    }
-  });
-
-  return {
-    request
-  };
-})();
+// editor.js - OopisOS Live Markdown Text Editor v2.2
 
 const EditorAppConfig = {
   EDITOR: {
@@ -963,11 +866,16 @@ const EditorManager = (() => {
     let terminalMessageClass = null;
 
     if (!saveChanges && isDirty) {
-      const userConfirmedDiscard = await EditorModal.request(
-        Config.MESSAGES.EDITOR_DISCARD_CONFIRM,
-        "Discard Changes",
-        "Keep Editing"
-      );
+      const userConfirmedDiscard = await new Promise(resolve => {
+        ModalManager.request({
+          context: 'graphical',
+          messageLines: [Config.MESSAGES.EDITOR_DISCARD_CONFIRM],
+          confirmText: "Discard Changes",
+          cancelText: "Keep Editing",
+          onConfirm: () => resolve(true),
+          onCancel: () => resolve(false)
+        });
+      });
 
       if (userConfirmedDiscard) {
         terminalMessage = `Editor closed for '${currentFilePath || "Untitled"}' without saving. Changes discarded.`;

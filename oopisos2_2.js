@@ -1,134 +1,4 @@
-// oopisos.js - OopisOS Core Logic v2.0
-
-const Config = (() => {
-  "use strict";
-  return {
-    DATABASE: {
-      NAME: "OopisOsDB",
-      VERSION: 2,
-      FS_STORE_NAME: "FileSystemsStore",
-      UNIFIED_FS_KEY: "OopisOS_SharedFS"
-    },
-    OS: {
-      NAME: "OopisOs",
-      VERSION: "2.0",
-      DEFAULT_HOST_NAME: "OopisOs",
-    },
-    USER: {
-      DEFAULT_NAME: "Guest",
-      RESERVED_USERNAMES: ["guest", "root", "admin", "system"],
-      MIN_USERNAME_LENGTH: 3,
-      MAX_USERNAME_LENGTH: 20,
-    },
-    TERMINAL: {
-      MAX_HISTORY_SIZE: 50,
-      PROMPT_CHAR: ">",
-      PROMPT_SEPARATOR: ":",
-      PROMPT_AT: "@",
-    },
-    STORAGE_KEYS: {
-      USER_CREDENTIALS: "oopisOsUserCredentials",
-      USER_TERMINAL_STATE_PREFIX: "oopisOsUserTerminalState_",
-      MANUAL_TERMINAL_STATE_PREFIX: "oopisOsManualUserTerminalState_",
-      EDITOR_WORD_WRAP_ENABLED: "oopisOsEditorWordWrapEnabled",
-    },
-    CSS_CLASSES: {
-      ERROR_MSG: "text-red-500",
-      SUCCESS_MSG: "text-lime-400",
-      CONSOLE_LOG_MSG: "text-neutral-400",
-      WARNING_MSG: "text-amber-400",
-      EDITOR_MSG: "text-sky-400",
-      DIR_ITEM: "text-sky-400 font-semibold",
-      FILE_ITEM: "text-green-500",
-      OUTPUT_LINE: "whitespace-pre-wrap break-words overflow-x-hidden min-h-[1.2em] leading-[1.2em]",
-      HIDDEN: "hidden",
-    },
-    FILESYSTEM: {
-      ROOT_PATH: "/",
-      CURRENT_DIR_SYMBOL: ".",
-      PARENT_DIR_SYMBOL: "..",
-      DEFAULT_DIRECTORY_TYPE: "directory",
-      DEFAULT_FILE_TYPE: "file",
-      PATH_SEPARATOR: "/",
-      DEFAULT_FILE_MODE: 0o60,
-      DEFAULT_DIR_MODE: 0o70,
-      DEFAULT_SCRIPT_MODE: 0o70,
-      PERMISSION_BIT_READ: 0b100,
-      PERMISSION_BIT_WRITE: 0b010,
-      PERMISSION_BIT_EXECUTE: 0b001,
-    },
-    MESSAGES: {
-      PERMISSION_DENIED_SUFFIX: ": Permission denied",
-      CONFIRMATION_PROMPT: "Type 'YES' (all caps) to confirm, or any other input to cancel.",
-      OPERATION_CANCELLED: "Operation cancelled.",
-      ALREADY_LOGGED_IN_AS_PREFIX: "Already logged in as '",
-      ALREADY_LOGGED_IN_AS_SUFFIX: "'.",
-      NO_ACTION_TAKEN: "No action taken.",
-      ALREADY_IN_DIRECTORY_PREFIX: "Already in '",
-      ALREADY_IN_DIRECTORY_SUFFIX: "'.",
-      DIRECTORY_EMPTY: "Directory is empty.",
-      TIMESTAMP_UPDATED_PREFIX: "Timestamp of '",
-      TIMESTAMP_UPDATED_SUFFIX: "' updated.",
-      FILE_CREATED_SUFFIX: "' created.",
-      ITEM_REMOVED_SUFFIX: "' removed.",
-      FORCIBLY_REMOVED_PREFIX: "Forcibly removed '",
-      FORCIBLY_REMOVED_SUFFIX: "'.",
-      REMOVAL_CANCELLED_PREFIX: "Removal of '",
-      REMOVAL_CANCELLED_SUFFIX: "' cancelled.",
-      MOVED_PREFIX: "Moved '",
-      MOVED_TO: "' to '",
-      MOVED_SUFFIX: "'.",
-      COPIED_PREFIX: "Copied '",
-      COPIED_TO: "' to '",
-      COPIED_SUFFIX: "'.",
-      SESSION_SAVED_FOR_PREFIX: "Session manually saved for ",
-      SESSION_LOADED_MSG: "Session loaded from manual save.",
-      LOAD_STATE_CANCELLED: "Load state cancelled.",
-      NO_MANUAL_SAVE_FOUND_PREFIX: "No manually saved state found for ",
-      WELCOME_PREFIX: "Guten Tag, ",
-      WELCOME_SUFFIX: "! Type 'help' for commands.",
-      EXPORTING_PREFIX: "Exporting '",
-      EXPORTING_SUFFIX: "'... Check your browser downloads.",
-      BACKUP_CREATING_PREFIX: "Creating backup '",
-      BACKUP_CREATING_SUFFIX: "'... Check your browser downloads.",
-      RESTORE_CANCELLED_NO_FILE: "Restore cancelled: No file selected.",
-      RESTORE_SUCCESS_PREFIX: "Session for user '",
-      RESTORE_SUCCESS_MIDDLE: "' successfully restored from '",
-      RESTORE_SUCCESS_SUFFIX: "'.",
-      UPLOAD_NO_FILE: "Upload cancelled: No file selected.",
-      UPLOAD_INVALID_TYPE_PREFIX: "Error: Invalid file type '",
-      UPLOAD_INVALID_TYPE_SUFFIX: "'. Only .txt, .md, .html, .sh, .js, .css, .json files are allowed.",
-      UPLOAD_SUCCESS_PREFIX: "File '",
-      UPLOAD_SUCCESS_MIDDLE: "' uploaded successfully to '",
-      UPLOAD_SUCCESS_SUFFIX: "'.",
-      UPLOAD_READ_ERROR_PREFIX: "Error reading file '",
-      UPLOAD_READ_ERROR_SUFFIX: "'.",
-      NO_COMMANDS_IN_HISTORY: "No commands in history.",
-      EDITOR_DISCARD_CONFIRM: "Care to save your work?",
-      BACKGROUND_PROCESS_STARTED_PREFIX: "[",
-      BACKGROUND_PROCESS_STARTED_SUFFIX: "] Backgrounded.",
-      BACKGROUND_PROCESS_OUTPUT_SUPPRESSED: "[Output suppressed for background process]",
-      PIPELINE_ERROR_PREFIX: "Pipeline error in command: ",
-    PASSWORD_PROMPT: "Enter password:",
-      PASSWORD_CONFIRM_PROMPT: "Confirm password:",
-      PASSWORD_MISMATCH: "Passwords do not match. User registration cancelled.",
-      INVALID_PASSWORD: "Incorrect password. Please try again.",
-      EMPTY_PASSWORD_NOT_ALLOWED: "Password cannot be empty.",
-    },
-    INTERNAL_ERRORS: {
-      DB_NOT_INITIALIZED_FS_SAVE: "DB not initialized for FS save",
-      DB_NOT_INITIALIZED_FS_LOAD: "DB not initialized for FS load",
-      DB_NOT_INITIALIZED_FS_DELETE: "DB not initialized for FS delete",
-      DB_NOT_INITIALIZED_FS_CLEAR: "DB not initialized for clearing all FS",
-      CORRUPTED_FS_DATA_PRE_SAVE: "Corrupted FS data before saving.",
-      SOURCE_NOT_FOUND_IN_PARENT_PREFIX: "internal error: source '",
-      SOURCE_NOT_FOUND_IN_PARENT_MIDDLE: "' not found in parent '",
-      SOURCE_NOT_FOUND_IN_PARENT_SUFFIX: "'",
-    },
-  };
-})();
-
-let DOM = {};
+// oopisos.js - OopisOS Core Logic v2.2
 
 const Utils = (() => {
   "use strict";
@@ -300,6 +170,7 @@ const Utils = (() => {
     const flags = {};
     const remainingArgs = [];
 
+    // Initialize all defined flag names to their default state
     flagDefinitions.forEach((def) => {
       flags[def.name] = def.takesValue ? null : false;
     });
@@ -308,97 +179,83 @@ const Utils = (() => {
       const arg = argsArray[i];
       let consumedAsFlag = false;
 
-      if (arg.startsWith("--") && arg.length > 2) {
-        for (const def of flagDefinitions) {
-          if (arg === def.long) {
-            if (def.takesValue) {
-              if (i + 1 < argsArray.length) {
-                flags[def.name] = argsArray[i + 1];
-                i++;
-              } else {
-                console.warn(`Flag ${arg} expects a value, but none was provided.`);
-                flags[def.name] = null;
+      // Function to check if an argument matches a flag definition (including aliases)
+      const isFlagMatch = (definition, argument) => {
+          const allIdentifiers = [definition.long, definition.short, ...(definition.aliases || [])];
+          return allIdentifiers.includes(argument);
+      };
+      
+      // Function to find the definition that matches the argument
+      const findDef = (argument) => {
+          for (const def of flagDefinitions) {
+              if (isFlagMatch(def, argument)) {
+                  return def;
               }
-            } else {
-              flags[def.name] = true;
-            }
-            consumedAsFlag = true;
-            break;
           }
-        }
-      } else if (arg.startsWith("-") && !arg.startsWith("--") && arg.length > 1) {
-        let isExactShortFlag = false;
-        for (const def of flagDefinitions) {
-          if (arg === def.short) {
-            if (def.takesValue) {
-              if (i + 1 < argsArray.length) {
-                flags[def.name] = argsArray[i + 1];
-                i++;
-              } else {
-                console.warn(`Flag ${arg} expects a value, but none was provided.`);
-                flags[def.name] = null;
-              }
+          return null;
+      };
+
+      if (arg.startsWith("-") && arg.length > 1) {
+        // Handle long flags (--flag) and exact short flags (-f)
+        const def = findDef(arg);
+
+        if (def) {
+          if (def.takesValue) {
+            if (i + 1 < argsArray.length) {
+              flags[def.name] = argsArray[i + 1];
+              i++; // Consume the value
             } else {
-              flags[def.name] = true;
+              console.warn(`Flag ${arg} expects a value, but none was provided.`);
+              flags[def.name] = null; // Or handle as an error
             }
-            isExactShortFlag = true;
-            consumedAsFlag = true;
-            break;
+          } else {
+            flags[def.name] = true;
           }
+          consumedAsFlag = true;
         }
+        // Handle combined short flags like -la (but not if it was an exact match above)
+        else if (arg.startsWith("-") && !arg.startsWith("--") && arg.length > 2) {
+            const chars = arg.substring(1);
+            let allCharsAreFlags = true;
+            let tempCombinedFlags = {};
+            let valueTaken = false;
 
-        if (!isExactShortFlag && arg.length > 1) {
-          const chars = arg.substring(1);
-          let allCharsAreFlags = true;
-          let tempCombinedFlags = {};
+            for (let j = 0; j < chars.length; j++) {
+                const charAsFlag = '-' + chars[j];
+                const charDef = findDef(charAsFlag);
 
-          for (let j = 0; j < chars.length; j++) {
-            const charAsFlag = '-' + chars[j];
-            let charIsDefinedFlag = false;
-            let charFlagTakesValue = false;
-            let charFlagDefName = null;
-
-            for (const def of flagDefinitions) {
-              if (charAsFlag === def.short) {
-                charIsDefinedFlag = true;
-                charFlagTakesValue = def.takesValue;
-                charFlagDefName = def.name;
-                break;
-              }
-            }
-
-            if (charIsDefinedFlag) {
-              if (charFlagTakesValue) {
-                if (j === chars.length - 1) {
-                  if (i + 1 < argsArray.length) {
-                    tempCombinedFlags[charFlagDefName] = argsArray[i + 1];
-                  } else {
-                    console.warn(`Flag ${charAsFlag} in group ${arg} expects a value, but none was provided.`);
-                    tempCombinedFlags[charFlagDefName] = null;
-                  }
+                if (charDef) {
+                    if (charDef.takesValue) {
+                        // A value-taking flag must be the last in a combined group
+                        if (j === chars.length - 1) {
+                            if (i + 1 < argsArray.length) {
+                                tempCombinedFlags[charDef.name] = argsArray[i + 1];
+                                valueTaken = true; // Mark that the next arg is consumed
+                            } else {
+                                console.warn(`Flag ${charAsFlag} in group ${arg} expects a value, but none was provided.`);
+                                tempCombinedFlags[charDef.name] = null;
+                            }
+                        } else {
+                            console.warn(`Value-taking flag ${charAsFlag} in combined group ${arg} must be at the end.`);
+                            allCharsAreFlags = false;
+                            break;
+                        }
+                    } else {
+                        tempCombinedFlags[charDef.name] = true;
+                    }
                 } else {
-                  console.warn(`Value-taking flag ${charAsFlag} in combined group ${arg} must be at the end of the group.`);
-                  allCharsAreFlags = false;
-                  break;
+                    allCharsAreFlags = false;
+                    break;
                 }
-              } else {
-                tempCombinedFlags[charFlagDefName] = true;
-              }
-            } else {
-              allCharsAreFlags = false;
-              break;
             }
-          }
 
-          if (allCharsAreFlags) {
-            Object.assign(flags, tempCombinedFlags);
-            consumedAsFlag = true;
-            const lastCharInGroup = '-' + chars[chars.length - 1];
-            const lastCharDef = flagDefinitions.find(d => d.short === lastCharInGroup);
-            if (lastCharDef && lastCharDef.takesValue && (i + 1 < argsArray.length)) {
-              i++;
+            if (allCharsAreFlags) {
+                Object.assign(flags, tempCombinedFlags);
+                consumedAsFlag = true;
+                if (valueTaken) {
+                    i++; // Consume the value for the last flag in the group
+                }
             }
-          }
         }
       }
 
@@ -406,10 +263,7 @@ const Utils = (() => {
         remainingArgs.push(arg);
       }
     }
-    return {
-      flags,
-      remainingArgs
-    };
+    return { flags, remainingArgs };
   }
 
   function globToRegex(glob) {
@@ -481,6 +335,418 @@ const Utils = (() => {
     validateUsernameFormat,
     parseFlags,
     globToRegex,
+  };
+})();
+
+const Config = (() => {
+  "use strict";
+
+  const defaultConfig = {
+    DATABASE: {
+      NAME: "OopisOsDB",
+      VERSION: 2,
+      FS_STORE_NAME: "FileSystemsStore",
+      UNIFIED_FS_KEY: "OopisOS_SharedFS"
+    },
+    OS: {
+      NAME: "OopisOs",
+      VERSION: "2.2",
+      DEFAULT_HOST_NAME: "OopisOs",
+    },
+    USER: {
+      DEFAULT_NAME: "Guest",
+      RESERVED_USERNAMES: ["guest", "root", "admin", "system"],
+      MIN_USERNAME_LENGTH: 3,
+      MAX_USERNAME_LENGTH: 20,
+    },
+    TERMINAL: {
+      MAX_HISTORY_SIZE: 50,
+      PROMPT_CHAR: ">", // Default prompt char - will be overridden by file
+      PROMPT_SEPARATOR: ":",
+      PROMPT_AT: "@",
+    },
+    STORAGE_KEYS: {
+      USER_CREDENTIALS: "oopisOsUserCredentials",
+      USER_TERMINAL_STATE_PREFIX: "oopisOsUserTerminalState_",
+      MANUAL_TERMINAL_STATE_PREFIX: "oopisOsManualUserTerminalState_",
+      EDITOR_WORD_WRAP_ENABLED: "oopisOsEditorWordWrapEnabled",
+      GEMINI_API_KEY: "oopisGeminiApiKey",
+    },
+    CSS_CLASSES: {
+      ERROR_MSG: "text-red-500",
+      SUCCESS_MSG: "text-lime-400",
+      CONSOLE_LOG_MSG: "text-neutral-400",
+      WARNING_MSG: "text-amber-400",
+      EDITOR_MSG: "text-sky-400",
+      DIR_ITEM: "text-sky-400 font-semibold",
+      FILE_ITEM: "text-green-500",
+      OUTPUT_LINE: "whitespace-pre-wrap break-words overflow-x-hidden min-h-[1.2em] leading-[1.2em]",
+      HIDDEN: "hidden",
+    },
+    FILESYSTEM: {
+      ROOT_PATH: "/",
+      CURRENT_DIR_SYMBOL: ".",
+      PARENT_DIR_SYMBOL: "..",
+      DEFAULT_DIRECTORY_TYPE: "directory",
+      DEFAULT_FILE_TYPE: "file",
+      PATH_SEPARATOR: "/",
+      DEFAULT_FILE_MODE: 0o60,
+      DEFAULT_DIR_MODE: 0o70,
+      DEFAULT_SCRIPT_MODE: 0o70,
+      DEFAULT_SH_MODE: 0o70,
+      PERMISSION_BIT_READ: 0b100,
+      PERMISSION_BIT_WRITE: 0b010,
+      PERMISSION_BIT_EXECUTE: 0b001,
+    },
+    MESSAGES: {
+      PERMISSION_DENIED_SUFFIX: ": Permission denied",
+      CONFIRMATION_PROMPT: "Type 'YES' (all caps) to confirm, or any other input to cancel.",
+      OPERATION_CANCELLED: "Operation cancelled.",
+      ALREADY_LOGGED_IN_AS_PREFIX: "Already logged in as '",
+      ALREADY_LOGGED_IN_AS_SUFFIX: "'.",
+      NO_ACTION_TAKEN: "No action taken.",
+      ALREADY_IN_DIRECTORY_PREFIX: "Already in '",
+      ALREADY_IN_DIRECTORY_SUFFIX: "'.",
+      DIRECTORY_EMPTY: "Directory is empty.",
+      TIMESTAMP_UPDATED_PREFIX: "Timestamp of '",
+      TIMESTAMP_UPDATED_SUFFIX: "' updated.",
+      FILE_CREATED_SUFFIX: "' created.",
+      ITEM_REMOVED_SUFFIX: "' removed.",
+      FORCIBLY_REMOVED_PREFIX: "Forcibly removed '",
+      FORCIBLY_REMOVED_SUFFIX: "'.",
+      REMOVAL_CANCELLED_PREFIX: "Removal of '",
+      REMOVAL_CANCELLED_SUFFIX: "' cancelled.",
+      MOVED_PREFIX: "Moved '",
+      MOVED_TO: "' to '",
+      MOVED_SUFFIX: "'.",
+      COPIED_PREFIX: "Copied '",
+      COPIED_TO: "' to '",
+      COPIED_SUFFIX: "'.",
+      SESSION_SAVED_FOR_PREFIX: "Session manually saved for ",
+      SESSION_LOADED_MSG: "Session loaded from manual save.",
+      LOAD_STATE_CANCELLED: "Load state cancelled.",
+      NO_MANUAL_SAVE_FOUND_PREFIX: "No manually saved state found for ",
+      WELCOME_PREFIX: "Aloha,", // Original hardcoded default (NO trailing space here!)
+      WELCOME_SUFFIX: "! Type 'help' for commands.",
+      EXPORTING_PREFIX: "Exporting '",
+      EXPORTING_SUFFIX: "'... Check your browser downloads.",
+      BACKUP_CREATING_PREFIX: "Creating backup '",
+      BACKUP_CREATING_SUFFIX: "'... Check your browser downloads.",
+      RESTORE_CANCELLED_NO_FILE: "Restore cancelled: No file selected.",
+      RESTORE_SUCCESS_PREFIX: "Session for user '",
+      RESTORE_SUCCESS_MIDDLE: "' successfully restored from '",
+      RESTORE_SUCCESS_SUFFIX: "'.",
+      UPLOAD_NO_FILE: "Upload cancelled: No file selected.",
+      UPLOAD_INVALID_TYPE_PREFIX: "Error: Invalid file type '",
+      UPLOAD_INVALID_TYPE_SUFFIX: "'. Only .txt, .md, .html, .sh, .js, .css, .json files are allowed.",
+      UPLOAD_SUCCESS_PREFIX: "File '",
+      UPLOAD_SUCCESS_MIDDLE: "' uploaded successfully to '",
+      UPLOAD_SUCCESS_SUFFIX: "'.",
+      UPLOAD_READ_ERROR_PREFIX: "Error reading file '",
+      UPLOAD_READ_ERROR_SUFFIX: "'.",
+      NO_COMMANDS_IN_HISTORY: "No commands in history.",
+      EDITOR_DISCARD_CONFIRM: "Care to save your work?",
+      BACKGROUND_PROCESS_STARTED_PREFIX: "[",
+      BACKGROUND_PROCESS_STARTED_SUFFIX: "] Backgrounded.",
+      BACKGROUND_PROCESS_OUTPUT_SUPPRESSED: "[Output suppressed for background process]",
+      PIPELINE_ERROR_PREFIX: "Pipeline error in command: ",
+      PASSWORD_PROMPT: "Enter password:",
+      PASSWORD_CONFIRM_PROMPT: "Confirm password:",
+      PASSWORD_MISMATCH: "Passwords do not match. User registration cancelled.",
+      INVALID_PASSWORD: "Incorrect password. Please try again.",
+      EMPTY_PASSWORD_NOT_ALLOWED: "Password cannot be empty.",
+    },
+    INTERNAL_ERRORS: {
+      DB_NOT_INITIALIZED_FS_SAVE: "DB not initialized for FS save",
+      DB_NOT_INITIALIZED_FS_LOAD: "DB not initialized for FS load",
+      DB_NOT_INITIALIZED_FS_DELETE: "DB not initialized for FS delete",
+      DB_NOT_INITIALIZED_FS_CLEAR: "DB not initialized for clearing all FS",
+      CORRUPTED_FS_DATA_PRE_SAVE: "Corrupted FS data before saving.",
+      SOURCE_NOT_FOUND_IN_PARENT_PREFIX: "internal error: source '",
+      SOURCE_NOT_FOUND_IN_PARENT_MIDDLE: "' not found in parent '",
+      SOURCE_NOT_FOUND_IN_PARENT_SUFFIX: "'",
+    },
+  };
+
+  // The active configuration object, initialized with defaults
+  let currentConfig = Utils.deepCopyNode(defaultConfig);
+
+  /**
+   * Helper to set a nested property on an object using a dot-notation path.
+   * @param {object} obj - The object to modify.
+   * @param {string} path - The dot-notation path (e.g., "TERMINAL.PROMPT_CHAR").
+   * @param {*} value - The value to set.
+   */
+  function setNestedProperty(obj, path, value) {
+    const parts = path.split('.');
+    let current = obj;
+    for (let i = 0; i < parts.length - 1; i++) {
+      if (!current[parts[i]] || typeof current[parts[i]] !== 'object') {
+        current[parts[i]] = {}; // Create nested object if it doesn't exist
+      }
+      current = current[parts[i]];
+    }
+    current[parts[parts.length - 1]] = parseConfigValue(value);
+  }
+
+  /**
+   * Helper to parse string values from config file into appropriate types.
+   * @param {string} valueStr - The string value from the config file.
+   * @returns {*} The parsed value (number, boolean, or string).
+   */
+  function parseConfigValue(valueStr) {
+    if (valueStr === 'true') return true;
+    if (valueStr === 'false') return false;
+    if (valueStr === 'null') return null; // Added for completeness, though not currently used.
+    if (!isNaN(valueStr) && !isNaN(parseFloat(valueStr))) return parseFloat(valueStr);
+    return valueStr;
+  }
+
+  /**
+   * Attempts to load configuration overrides from /etc/oopis.conf.
+   * This function should be called after FileSystemManager is loaded.
+   */
+  async function loadFromFile() {
+    const configFilePath = "/etc/oopis.conf";
+    // Using try-catch to handle potential errors during FS access or parsing.
+    try {
+      const configNode = FileSystemManager.getNodeByPath(configFilePath);
+
+      // If the file doesn't exist, we just use the defaults and log a warning.
+      // This should ideally not happen if initialize() creates it reliably.
+      if (!configNode) {
+        console.warn(`Config: '${configFilePath}' not found. Using default configuration.`);
+        return;
+      }
+
+      // Basic validation for the config file node.
+      if (configNode.type !== defaultConfig.FILESYSTEM.DEFAULT_FILE_TYPE) {
+        console.warn(`Config: '${configFilePath}' is not a file. Using default configuration.`);
+        return;
+      }
+
+      // Check read permission on the config file. Root user or owner needs read access.
+      // We explicitly allow root to read anything.
+      const currentUser = UserManager.getCurrentUser().name;
+      if (!FileSystemManager.hasPermission(configNode, currentUser, "read")) {
+        console.warn(`Config: Permission denied to read '${configFilePath}'. Using default configuration.`);
+        return;
+      }
+
+      const content = configNode.content || "";
+      const lines = content.split('\n');
+
+      for (const line of lines) {
+        const trimmedLine = line.trim();
+        // Skip comments and empty lines.
+        if (trimmedLine.startsWith('#') || trimmedLine === '') {
+          continue;
+        }
+
+        const parts = trimmedLine.split('=');
+        if (parts.length >= 2) {
+          const key = parts[0].trim();
+          // Join the rest of the parts in case the value itself contains an '='
+          const value = parts.slice(1).join('=').trim();
+
+          // Only apply overrides for keys that exist in our defaultConfig structure.
+          // This prevents accidental creation of new config properties.
+          let tempCheck = defaultConfig;
+          let keyExistsInDefaults = true;
+          const keyParts = key.split('.');
+          for(const part of keyParts) {
+              if (tempCheck && typeof tempCheck === 'object' && tempCheck.hasOwnProperty(part)) {
+                  tempCheck = tempCheck[part];
+              } else {
+                  keyExistsInDefaults = false;
+                  break;
+              }
+          }
+
+          if (keyExistsInDefaults) {
+              setNestedProperty(currentConfig, key, value);
+          } else {
+              console.warn(`Config: Unknown or invalid key path '${key}' in '${configFilePath}'. Ignoring.`);
+          }
+        } else {
+            console.warn(`Config: Malformed line in '${configFilePath}': '${trimmedLine}'. Ignoring.`);
+        }
+      }
+      console.log(`Config: Configuration loaded from '${configFilePath}'.`);
+    } catch (error) {
+      console.error(`Config: Error loading or parsing '${configFilePath}':`, error);
+      // Fallback to default configuration in case of any runtime error during loading.
+    }
+  }
+
+  // Return the currentConfig object directly. This allows existing code
+  // like `Config.TERMINAL.PROMPT_CHAR` to continue working without modification.
+  // We also expose the `loadFromFile` method for external use.
+  return {
+    ...currentConfig, // Spreads all properties of currentConfig
+    loadFromFile, // Exposes the function to load config from file
+    // If you need a getter for dynamic access *after* initial load (e.g., if you modify Config.currentConfig directly later)
+    // you could add: get: (key) => { const parts = key.split('.'); let value = currentConfig; for (const p of parts) { if (value && value.hasOwnProperty(p)) value = value[p]; else return undefined; } return value; }
+  };
+})();
+
+let DOM = {};
+
+const ModalManager = (() => {
+  "use strict";
+
+  let isAwaitingTerminalInput = false;
+  let activeModalContext = null;
+
+  // Private function to render the graphical modal (logic from EditorModal)
+  function _renderGraphicalModal(options) {
+    const {
+        messageLines,
+        onConfirm,
+        onCancel,
+        confirmText = 'OK',
+        cancelText = 'Cancel'
+    } = options;
+
+    const parentContainer = DOM.terminalBezel;
+    if (!parentContainer) {
+        console.error("ModalManager: Cannot find terminal-bezel to attach modal.");
+        if (options.onCancel) options.onCancel();
+        return;
+    }
+    
+    // The CSS for #editor-modal-dialog uses `position: absolute`, so its parent
+    // needs a non-static position. We'll ensure it's relative.
+    const originalParentPosition = parentContainer.style.position;
+    if (window.getComputedStyle(parentContainer).position === 'static') {
+        parentContainer.style.position = 'relative';
+    }
+
+    const removeModal = () => {
+        const modal = document.getElementById('editor-modal-dialog');
+        if (modal && modal.parentNode) {
+            modal.parentNode.removeChild(modal);
+        }
+        // Restore original position style to avoid side-effects
+        parentContainer.style.position = originalParentPosition;
+    };
+
+    // Use the specific CSS classes and IDs from terminal.css
+    const confirmButton = Utils.createElement('button', {
+        className: 'btn-editor-modal btn-confirm',
+        textContent: confirmText,
+        eventListeners: {
+            click: () => {
+                removeModal();
+                if (onConfirm) onConfirm();
+            }
+        }
+    });
+
+    const cancelButton = Utils.createElement('button', {
+        className: 'btn-editor-modal btn-cancel',
+        textContent: cancelText,
+        eventListeners: {
+            click: () => {
+                removeModal();
+                if (onCancel) onCancel();
+            }
+        }
+    });
+
+    const buttonContainer = Utils.createElement('div', {
+        className: 'editor-modal-buttons'
+    }, [confirmButton, cancelButton]);
+
+    const messageContainer = Utils.createElement('div');
+    messageLines.forEach(line => {
+        messageContainer.appendChild(Utils.createElement('p', { textContent: line }));
+    });
+
+    const modalDialog = Utils.createElement('div', {
+        id: 'editor-modal-dialog'
+    }, [messageContainer, buttonContainer]);
+
+    parentContainer.appendChild(modalDialog);
+  }
+
+  // --- FIX STARTS HERE ---
+  // The missing function is defined and now includes logic to restore the input line.
+  function _renderTerminalPrompt(options) {
+    if (isAwaitingTerminalInput) {
+        OutputManager.appendToOutput("ModalManager: Another terminal prompt is already active.", { typeClass: Config.CSS_CLASSES.WARNING_MSG });
+        if (options.onCancel) options.onCancel();
+        return;
+    }
+
+    isAwaitingTerminalInput = true;
+    activeModalContext = {
+        onConfirm: options.onConfirm,
+        onCancel: options.onCancel,
+        data: options.data || {}
+    };
+
+    options.messageLines.forEach(line => {
+        OutputManager.appendToOutput(line, { typeClass: Config.CSS_CLASSES.WARNING_MSG });
+    });
+
+    OutputManager.appendToOutput(Config.MESSAGES.CONFIRMATION_PROMPT, { typeClass: Config.CSS_CLASSES.CONSOLE_LOG_MSG });
+    
+    // This is the crucial part: The command executor hides the input line
+    // before running the command. A modal that requires terminal input
+    // must explicitly un-hide it to break the deadlock.
+    if (DOM.inputLineContainerDiv) {
+        DOM.inputLineContainerDiv.classList.remove(Config.CSS_CLASSES.HIDDEN);
+    }
+    TerminalUI.setInputState(true); // Also ensure it's editable.
+    TerminalUI.focusInput();
+    TerminalUI.clearInput();
+    
+    if (DOM.outputDiv) {
+        DOM.outputDiv.scrollTop = DOM.outputDiv.scrollHeight;
+    }
+  }
+  // --- FIX ENDS HERE ---
+
+  // The main public API
+  function request(options) {
+    if (options.context === 'graphical') {
+      _renderGraphicalModal(options);
+    } else { // Default to terminal
+      _renderTerminalPrompt(options);
+    }
+  }
+
+  // New function to handle input when a terminal prompt is active
+  async function handleTerminalInput(input) {
+    if (!isAwaitingTerminalInput) return false;
+
+    const promptString = `${DOM.promptUserSpan.textContent}${Config.TERMINAL.PROMPT_AT}${DOM.promptHostSpan.textContent}${Config.TERMINAL.PROMPT_SEPARATOR}${DOM.promptPathSpan.textContent}${Config.TERMINAL.PROMPT_CHAR} `;
+    await OutputManager.appendToOutput(`${promptString}${input.trim()}`);
+
+    if (input.trim() === 'YES') {
+      await activeModalContext.onConfirm(activeModalContext.data);
+    } else {
+      if (typeof activeModalContext.onCancel === 'function') {
+        await activeModalContext.onCancel(activeModalContext.data);
+      } else {
+        OutputManager.appendToOutput(Config.MESSAGES.OPERATION_CANCELLED, { typeClass: Config.CSS_CLASSES.CONSOLE_LOG_MSG });
+      }
+    }
+    
+    isAwaitingTerminalInput = false;
+    activeModalContext = null;
+    return true; // Indicates the input was consumed by the modal manager
+  }
+  
+  function isAwaiting() {
+    return isAwaitingTerminalInput;
+  }
+
+  return {
+    request,
+    handleTerminalInput,
+    isAwaiting,
   };
 })();
 
@@ -588,7 +854,7 @@ const OutputManager = (() => {
       const currentInputVal = TerminalUI.getCurrentInputValue();
       const echoLine = Utils.createElement("div", {
         className: Config.CSS_CLASSES.OUTPUT_LINE,
-        textContent: `${promptText}${currentInputVal}`
+        innerHTML: `${promptText}${currentInputVal}`
       });
       DOM.outputDiv.appendChild(echoLine);
     }
@@ -598,7 +864,7 @@ const OutputManager = (() => {
       const lineClasses = Config.CSS_CLASSES.OUTPUT_LINE.split(" ");
       const lineAttributes = {
         classList: [...lineClasses],
-        textContent: line
+        innerHTML: line
       };
       if (typeClass) typeClass.split(" ").forEach((cls) => {
         if (cls) lineAttributes.classList.push(cls);
@@ -792,6 +1058,10 @@ const FileSystemManager = (() => {
   "use strict";
   let fsData = {};
   let currentPath = Config.FILESYSTEM.ROOT_PATH;
+  const OOPIS_CONF_CONTENT = `TERMINAL.PROMPT_CHAR=>
+OS.DEFAULT_HOST_NAME=OopisOS
+MESSAGES.WELCOME_PREFIX=Greetings and Salutations,
+MESSAGES.WELCOME_SUFFIX=! Welcome to OopisOS!`;
 
   async function initialize(guestUsername) { // guestUsername param is now effectively just Config.USER.DEFAULT_NAME
         const nowISO = new Date().toISOString();
@@ -817,7 +1087,35 @@ const FileSystemManager = (() => {
         await createUserHomeDirectory('root');
         await createUserHomeDirectory(guestUsername); // which is 'Guest'
         await createUserHomeDirectory('userDiag');
-  }
+        const rootNode = fsData[Config.FILESYSTEM.ROOT_PATH];
+          if (rootNode) { // Create /etc directory
+            rootNode.children['etc'] = {
+            type: Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE,
+            children: {},
+            owner: 'root',
+            mode: 0o75, // rwxr-x for etc directory
+            mtime: nowISO
+          };
+          rootNode.mtime = nowISO; // Update root's modification time
+
+          const etcNode = rootNode.children['etc'];
+          if (etcNode) {
+            // Create oopis.conf inside /etc
+            etcNode.children['oopis.conf'] = {
+                type: Config.FILESYSTEM.DEFAULT_FILE_TYPE,
+                content: OOPIS_CONF_CONTENT, // Use the hardcoded content
+                owner: 'root',
+                mode: 0o64, // rw-r-- for config file
+                mtime: nowISO
+            };
+            etcNode.mtime = nowISO; // Update etc's modification time
+            } else {
+              console.error("FileSystemManager: Failed to create /etc directory.");
+            }
+            } else {
+              console.error("FileSystemManager: Root node not found during initialization. Critical error.");
+            }
+          }
 
   async function createUserHomeDirectory(username) {
     if (!fsData['/']?.children?.home) {
@@ -968,8 +1266,7 @@ const FileSystemManager = (() => {
     return Config.FILESYSTEM.PATH_SEPARATOR + resolvedSegments.join(Config.FILESYSTEM.PATH_SEPARATOR);
   }
 
-  function getNodeByPath(path) {
-    const absolutePath = getAbsolutePath(path, currentPath);
+  function getNodeByPath(absolutePath) {
     const currentUser = UserManager.getCurrentUser().name;
 
     if (absolutePath === Config.FILESYSTEM.ROOT_PATH) {
@@ -1006,13 +1303,15 @@ const FileSystemManager = (() => {
   }
 
   function _updateNodeAndParentMtime(nodePath, nowISO) {
+    // This function already deals with absolute paths, so it can use the new internal function.
     if (!nodePath || !nowISO) return;
-    const node = getNodeByPath(nodePath);
+    const node = getNodeByPath(nodePath); 
     if (node) node.mtime = nowISO;
     if (nodePath !== Config.FILESYSTEM.ROOT_PATH) {
-      const parentPath = nodePath.substring(0, nodePath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR)) || Config.FILESYSTEM.ROOT_PATH;
-      const parentNode = getNodeByPath(parentPath);
-      if (parentNode && parentNode.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE) parentNode.mtime = nowISO;
+        const parentPath = nodePath.substring(0, nodePath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR)) || Config.FILESYSTEM.ROOT_PATH;
+        // Changed from the non-existent _getNodeByAbsolutePath to the correct getNodeByPath
+        const parentNode = getNodeByPath(parentPath);
+        if (parentNode && parentNode.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE) parentNode.mtime = nowISO;
     }
   }
 
@@ -1260,30 +1559,19 @@ const FileSystemManager = (() => {
     return { success: true, messages, anyChangeMade };
   }
 
-  function _createNewFileNode(filename, content, owner) {
-    if (!filename || typeof owner === 'undefined') {
-        console.error("_createNewFileNode: filename and owner are required.");
-        return null; // Or throw an error
-    }
-  
-    const fileExt = Utils.getFileExtension(filename);
-    // In OopisOS, only .sh files are considered executable by default upon creation
-    const isExecutable = fileExt === "sh";
-  
-    // Determine the correct file mode based on the extension
-    const newFileMode = isExecutable
-        ? Config.FILESYSTEM.DEFAULT_SCRIPT_MODE // e.g., 0o70 (rwx---)
-        : Config.FILESYSTEM.DEFAULT_FILE_MODE;  // e.g., 0o60 (rw----)
-  
-    // Return the standardized file node object
+  function _createNewFileNode(name, content, owner, mode = null) {
+    const nowISO = new Date().toISOString();
     return {
         type: Config.FILESYSTEM.DEFAULT_FILE_TYPE,
         content: content || "",
         owner: owner,
-        mode: newFileMode,
-        mtime: new Date().toISOString(),
+        // --- THIS IS THE CRITICAL LOGIC ---
+        // If an explicit mode is passed (e.g., from upload), use it.
+        // Otherwise, use the secure, non-executable default.
+        mode: (mode !== null) ? mode : Config.FILESYSTEM.DEFAULT_FILE_MODE, // DEFAULT_FILE_MODE should be 64
+        mtime: nowISO,
     };
-  }
+}
 
   return {
     initialize,
@@ -1296,7 +1584,7 @@ const FileSystemManager = (() => {
     getFsData,
     setFsData,
     getAbsolutePath,
-    getNodeByPath,
+    getNodeByPath, // This is now the safe, public function
     createParentDirectoriesIfNeeded,
     calculateNodeSize,
     validatePath,
@@ -1305,7 +1593,7 @@ const FileSystemManager = (() => {
     _updateNodeAndParentMtime,
     _ensurePermissionsAndMtimeRecursive,
     _createNewFileNode,
-    deleteNodeRecursive, // Expose the new function
+    deleteNodeRecursive,
   };
 })();
 
@@ -1371,564 +1659,8 @@ const HistoryManager = (() => {
   };
 })();
 
-const ConfirmationManager = (() => {
-  "use strict";
-  let awaitingConfirmation = false;
-  let confirmationContext = null;
-
-  function request(promptMessageLines, dataForAction, onConfirmCallback, onCancelCallback = null) {
-    if (awaitingConfirmation) {
-      OutputManager.appendToOutput("Another confirmation is already pending.", {
-        typeClass: Config.CSS_CLASSES.WARNING_MSG
-      });
-      if (onCancelCallback) onCancelCallback(dataForAction);
-      return;
-    }
-    awaitingConfirmation = true;
-    confirmationContext = {
-      promptMessageLines: Array.isArray(promptMessageLines) ? promptMessageLines : [promptMessageLines],
-      data: dataForAction,
-      onConfirm: onConfirmCallback,
-      onCancel: onCancelCallback
-    };
-    confirmationContext.promptMessageLines.forEach((line) => OutputManager.appendToOutput(line, {
-      typeClass: Config.CSS_CLASSES.WARNING_MSG
-    }));
-    OutputManager.appendToOutput(Config.MESSAGES.CONFIRMATION_PROMPT, {
-      typeClass: Config.CSS_CLASSES.WARNING_MSG
-    });
-    TerminalUI.setInputState(true);
-    TerminalUI.clearInput();
-    if (DOM.inputLineContainerDiv) DOM.inputLineContainerDiv.classList.remove(Config.CSS_CLASSES.HIDDEN);
-    TerminalUI.focusInput();
-    if (DOM.outputDiv) DOM.outputDiv.scrollTop = DOM.outputDiv.scrollHeight;
-  }
-  async function handleConfirmation(input) {
-    if (!awaitingConfirmation || !confirmationContext) return false;
-    let processed = false;
-    if (input.trim() === "YES" && typeof confirmationContext.onConfirm === "function") {
-      await confirmationContext.onConfirm(confirmationContext.data);
-      processed = true;
-    } else {
-      if (typeof confirmationContext.onCancel === "function") await confirmationContext.onCancel(confirmationContext.data);
-      else OutputManager.appendToOutput(Config.MESSAGES.OPERATION_CANCELLED, {
-        typeClass: Config.CSS_CLASSES.CONSOLE_LOG_MSG
-      });
-      processed = true;
-    }
-    awaitingConfirmation = false;
-    confirmationContext = null;
-    return processed;
-  }
-
-  function isAwaiting() {
-    return awaitingConfirmation;
-  }
-  return {
-    request,
-    handleConfirmation,
-    isAwaiting
-  };
-})();
-
-    // --- NEW: PasswordPromptManager Module ---
-    const PasswordPromptManager = (() => {
-      "use strict";
-      let _isAwaitingPasswordInput = false;
-      let _passwordContext = null; // { onPasswordReceived: fn, onCancelled: fn, currentPassword: '' }
-      let _obscuredInput = ''; // To store the actual password input
-      let _cursorPosition = 0; // To track cursor for obscured display
-    
-      function requestPassword(promptMessage, onPasswordReceivedCallback, onCancelledCallback = null, isConfirmPassword = false) {
-        if (_isAwaitingPasswordInput) {
-          OutputManager.appendToOutput("Another password prompt is already pending.", { typeClass: Config.CSS_CLASSES.WARNING_MSG });
-          if (onCancelledCallback) onCancelledCallback();
-          return;
-        }
-    
-        _isAwaitingPasswordInput = true;
-        _obscuredInput = '';
-        _cursorPosition = 0;
-        _passwordContext = { onPasswordReceived: onPasswordReceivedCallback, onCancelled: onCancelledCallback, isConfirmPassword: isConfirmPassword };
-    
-        OutputManager.appendToOutput(promptMessage, { typeClass: Config.CSS_CLASSES.CONSOLE_LOG_MSG });
-        TerminalUI.clearInput();
-        TerminalUI.setInputState(true, true); // Enable input, set obscured mode
-        TerminalUI.focusInput();
-        if (DOM.outputDiv) DOM.outputDiv.scrollTop = DOM.outputDiv.scrollHeight;
-      }
-    
-      async function handlePasswordInput(rawInput) {
-    if (!_isAwaitingPasswordInput || !_passwordContext) return false;
-
-    // Capture the necessary callback before clearing the state.
-    const callback = _passwordContext.onPasswordReceived;
-    const isConfirm = _passwordContext.isConfirmPassword;
-    const cancelledCallback = _passwordContext.onCancelled;
-
-    // Clear state *before* invoking the callback to prevent re-entrancy issues.
-    _isAwaitingPasswordInput = false;
-    _passwordContext = null;
-
-    TerminalUI.setInputState(true, false); // Disable obscured mode
-    TerminalUI.clearInput(); // Clear asterisks
-
-    const password = rawInput;
-
-    // Now, handle the logic with the captured callback.
-    // The policy for empty passwords is now moved to the command handler.
-    if (typeof callback === "function") {
-        await callback(password);
-    }
-
-    return true; // Input was handled
-}
-    
-      function isAwaitingPassword() {
-        return _isAwaitingPasswordInput;
-      }
-    
-      // Public API for updating obscured input (called by TerminalUI's keydown)
-      function updateObscuredDisplay(key, rawChar, currentCursorPos) {
-        if (!_isAwaitingPasswordInput) return;
-    
-        let currentInputArray = Array.from(_obscuredInput);
-        let newObscuredInput = '';
-    
-        if (key === 'Backspace') {
-          if (_cursorPosition > 0) {
-            currentInputArray.splice(_cursorPosition - 1, 1);
-            _cursorPosition--;
-          }
-        } else if (key === 'Delete') {
-          if (_cursorPosition < currentInputArray.length) {
-            currentInputArray.splice(_cursorPosition, 1);
-          }
-        } else if (rawChar && rawChar.length === 1 && !['Tab', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter', 'Escape'].includes(key)) {
-            // Insert character at cursor position
-            currentInputArray.splice(_cursorPosition, 0, rawChar);
-            _cursorPosition++;
-        } else if (key === 'ArrowLeft') {
-            _cursorPosition = Math.max(0, _cursorPosition - 1);
-        } else if (key === 'ArrowRight') {
-            _cursorPosition = Math.min(currentInputArray.length, _cursorPosition + 1);
-        } else if (key === 'Home') { // Or 'PageUp'
-            _cursorPosition = 0;
-        } else if (key === 'End') { // Or 'PageDown'
-            _cursorPosition = currentInputArray.length;
-        }
-    
-        _obscuredInput = currentInputArray.join('');
-        TerminalUI.setCurrentInputValue('*'.repeat(_obscuredInput.length), false); // Display asterisks
-        TerminalUI.setCaretPosition(DOM.editableInputDiv, _cursorPosition); // Set caret for asterisks
-      }
-    
-      // Public API for retrieving the actual (un-obscured) input
-      function getActualObscuredInput() {
-        return _obscuredInput;
-      }
-    
-      return {
-        requestPassword,
-        handlePasswordInput,
-        isAwaitingPassword,
-        updateObscuredDisplay,
-        getActualObscuredInput
-      };
-    })();
-    // --- END NEW: PasswordPromptManager ---
-
-const UserManager = (() => {
-  "use strict";
-  let currentUser = {
-    name: Config.USER.DEFAULT_NAME
-  };
-  function _hashPassword(password) {
-        // IMPORTANT: This is a very simple, non-cryptographic hash for simulation purposes.
-        // DO NOT use this for real-world password storage!
-        if (!password || typeof password !== 'string' || password.trim() === '') {
-            return null; // Represent no password or invalid password input
-        }
-        let hash = 0;
-        for (let i = 0; i < password.length; i++) {
-          const char = password.charCodeAt(i);
-          hash = ((hash << 5) - hash) + char; // Simple bit shift and add
-          hash |= 0; // Convert to 32bit integer
-        }
-        // Combine a fixed string with the hash and password length for simple obscurity
-        return btoa(`OopisOS_Hash_${String(hash)}_${password.length}`);
-      }
-  function getCurrentUser() {
-    return currentUser;
-  }
-
-  async function register(username, password) {
-    const formatValidation = Utils.validateUsernameFormat(username);
-    if (!formatValidation.isValid) return {
-      success: false,
-      error: formatValidation.error
-    };
-
-    const users = StorageManager.loadItem(Config.STORAGE_KEYS.USER_CREDENTIALS, "User list", {});
-
-    if (users[username]) return {
-      success: false,
-      error: `User '${username}' already exists.`
-    };
-
-    const passwordHash = password ? _hashPassword(password) : null; // Hash the password
-        users[username] = { passwordHash: passwordHash };
-
-    await FileSystemManager.createUserHomeDirectory(username);
-
-    if (StorageManager.saveItem(Config.STORAGE_KEYS.USER_CREDENTIALS, users, "User list") && await FileSystemManager.save()) {
-      return {
-        success: true,
-        message: `User '${username}' registered. Home directory created at /home/${username}.`
-      };
-    } else {
-      return {
-        success: false,
-        error: "Failed to save new user and filesystem."
-      };
-    }
-  }
-
-  async function login(username, providedPassword = null) {
-    if (currentUser.name === username) return {
-      success: true,
-      message: `...`,
-      noAction: true
-    };
-    const users = StorageManager.loadItem(Config.STORAGE_KEYS.USER_CREDENTIALS, "User list", {});
-  
-    const userEntry = users[username]; // Get the user entry
-    
-        // --- NEW: Password verification logic ---
-        if (!userEntry && username !== Config.USER.DEFAULT_NAME && username !== 'root') { // 'root' might not be in users if initial setup is lean
-             return { success: false, error: "Invalid username." };
-        }
-    
-        const storedPasswordHash = userEntry ? userEntry.passwordHash : null;
-    
-        if (storedPasswordHash !== null) { // User has a password
-            if (providedPassword === null) { // No password provided yet (initial call to login command)
-                // The CommandExecutor's handler will now initiate a password prompt
-                return { success: false, error: "Password required.", requiresPasswordPrompt: true };
-            }
-            const providedPasswordHash = _hashPassword(providedPassword); // Hash the provided password
-            if (providedPasswordHash !== storedPasswordHash) {
-                return { success: false, error: Config.MESSAGES.INVALID_PASSWORD };
-            }
-        } else { // User has no password (e.g., Guest)
-            if (providedPassword !== null) { // User tried to provide a password for a passwordless account
-                return { success: false, error: "This account does not require a password." };
-            }
-        }
-
-    if (currentUser.name !== Config.USER.DEFAULT_NAME) {
-      SessionManager.saveAutomaticState(currentUser.name);
-    }
-
-    currentUser = {
-      name: username
-    };
-
-    SessionManager.loadAutomaticState(username);
-
-    const homePath = `/home/${username}`;
-    if (FileSystemManager.getNodeByPath(homePath)) {
-      FileSystemManager.setCurrentPath(homePath);
-    } else {
-      FileSystemManager.setCurrentPath(Config.FILESYSTEM.ROOT_PATH);
-    }
-
-    TerminalUI.updatePrompt();
-    return {
-      success: true,
-      message: `Logged in as ${username}.`
-    };
-  }
-
-  async function logout() {
-    if (currentUser.name === Config.USER.DEFAULT_NAME) return {
-      success: true,
-      message: `...`,
-      noAction: true
-    };
-    SessionManager.saveAutomaticState(currentUser.name);
-
-    const prevUserName = currentUser.name;
-    currentUser = {
-      name: Config.USER.DEFAULT_NAME
-    };
-
-    SessionManager.loadAutomaticState(Config.USER.DEFAULT_NAME);
-
-    const guestHome = `/home/${Config.USER.DEFAULT_NAME}`;
-    if (FileSystemManager.getNodeByPath(guestHome)) {
-      FileSystemManager.setCurrentPath(guestHome);
-    } else {
-      FileSystemManager.setCurrentPath(Config.FILESYSTEM.ROOT_PATH);
-    }
-
-    TerminalUI.updatePrompt();
-    return {
-      success: true,
-      message: `User ${prevUserName} logged out. Now logged in as ${Config.USER.DEFAULT_NAME}.`
-    };
-  }
-
-  async function initializeDefaultUsers() {
-    const users = StorageManager.loadItem(Config.STORAGE_KEYS.USER_CREDENTIALS, "User list", {});
-    let changesMade = false;
-
-    // Ensure root user exists with the specified password 'mcgoopis'
-    if (!users['root']) {
-      users['root'] = { passwordHash: _hashPassword('mcgoopis') };
-      changesMade = true;
-    }
-
-    // Ensure Guest user exists (no password)
-    if (!users[Config.USER.DEFAULT_NAME]) {
-        users[Config.USER.DEFAULT_NAME] = { passwordHash: null };
-        changesMade = true;
-    }
-
-    // Ensure userDiag exists for testing
-    if (!users['userDiag']) {
-        users['userDiag'] = { passwordHash: _hashPassword('pantload') };
-        changesMade = true;
-    }
-
-    if (changesMade) {
-        StorageManager.saveItem(Config.STORAGE_KEYS.USER_CREDENTIALS, users, "User list");
-    }
-  }
-
-  return {
-    getCurrentUser,
-    register,
-    login,
-    logout,
-    initializeDefaultUsers
-  };
-})();
-
-const SessionManager = (() => {
-  "use strict";
-
-  function _getAutomaticSessionStateKey(user) {
-    return `${Config.STORAGE_KEYS.USER_TERMINAL_STATE_PREFIX}${user}`;
-  }
-
-  function _getManualUserTerminalStateKey(user) {
-    const userName = typeof user === "object" && user !== null && user.name ? user.name : String(user);
-    return `${Config.STORAGE_KEYS.MANUAL_TERMINAL_STATE_PREFIX}${userName}`;
-  }
-
-  function saveAutomaticState(username) {
-    if (!username) {
-      console.warn("saveAutomaticState: No username provided. State not saved.");
-      return;
-    }
-    const currentInput = TerminalUI.getCurrentInputValue();
-    const autoState = {
-      currentPath: FileSystemManager.getCurrentPath(),
-      outputHTML: DOM.outputDiv ? DOM.outputDiv.innerHTML : "",
-      currentInput: currentInput,
-      commandHistory: HistoryManager.getFullHistory()
-    };
-    StorageManager.saveItem(_getAutomaticSessionStateKey(username), autoState, `Auto session for ${username}`);
-  }
-
-  function loadAutomaticState(username) {
-    if (!username) {
-      console.warn("loadAutomaticState: No username provided. Cannot load state.");
-      if (DOM.outputDiv) DOM.outputDiv.innerHTML = "";
-      TerminalUI.setCurrentInputValue("");
-      FileSystemManager.setCurrentPath(Config.FILESYSTEM.ROOT_PATH);
-      HistoryManager.clearHistory();
-      OutputManager.appendToOutput(`${Config.MESSAGES.WELCOME_PREFIX}${Config.USER.DEFAULT_NAME}${Config.MESSAGES.WELCOME_SUFFIX}`);
-      TerminalUI.updatePrompt();
-      if (DOM.outputDiv) DOM.outputDiv.scrollTop = DOM.outputDiv.scrollHeight;
-      return false;
-    }
-    const autoState = StorageManager.loadItem(_getAutomaticSessionStateKey(username), `Auto session for ${username}`);
-    if (autoState) {
-      FileSystemManager.setCurrentPath(autoState.currentPath || Config.FILESYSTEM.ROOT_PATH);
-      if (DOM.outputDiv) {
-        if (autoState.hasOwnProperty("outputHTML")) {
-          DOM.outputDiv.innerHTML = autoState.outputHTML || "";
-        } else {
-          DOM.outputDiv.innerHTML = "";
-          OutputManager.appendToOutput(`${Config.MESSAGES.WELCOME_PREFIX}${username}${Config.MESSAGES.WELCOME_SUFFIX}`);
-        }
-      }
-      TerminalUI.setCurrentInputValue(autoState.currentInput || "");
-      HistoryManager.setHistory(autoState.commandHistory || []);
-    } else {
-      if (DOM.outputDiv) DOM.outputDiv.innerHTML = "";
-      TerminalUI.setCurrentInputValue("");
-      const homePath = `/home/${username}`;
-      if (FileSystemManager.getNodeByPath(homePath)) {
-        FileSystemManager.setCurrentPath(homePath);
-      } else {
-        FileSystemManager.setCurrentPath(Config.FILESYSTEM.ROOT_PATH);
-      }
-      HistoryManager.clearHistory();
-      OutputManager.appendToOutput(`${Config.MESSAGES.WELCOME_PREFIX}${username}${Config.MESSAGES.WELCOME_SUFFIX}`);
-    }
-    TerminalUI.updatePrompt();
-    if (DOM.outputDiv) DOM.outputDiv.scrollTop = DOM.outputDiv.scrollHeight;
-    return !!autoState;
-  }
-
-  async function saveManualState() {
-    const currentUser = UserManager.getCurrentUser();
-    const currentInput = TerminalUI.getCurrentInputValue();
-    const manualStateData = {
-      user: currentUser.name,
-      osVersion: Config.OS.VERSION,
-      timestamp: new Date().toISOString(),
-      currentPath: FileSystemManager.getCurrentPath(),
-      outputHTML: DOM.outputDiv ? DOM.outputDiv.innerHTML : "",
-      currentInput: currentInput,
-      fsDataSnapshot: Utils.deepCopyNode(FileSystemManager.getFsData()),
-      commandHistory: HistoryManager.getFullHistory()
-    };
-    if (StorageManager.saveItem(_getManualUserTerminalStateKey(currentUser), manualStateData, `Manual save for ${currentUser.name}`)) return {
-      success: true,
-      message: `${Config.MESSAGES.SESSION_SAVED_FOR_PREFIX}${currentUser.name}.`
-    };
-    else return {
-      success: false,
-      error: "Failed to save session manually."
-    };
-  }
-
-  async function loadManualState() {
-    const currentUser = UserManager.getCurrentUser();
-    const manualStateData = StorageManager.loadItem(_getManualUserTerminalStateKey(currentUser), `Manual save for ${currentUser.name}`);
-    if (manualStateData) {
-      if (manualStateData.user && manualStateData.user !== currentUser.name) {
-        OutputManager.appendToOutput(`Warning: Saved state is for user '${manualStateData.user}'. Current user is '${currentUser.name}'. Load aborted. Use 'login ${manualStateData.user}' then 'loadstate'.`, {
-          typeClass: Config.CSS_CLASSES.WARNING_MSG
-        });
-        return {
-          success: false,
-          message: `Saved state user mismatch. Current: ${currentUser.name}, Saved: ${manualStateData.user}.`
-        };
-      }
-      ConfirmationManager.request([`Load manually saved state for '${currentUser.name}'? This overwrites current session & filesystem.`], {
-          pendingData: manualStateData,
-          userNameToRestoreTo: currentUser.name
-        },
-        async (data) => {
-            FileSystemManager.setFsData(Utils.deepCopyNode(data.pendingData.fsDataSnapshot) || {
-              [Config.FILESYSTEM.ROOT_PATH]: {
-                type: Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE,
-                children: {},
-                owner: data.userNameToRestoreTo,
-                mode: Config.FILESYSTEM.DEFAULT_DIR_MODE,
-                mtime: new Date().toISOString()
-              }
-            });
-            FileSystemManager.setCurrentPath(data.pendingData.currentPath || Config.FILESYSTEM.ROOT_PATH);
-            if (DOM.outputDiv) DOM.outputDiv.innerHTML = data.pendingData.outputHTML || "";
-            TerminalUI.setCurrentInputValue(data.pendingData.currentInput || "");
-            HistoryManager.setHistory(data.pendingData.commandHistory || []);
-            await FileSystemManager.save(data.userNameToRestoreTo);
-            OutputManager.appendToOutput(Config.MESSAGES.SESSION_LOADED_MSG, {
-              typeClass: Config.CSS_CLASSES.SUCCESS_MSG
-            });
-            TerminalUI.updatePrompt();
-            if (DOM.outputDiv) DOM.outputDiv.scrollTop = DOM.outputDiv.scrollHeight;
-          },
-          () => {
-            OutputManager.appendToOutput(Config.MESSAGES.LOAD_STATE_CANCELLED, {
-              typeClass: Config.CSS_CLASSES.CONSOLE_LOG_MSG
-            });
-          }
-      );
-      return {
-        success: true,
-        message: "Confirmation requested for loading state."
-      };
-    } else return {
-      success: false,
-      message: `${Config.MESSAGES.NO_MANUAL_SAVE_FOUND_PREFIX}${currentUser.name}.`
-    };
-  }
-
-  function clearUserSessionStates(username) {
-    if (!username || typeof username !== "string") {
-      console.warn("SessionManager.clearUserSessionStates: Invalid username provided.", username);
-      return false;
-    }
-    try {
-      StorageManager.removeItem(_getAutomaticSessionStateKey(username));
-      StorageManager.removeItem(_getManualUserTerminalStateKey(username));
-    const users = StorageManager.loadItem(Config.STORAGE_KEYS.USER_CREDENTIALS, "User list", {});
-          if (users.hasOwnProperty(username)) {
-            delete users[username];
-            StorageManager.saveItem(Config.STORAGE_KEYS.USER_CREDENTIALS, users, "User list");
-          }
-      return true;
-    } catch (e) {
-      console.error(`Error clearing session states for user '${username}':`, e);
-      return false;
-    }
-  }
-
-  async function performFullReset() {
-    OutputManager.clearOutput();
-    TerminalUI.clearInput();
-    const keysToRemove = [];
-    const allKeys = StorageManager.getAllLocalStorageKeys();
-    allKeys.forEach((key) => {
-      if (
-        key.startsWith(Config.STORAGE_KEYS.USER_TERMINAL_STATE_PREFIX) ||
-        key.startsWith(Config.STORAGE_KEYS.MANUAL_TERMINAL_STATE_PREFIX) ||
-        key === Config.STORAGE_KEYS.USER_CREDENTIALS ||
-        key === Config.STORAGE_KEYS.EDITOR_WORD_WRAP_ENABLED
-      ) {
-        keysToRemove.push(key);
-      }
-    });
-    keysToRemove.forEach((key) => StorageManager.removeItem(key));
-    await OutputManager.appendToOutput("All session states, credentials, and editor settings cleared from local storage.");
-    try {
-      await FileSystemManager.clearAllFS();
-      await OutputManager.appendToOutput("All user filesystems cleared from DB.");
-    } catch (error) {
-      await OutputManager.appendToOutput(`Warning: Could not fully clear all user filesystems from DB. Error: ${error.message}`, {
-        typeClass: Config.CSS_CLASSES.WARNING_MSG
-      });
-    }
-
-    await OutputManager.appendToOutput("Reset complete. Rebooting OopisOS...", {
-      typeClass: Config.CSS_CLASSES.SUCCESS_MSG
-    });
-
-    TerminalUI.setInputState(false);
-    if (DOM.inputLineContainerDiv) {
-      DOM.inputLineContainerDiv.classList.add(Config.CSS_CLASSES.HIDDEN);
-    }
-
-    setTimeout(() => {
-      window.location.reload();
-    }, 1500);
-  }
-  return {
-    saveAutomaticState,
-    loadAutomaticState,
-    saveManualState,
-    loadManualState,
-    clearUserSessionStates,
-    performFullReset
-  };
-})();
+// --- BUG FIX: MODULE REORDERING ---
+// The TerminalUI module MUST be defined before ModalInputManager, because ModalInputManager calls functions from TerminalUI.
 
 const TerminalUI = (() => {
   "use strict";
@@ -1936,9 +1668,7 @@ const TerminalUI = (() => {
   let _isObscuredInputMode = false;
 
   function updatePrompt() {
-    const user = typeof UserManager !== "undefined" ? UserManager.getCurrentUser() : {
-      name: Config.USER.DEFAULT_NAME
-    };
+    const user = typeof UserManager !== "undefined" ? UserManager.getCurrentUser() : { name: Config.USER.DEFAULT_NAME };
     if (DOM.promptUserSpan) {
       DOM.promptUserSpan.textContent = user ? user.name : Config.USER.DEFAULT_NAME;
       DOM.promptUserSpan.className = "prompt-user mr-0.5 text-sky-400";
@@ -1946,6 +1676,7 @@ const TerminalUI = (() => {
     if (DOM.promptHostSpan) DOM.promptHostSpan.textContent = Config.OS.DEFAULT_HOST_NAME;
     const currentPathDisplay = typeof FileSystemManager !== "undefined" ? FileSystemManager.getCurrentPath() : Config.FILESYSTEM.ROOT_PATH;
     if (DOM.promptPathSpan) DOM.promptPathSpan.textContent = currentPathDisplay === Config.FILESYSTEM.ROOT_PATH && currentPathDisplay.length > 1 ? Config.FILESYSTEM.ROOT_PATH : currentPathDisplay;
+    if (DOM.promptCharSpan) DOM.promptCharSpan.textContent = Config.TERMINAL.PROMPT_CHAR;
   }
 
   function focusInput() {
@@ -2021,17 +1752,18 @@ const TerminalUI = (() => {
   }
 
   function setInputState(isEditable, obscured = false) {
-        if (DOM.editableInputDiv) {
-          DOM.editableInputDiv.contentEditable = isEditable ? "true" : "false";
-          DOM.editableInputDiv.style.opacity = isEditable ? "1" : "0.5";
-          _isObscuredInputMode = obscured; // Set the obscured mode flag
-          if (!isEditable) DOM.editableInputDiv.blur();
-        }
-      }
-    
+    if (DOM.editableInputDiv) {
+      DOM.editableInputDiv.contentEditable = isEditable ? "true" : "false";
+      DOM.editableInputDiv.style.opacity = isEditable ? "1" : "0.5";
+      _isObscuredInputMode = obscured; // Set the obscured mode flag
+      if (!isEditable) DOM.editableInputDiv.blur();
+    }
+  }
+
   function getIsObscuredInputMode() {
-        return _isObscuredInputMode;
-      }
+    return _isObscuredInputMode;
+  }
+
   function setIsNavigatingHistory(status) {
     isNavigatingHistory = status;
   }
@@ -2039,6 +1771,29 @@ const TerminalUI = (() => {
   function getIsNavigatingHistory() {
     return isNavigatingHistory;
   }
+
+  // --- BUG FIX: Add the missing getSelection function ---
+  function getSelection() {
+    const sel = window.getSelection();
+    let start = 0, end = 0;
+
+    if (sel && sel.rangeCount > 0) {
+        const range = sel.getRangeAt(0);
+        if (DOM.editableInputDiv && DOM.editableInputDiv.contains(range.commonAncestorContainer)) {
+            const preSelectionRange = range.cloneRange();
+            preSelectionRange.selectNodeContents(DOM.editableInputDiv);
+            preSelectionRange.setEnd(range.startContainer, range.startOffset);
+            start = preSelectionRange.toString().length;
+            end = start + range.toString().length;
+        } else {
+            start = end = getCurrentInputValue().length;
+        }
+    } else {
+        start = end = getCurrentInputValue().length;
+    }
+    return { start, end };
+  }
+
   return {
     updatePrompt,
     focusInput,
@@ -2049,260 +1804,802 @@ const TerminalUI = (() => {
     setIsNavigatingHistory,
     getIsNavigatingHistory,
     setCaretPosition,
-    setInputState
+    setInputState,
+    getSelection // --- BUG FIX: Export the new function ---
+  };
+})();
+
+const ModalInputManager = (() => {
+  "use strict";
+  let _isAwaitingInput = false;
+  let _inputContext = null; // { onInputReceived, onCancelled, isObscured, currentInput }
+
+  // =========== CHANGE 1: Add isObscured() helper function ===========
+  function isObscured() {
+    return _isAwaitingInput && _inputContext && _inputContext.isObscured;
+  }
+  
+  function requestInput(promptMessage, onInputReceivedCallback, onCancelledCallback, isObscured = false) {
+    if (_isAwaitingInput) {
+      OutputManager.appendToOutput("Another modal input prompt is already pending.", { typeClass: Config.CSS_CLASSES.WARNING_MSG });
+      if (onCancelledCallback) onCancelledCallback();
+      return;
+    }
+
+    _isAwaitingInput = true;
+    _inputContext = { 
+      onInputReceived: onInputReceivedCallback, 
+      onCancelled: onCancelledCallback,
+      isObscured: isObscured,
+      currentInput: '' // Start with empty input
+    };
+
+    if (DOM.inputLineContainerDiv) {
+        DOM.inputLineContainerDiv.classList.remove(Config.CSS_CLASSES.HIDDEN);
+    }
+
+    OutputManager.appendToOutput(promptMessage, { typeClass: Config.CSS_CLASSES.CONSOLE_LOG_MSG });
+    TerminalUI.clearInput();
+    TerminalUI.setInputState(true, false); // Keep contentEditable true, obscurity is handled manually
+    TerminalUI.focusInput();
+    if (DOM.outputDiv) DOM.outputDiv.scrollTop = DOM.outputDiv.scrollHeight;
+  }
+
+  // =========== CHANGE 2: Modify handleInput to read from the correct source ===========
+  async function handleInput() {
+    if (!_isAwaitingInput || !_inputContext) return false;
+
+    // If input was obscured, use the manually built string.
+    // Otherwise, get the live text directly from the contentEditable div.
+    const finalInput = _inputContext.isObscured 
+        ? _inputContext.currentInput 
+        : TerminalUI.getCurrentInputValue();
+
+    const callback = _inputContext.onInputReceived;
+
+    _isAwaitingInput = false;
+    _inputContext = null;
+
+    TerminalUI.clearInput();
+
+    if (typeof callback === "function") {
+        await callback(finalInput.trim());
+    }
+    return true;
+  }
+
+  function updateInput(key, rawChar) {
+    if (!_isAwaitingInput) return;
+
+    let inputArray = Array.from(_inputContext.currentInput);
+    const selection = TerminalUI.getSelection();
+    let { start, end } = selection;
+
+    if (key === 'Backspace') {
+        if (start === end && start > 0) {
+            inputArray.splice(start - 1, 1);
+            start--;
+        } else if (start !== end) {
+            inputArray.splice(start, end - start);
+        }
+    } else if (key === 'Delete') {
+        if (start === end && start < inputArray.length) {
+            inputArray.splice(start, 1);
+        } else if (start !== end) {
+            inputArray.splice(start, end - start);
+        }
+    } else if (rawChar) {
+        inputArray.splice(start, end - start, rawChar);
+        start += rawChar.length;
+    }
+
+    _inputContext.currentInput = inputArray.join('');
+    const displayText = _inputContext.isObscured ? '*'.repeat(_inputContext.currentInput.length) : _inputContext.currentInput;
+
+    TerminalUI.setCurrentInputValue(displayText, false);
+    TerminalUI.setCaretPosition(DOM.editableInputDiv, start);
+  }
+
+  return {
+    requestInput,
+    handleInput,
+    updateInput,
+    isAwaiting: () => _isAwaitingInput,
+    isObscured, // <-- Expose the new function
+  };
+})();
+
+const UserManager = (() => {
+  "use strict";
+  let currentUser = {
+    name: Config.USER.DEFAULT_NAME
+  };
+
+  // --- REPLACED: The old simple hash function is gone. ---
+  // --- NEW: A secure, async password hasher using the Web Cryptography API. ---
+  async function _secureHashPassword(password) {
+    if (!password || typeof password !== 'string' || password.trim() === '') {
+        return null; // Represent no password or invalid password input
+    }
+    try {
+        // 1. Encode the password string into a buffer of bytes
+        const encoder = new TextEncoder();
+        const data = encoder.encode(password);
+
+        // 2. Hash the data using the SHA-256 algorithm. This returns a Promise.
+        const hashBuffer = await window.crypto.subtle.digest('SHA-256', data);
+
+        // 3. Convert the ArrayBuffer to a hexadecimal string for easy storage
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+        return hashHex;
+    } catch (error) {
+        console.error("Password hashing failed:", error);
+        // Fallback or error handling. Returning null prevents a broken hash from being stored.
+        return null;
+    }
+  }
+
+  function getCurrentUser() {
+    return currentUser;
+  }
+
+  async function register(username, password) {
+    const formatValidation = Utils.validateUsernameFormat(username);
+    if (!formatValidation.isValid) return {
+      success: false,
+      error: formatValidation.error
+    };
+
+    const users = StorageManager.loadItem(Config.STORAGE_KEYS.USER_CREDENTIALS, "User list", {});
+
+    if (users[username]) return {
+      success: false,
+      error: `User '${username}' already exists.`
+    };
+
+    const passwordHash = password ? await _secureHashPassword(password) : null;
+    if (password && !passwordHash) {
+        // This occurs if the crypto API fails for some reason
+        return { success: false, error: "Failed to securely process password." };
+    }
+    users[username] = { passwordHash: passwordHash };
+
+    await FileSystemManager.createUserHomeDirectory(username);
+
+    if (StorageManager.saveItem(Config.STORAGE_KEYS.USER_CREDENTIALS, users, "User list") && await FileSystemManager.save()) {
+      return {
+        success: true,
+        message: `User '${username}' registered. Home directory created at /home/${username}.`
+      };
+    } else {
+      return {
+        success: false,
+        error: "Failed to save new user and filesystem."
+      };
+    }
+  }
+
+  async function login(username, providedPassword = null) {
+    if (currentUser.name === username) return {
+      success: true,
+      message: `...`,
+      noAction: true
+    };
+    const users = StorageManager.loadItem(Config.STORAGE_KEYS.USER_CREDENTIALS, "User list", {});
+  
+    const userEntry = users[username];
+    
+    if (!userEntry && username !== Config.USER.DEFAULT_NAME && username !== 'root') {
+         return { success: false, error: "Invalid username." };
+    }
+    
+        const storedPasswordHash = userEntry ? userEntry.passwordHash : null;
+    
+    if (storedPasswordHash !== null) {
+        if (providedPassword === null) {
+            return { success: false, error: "Password required.", requiresPasswordPrompt: true };
+        }
+        // MODIFIED: Awaiting the result of the secure hash function
+        const providedPasswordHash = await _secureHashPassword(providedPassword);
+        if (providedPasswordHash !== storedPasswordHash) {
+            return { success: false, error: Config.MESSAGES.INVALID_PASSWORD };
+        }
+    } else {
+        if (providedPassword !== null) {
+            return { success: false, error: "This account does not require a password." };
+        }
+    }
+
+
+    if (currentUser.name !== Config.USER.DEFAULT_NAME) {
+      SessionManager.saveAutomaticState(currentUser.name);
+    }
+
+    currentUser = {
+      name: username
+    };
+
+    SessionManager.loadAutomaticState(username);
+
+    const homePath = `/home/${username}`;
+    if (FileSystemManager.getNodeByPath(homePath)) {
+      FileSystemManager.setCurrentPath(homePath);
+    } else {
+      FileSystemManager.setCurrentPath(Config.FILESYSTEM.ROOT_PATH);
+    }
+
+    TerminalUI.updatePrompt();
+    return {
+      success: true,
+      message: `Logged in as ${username}.`
+    };
+  }
+
+  async function logout() {
+    if (currentUser.name === Config.USER.DEFAULT_NAME) return {
+      success: true,
+      message: `...`,
+      noAction: true
+    };
+    SessionManager.saveAutomaticState(currentUser.name);
+
+    const prevUserName = currentUser.name;
+    currentUser = {
+      name: Config.USER.DEFAULT_NAME
+    };
+
+    SessionManager.loadAutomaticState(Config.USER.DEFAULT_NAME);
+
+    const guestHome = `/home/${Config.USER.DEFAULT_NAME}`;
+    if (FileSystemManager.getNodeByPath(guestHome)) {
+      FileSystemManager.setCurrentPath(guestHome);
+    } else {
+      FileSystemManager.setCurrentPath(Config.FILESYSTEM.ROOT_PATH);
+    }
+
+    TerminalUI.updatePrompt();
+    return {
+      success: true,
+      message: `User ${prevUserName} logged out. Now logged in as ${Config.USER.DEFAULT_NAME}.`
+    };
+  }
+
+  async function initializeDefaultUsers() {
+    const users = StorageManager.loadItem(Config.STORAGE_KEYS.USER_CREDENTIALS, "User list", {});
+    let changesMade = false;
+
+    // MODIFIED: Awaiting the result of the secure hash function for default users
+    if (!users['root']) {
+      users['root'] = { passwordHash: await _secureHashPassword('mcgoopis') };
+      changesMade = true;
+    }
+
+    if (!users[Config.USER.DEFAULT_NAME]) {
+        users[Config.USER.DEFAULT_NAME] = { passwordHash: null };
+        changesMade = true;
+    }
+
+    if (!users['userDiag']) {
+        users['userDiag'] = { passwordHash: await _secureHashPassword('pantload') };
+        changesMade = true;
+    }
+
+    if (changesMade) {
+        StorageManager.saveItem(Config.STORAGE_KEYS.USER_CREDENTIALS, users, "User list");
+    }
+  }
+
+  return {
+    getCurrentUser,
+    register,
+    login,
+    logout,
+    initializeDefaultUsers
+  };
+})();
+
+const SessionManager = (() => {
+  "use strict";
+
+  function _getAutomaticSessionStateKey(user) {
+    return `${Config.STORAGE_KEYS.USER_TERMINAL_STATE_PREFIX}${user}`;
+  }
+
+  function _getManualUserTerminalStateKey(user) {
+    const userName = typeof user === "object" && user !== null && user.name ? user.name : String(user);
+    return `${Config.STORAGE_KEYS.MANUAL_TERMINAL_STATE_PREFIX}${userName}`;
+  }
+
+  function saveAutomaticState(username) {
+    if (!username) {
+      console.warn("saveAutomaticState: No username provided. State not saved.");
+      return;
+    }
+    const currentInput = TerminalUI.getCurrentInputValue();
+    const autoState = {
+      currentPath: FileSystemManager.getCurrentPath(),
+      outputHTML: DOM.outputDiv ? DOM.outputDiv.innerHTML : "",
+      currentInput: currentInput,
+      commandHistory: HistoryManager.getFullHistory()
+    };
+    StorageManager.saveItem(_getAutomaticSessionStateKey(username), autoState, `Auto session for ${username}`);
+  }
+
+  function loadAutomaticState(username) {
+    if (!username) {
+      console.warn("loadAutomaticState: No username provided. Cannot load state.");
+      if (DOM.outputDiv) DOM.outputDiv.innerHTML = "";
+      TerminalUI.setCurrentInputValue("");
+      FileSystemManager.setCurrentPath(Config.FILESYSTEM.ROOT_PATH);
+      HistoryManager.clearHistory();
+      OutputManager.appendToOutput(`${Config.MESSAGES.WELCOME_PREFIX} ${Config.USER.DEFAULT_NAME}${Config.MESSAGES.WELCOME_SUFFIX}`);
+      TerminalUI.updatePrompt();
+      if (DOM.outputDiv) DOM.outputDiv.scrollTop = DOM.outputDiv.scrollHeight;
+      return false;
+    }
+    const autoState = StorageManager.loadItem(_getAutomaticSessionStateKey(username), `Auto session for ${username}`);
+    if (autoState) {
+      FileSystemManager.setCurrentPath(autoState.currentPath || Config.FILESYSTEM.ROOT_PATH);
+      if (DOM.outputDiv) {
+        if (autoState.hasOwnProperty("outputHTML")) {
+          DOM.outputDiv.innerHTML = autoState.outputHTML || "";
+        } else {
+          DOM.outputDiv.innerHTML = "";
+          OutputManager.appendToOutput(`${Config.MESSAGES.WELCOME_PREFIX} ${username}${Config.MESSAGES.WELCOME_SUFFIX}`);
+        }
+      }
+      TerminalUI.setCurrentInputValue(autoState.currentInput || "");
+      HistoryManager.setHistory(autoState.commandHistory || []);
+    } else {
+      if (DOM.outputDiv) DOM.outputDiv.innerHTML = "";
+      TerminalUI.setCurrentInputValue("");
+      const homePath = `/home/${username}`;
+      if (FileSystemManager.getNodeByPath(homePath)) {
+        FileSystemManager.setCurrentPath(homePath);
+      } else {
+        FileSystemManager.setCurrentPath(Config.FILESYSTEM.ROOT_PATH);
+      }
+      HistoryManager.clearHistory();
+      OutputManager.appendToOutput(`${Config.MESSAGES.WELCOME_PREFIX} ${username}${Config.MESSAGES.WELCOME_SUFFIX}`);
+    }
+    TerminalUI.updatePrompt();
+    if (DOM.outputDiv) DOM.outputDiv.scrollTop = DOM.outputDiv.scrollHeight;
+    return !!autoState;
+  }
+
+  async function saveManualState() {
+    const currentUser = UserManager.getCurrentUser();
+    const currentInput = TerminalUI.getCurrentInputValue();
+    const manualStateData = {
+      user: currentUser.name,
+      osVersion: Config.OS.VERSION,
+      timestamp: new Date().toISOString(),
+      currentPath: FileSystemManager.getCurrentPath(),
+      outputHTML: DOM.outputDiv ? DOM.outputDiv.innerHTML : "",
+      currentInput: currentInput,
+      fsDataSnapshot: Utils.deepCopyNode(FileSystemManager.getFsData()),
+      commandHistory: HistoryManager.getFullHistory()
+    };
+    if (StorageManager.saveItem(_getManualUserTerminalStateKey(currentUser), manualStateData, `Manual save for ${currentUser.name}`)) return {
+      success: true,
+      message: `${Config.MESSAGES.SESSION_SAVED_FOR_PREFIX}${currentUser.name}.`
+    };
+    else return {
+      success: false,
+      error: "Failed to save session manually."
+    };
+  }
+
+  async function loadManualState() {
+    const currentUser = UserManager.getCurrentUser();
+    const manualStateData = StorageManager.loadItem(_getManualUserTerminalStateKey(currentUser), `Manual save for ${currentUser.name}`);
+    if (manualStateData) {
+      if (manualStateData.user && manualStateData.user !== currentUser.name) {
+        OutputManager.appendToOutput(`Warning: Saved state is for user '${manualStateData.user}'. Current user is '${currentUser.name}'. Load aborted. Use 'login ${manualStateData.user}' then 'loadstate'.`, {
+          typeClass: Config.CSS_CLASSES.WARNING_MSG
+        });
+        return {
+          success: false,
+          message: `Saved state user mismatch. Current: ${currentUser.name}, Saved: ${manualStateData.user}.`
+        };
+      }
+      ModalManager.request({
+        context: 'terminal',
+        messageLines: [`Load manually saved state for '${currentUser.name}'? This overwrites current session & filesystem.`],
+        data: {
+            pendingData: manualStateData,
+            userNameToRestoreTo: currentUser.name
+        },
+        onConfirm: async (data) => {
+            FileSystemManager.setFsData(Utils.deepCopyNode(data.pendingData.fsDataSnapshot) || {
+                [Config.FILESYSTEM.ROOT_PATH]: {
+                    type: Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE,
+                    children: {},
+                    owner: data.userNameToRestoreTo,
+                    mode: Config.FILESYSTEM.DEFAULT_DIR_MODE,
+                    mtime: new Date().toISOString()
+                }
+            });
+            FileSystemManager.setCurrentPath(data.pendingData.currentPath || Config.FILESYSTEM.ROOT_PATH);
+            if (DOM.outputDiv) DOM.outputDiv.innerHTML = data.pendingData.outputHTML || "";
+            TerminalUI.setCurrentInputValue(data.pendingData.currentInput || "");
+            HistoryManager.setHistory(data.pendingData.commandHistory || []);
+            await FileSystemManager.save(data.userNameToRestoreTo);
+            OutputManager.appendToOutput(Config.MESSAGES.SESSION_LOADED_MSG, {
+                typeClass: Config.CSS_CLASSES.SUCCESS_MSG
+            });
+            TerminalUI.updatePrompt();
+            if (DOM.outputDiv) DOM.outputDiv.scrollTop = DOM.outputDiv.scrollHeight;
+        },
+        onCancel: () => {
+            OutputManager.appendToOutput(Config.MESSAGES.LOAD_STATE_CANCELLED, {
+                typeClass: Config.CSS_CLASSES.CONSOLE_LOG_MSG
+            });
+        }
+      });
+      return {
+        success: true,
+        message: "Confirmation requested for loading state."
+      };
+    } else return {
+      success: false,
+      message: `${Config.MESSAGES.NO_MANUAL_SAVE_FOUND_PREFIX}${currentUser.name}.`
+    };
+  }
+
+  function clearUserSessionStates(username) {
+    if (!username || typeof username !== "string") {
+      console.warn("SessionManager.clearUserSessionStates: Invalid username provided.", username);
+      return false;
+    }
+    try {
+      StorageManager.removeItem(_getAutomaticSessionStateKey(username));
+      StorageManager.removeItem(_getManualUserTerminalStateKey(username));
+    const users = StorageManager.loadItem(Config.STORAGE_KEYS.USER_CREDENTIALS, "User list", {});
+          if (users.hasOwnProperty(username)) {
+            delete users[username];
+            StorageManager.saveItem(Config.STORAGE_KEYS.USER_CREDENTIALS, users, "User list");
+          }
+      return true;
+    } catch (e) {
+      console.error(`Error clearing session states for user '${username}':`, e);
+      return false;
+    }
+  }
+
+  async function performFullReset() {
+    OutputManager.clearOutput();
+    TerminalUI.clearInput();
+    const allKeys = StorageManager.getAllLocalStorageKeys();
+      allKeys.forEach((key) => {
+        const shouldRemove = (
+            key.startsWith(Config.STORAGE_KEYS.USER_TERMINAL_STATE_PREFIX) ||
+            key.startsWith(Config.STORAGE_KEYS.MANUAL_TERMINAL_STATE_PREFIX) ||
+            key === Config.STORAGE_KEYS.USER_CREDENTIALS ||
+            key === Config.STORAGE_KEYS.EDITOR_WORD_WRAP_ENABLED
+        );
+
+        // Explicitly protect the Gemini API key from being removed.
+        if (shouldRemove && key !== Config.STORAGE_KEYS.GEMINI_API_KEY) {
+            StorageManager.removeItem(key);
+      }
+    });
+      
+    await OutputManager.appendToOutput("All session states, credentials, and editor settings cleared from local storage.");
+    try {
+      await FileSystemManager.clearAllFS();
+      await OutputManager.appendToOutput("All user filesystems cleared from DB.");
+    } catch (error) {
+      await OutputManager.appendToOutput(`Warning: Could not fully clear all user filesystems from DB. Error: ${error.message}`, {
+        typeClass: Config.CSS_CLASSES.WARNING_MSG
+      });
+    }
+
+    await OutputManager.appendToOutput("Reset complete. Rebooting OopisOS...", {
+      typeClass: Config.CSS_CLASSES.SUCCESS_MSG
+    });
+
+    TerminalUI.setInputState(false);
+    if (DOM.inputLineContainerDiv) {
+      DOM.inputLineContainerDiv.classList.add(Config.CSS_CLASSES.HIDDEN);
+    }
+
+    setTimeout(() => {
+      window.location.reload();
+    }, 1500);
+  }
+  return {
+    saveAutomaticState,
+    loadAutomaticState,
+    saveManualState,
+    loadManualState,
+    clearUserSessionStates,
+    performFullReset
   };
 })();
 
 const TabCompletionManager = (() => {
   "use strict";
-  const PATH_COMMANDS = ["ls", "cd", "cat", "edit", "run", "mv", "cp", "rm", "mkdir", "touch", "export", "find", "tree", "chmod", "chown", "grep", "adventure", "printscreen", "gemini"];
+  const PATH_COMMANDS = ["ls", "cd", "cat", "edit", "run", "mv", "cp", "rm", "mkdir", "touch", "export", "find", "tree", "chmod", "chown", "grep", "adventure", "printscreen", "gemini"]; //
 
-  function findLongestCommonPrefix(strs) {
-    if (!strs || strs.length === 0) return "";
-    if (strs.length === 1) return strs[0];
-    let prefix = strs[0];
-    for (let i = 1; i < strs.length; i++) {
-      while (strs[i].indexOf(prefix) !== 0) {
-        prefix = prefix.substring(0, prefix.length - 1);
-        if (prefix === "") return "";
+  function findLongestCommonPrefix(strs) { //
+    if (!strs || strs.length === 0) return ""; //
+    if (strs.length === 1) return strs[0]; //
+    let prefix = strs[0]; //
+    for (let i = 1; i < strs.length; i++) { //
+      while (strs[i].indexOf(prefix) !== 0) { //
+        prefix = prefix.substring(0, prefix.length - 1); //
+        if (prefix === "") return ""; //
       }
     }
-    return prefix;
+    return prefix; //
   }
 
-  function getSuggestions(fullInput, cursorPos) {
-    const textBeforeCursor = fullInput.substring(0, cursorPos);
-    const tokensInitial = textBeforeCursor.trimStart().split(/\s+/);
-    let currentWordPrefix = "";
-    let isCompletingCommandName = false;
-    let baseCommandForPath = "";
-    const lastCharIsSpace = /\s$/.test(textBeforeCursor) || textBeforeCursor.length === 0;
-    let startOfWordIndex = 0;
-    let effectiveArgStart = 0;
-    if (tokensInitial.length === 0 || (tokensInitial.length === 1 && !lastCharIsSpace && tokensInitial[0] !== "")) {
-      isCompletingCommandName = true;
-      currentWordPrefix = tokensInitial.length > 0 ? tokensInitial[0] : "";
-      if (textBeforeCursor.length > 0 && !/\s$/.test(textBeforeCursor.charAt(0))) {
-        startOfWordIndex = textBeforeCursor.indexOf(currentWordPrefix);
-        if (startOfWordIndex === -1 && currentWordPrefix === "") startOfWordIndex = cursorPos;
-        else if (startOfWordIndex === -1) startOfWordIndex = 0;
+  function getSuggestions(fullInput, cursorPos) { //
+    const textBeforeCursor = fullInput.substring(0, cursorPos); //
+    const tokensInitial = textBeforeCursor.trimStart().split(/\s+/); //
+    let currentWordPrefix = ""; //
+    let isCompletingCommandName = false; //
+    let baseCommandForPath = ""; //
+    const lastCharIsSpace = /\s$/.test(textBeforeCursor) || textBeforeCursor.length === 0; //
+    let startOfWordIndex = 0; //
+    let effectiveArgStart = 0; //
+    if (tokensInitial.length === 0 || (tokensInitial.length === 1 && !lastCharIsSpace && tokensInitial[0] !== "")) { //
+      isCompletingCommandName = true; //
+      currentWordPrefix = tokensInitial.length > 0 ? tokensInitial[0] : ""; //
+      if (textBeforeCursor.length > 0 && !/\s$/.test(textBeforeCursor.charAt(0))) { //
+        startOfWordIndex = textBeforeCursor.indexOf(currentWordPrefix); //
+        if (startOfWordIndex === -1 && currentWordPrefix === "") startOfWordIndex = cursorPos; //
+        else if (startOfWordIndex === -1) startOfWordIndex = 0; //
       } else {
-        startOfWordIndex = textBeforeCursor.lastIndexOf(currentWordPrefix);
-        if (startOfWordIndex === -1 && currentWordPrefix === "") startOfWordIndex = cursorPos;
-        else if (startOfWordIndex === -1) startOfWordIndex = 0;
+        startOfWordIndex = textBeforeCursor.lastIndexOf(currentWordPrefix); //
+        if (startOfWordIndex === -1 && currentWordPrefix === "") startOfWordIndex = cursorPos; //
+        else if (startOfWordIndex === -1) startOfWordIndex = 0; //
       }
     } else {
-      isCompletingCommandName = false;
-      baseCommandForPath = tokensInitial[0].toLowerCase();
-      if (lastCharIsSpace) {
-        currentWordPrefix = "";
-        effectiveArgStart = cursorPos;
+      isCompletingCommandName = false; //
+      baseCommandForPath = tokensInitial[0].toLowerCase(); //
+      if (lastCharIsSpace) { //
+        currentWordPrefix = ""; //
+        effectiveArgStart = cursorPos; //
       } else {
-        const commandEndPos = textBeforeCursor.indexOf(tokensInitial[0]) + tokensInitial[0].length;
-        let currentFragmentStart = commandEndPos;
-        if (textBeforeCursor.length > commandEndPos && textBeforeCursor[commandEndPos] === ' ') currentFragmentStart = commandEndPos + 1;
-        let tempInSingleQuote = false;
-        let tempInDoubleQuote = false;
-        for (let i = currentFragmentStart; i < cursorPos; i++) {
-          const char = textBeforeCursor[i];
-          if (char === "'" && (i === 0 || textBeforeCursor[i - 1] !== '\\')) {
-            if (!tempInDoubleQuote) tempInSingleQuote = !tempInSingleQuote;
-          } else if (char === '"' && (i === 0 || textBeforeCursor[i - 1] !== '\\')) {
-            if (!tempInSingleQuote) tempInDoubleQuote = !tempInDoubleQuote;
-          } else if (char === ' ' && !tempInSingleQuote && !tempInDoubleQuote) currentFragmentStart = i + 1;
+        const commandEndPos = textBeforeCursor.indexOf(tokensInitial[0]) + tokensInitial[0].length; //
+        let currentFragmentStart = commandEndPos; //
+        if (textBeforeCursor.length > commandEndPos && textBeforeCursor[commandEndPos] === ' ') currentFragmentStart = commandEndPos + 1; //
+        let tempInSingleQuote = false; //
+        let tempInDoubleQuote = false; //
+        for (let i = currentFragmentStart; i < cursorPos; i++) { //
+          const char = textBeforeCursor[i]; //
+          if (char === "'" && (i === 0 || textBeforeCursor[i - 1] !== '\\')) { //
+            if (!tempInDoubleQuote) tempInSingleQuote = !tempInSingleQuote; //
+          } else if (char === '"' && (i === 0 || textBeforeCursor[i - 1] !== '\\')) { //
+            if (!tempInSingleQuote) tempInDoubleQuote = !tempInDoubleQuote; //
+          } else if (char === ' ' && !tempInSingleQuote && !tempInDoubleQuote) currentFragmentStart = i + 1; //
         }
-        effectiveArgStart = currentFragmentStart;
-        currentWordPrefix = textBeforeCursor.substring(effectiveArgStart, cursorPos);
+        effectiveArgStart = currentFragmentStart; //
+        currentWordPrefix = textBeforeCursor.substring(effectiveArgStart, cursorPos); //
       }
-      startOfWordIndex = effectiveArgStart;
+      startOfWordIndex = effectiveArgStart; //
     }
-    if (startOfWordIndex < 0) startOfWordIndex = 0;
-    let suggestions = [];
-    if (isCompletingCommandName) {
-      const allCommands = CommandExecutor.getCommands();
-      if (allCommands) suggestions = Object.keys(allCommands).filter((cmdName) => cmdName.startsWith(currentWordPrefix)).sort();
-      if (suggestions.length === 0) return {
-        textToInsert: null,
-        newCursorPos: cursorPos
+    if (startOfWordIndex < 0) startOfWordIndex = 0; //
+    let suggestions = []; //
+    if (isCompletingCommandName) { //
+      const allCommands = CommandExecutor.getCommands(); //
+      if (allCommands) suggestions = Object.keys(allCommands).filter((cmdName) => cmdName.startsWith(currentWordPrefix)).sort(); //
+      if (suggestions.length === 0) return { //
+        textToInsert: null, //
+        newCursorPos: cursorPos //
       };
-      if (suggestions.length === 1) {
-        const completedSegment = suggestions[0] + " ";
-        const textToInsert = textBeforeCursor.substring(0, startOfWordIndex) + completedSegment + fullInput.substring(cursorPos);
-        const newCursorPos = startOfWordIndex + completedSegment.length;
+      if (suggestions.length === 1) { //
+        const completedSegment = suggestions[0] + " "; //
+        const textToInsert = textBeforeCursor.substring(0, startOfWordIndex) + completedSegment + fullInput.substring(cursorPos); //
+        const newCursorPos = startOfWordIndex + completedSegment.length; //
         return {
-          textToInsert,
-          newCursorPos
+          textToInsert, //
+          newCursorPos //
         };
       } else {
-        const lcp = findLongestCommonPrefix(suggestions);
-        if (lcp.length > currentWordPrefix.length) {
-          const textToInsert = textBeforeCursor.substring(0, startOfWordIndex) + lcp + fullInput.substring(cursorPos);
-          const newCursorPos = startOfWordIndex + lcp.length;
-          OutputManager.appendToOutput(suggestions.join("    "), {
-            typeClass: Config.CSS_CLASSES.CONSOLE_LOG_MSG,
-            isCompletionSuggestion: true
+        const lcp = findLongestCommonPrefix(suggestions); //
+        if (lcp.length > currentWordPrefix.length) { //
+          const textToInsert = textBeforeCursor.substring(0, startOfWordIndex) + lcp + fullInput.substring(cursorPos); //
+          const newCursorPos = startOfWordIndex + lcp.length; //
+          OutputManager.appendToOutput(suggestions.join("    "), { //
+            typeClass: Config.CSS_CLASSES.CONSOLE_LOG_MSG, //
+            isCompletionSuggestion: true //
           });
-          const promptText = `${DOM.promptUserSpan.textContent}${Config.TERMINAL.PROMPT_AT}${DOM.promptHostSpan.textContent}${Config.TERMINAL.PROMPT_SEPARATOR}${DOM.promptPathSpan.textContent}${Config.TERMINAL.PROMPT_CHAR} `;
-          OutputManager.appendToOutput(`${promptText}${textBeforeCursor.substring(0, startOfWordIndex) + lcp}${fullInput.substring(cursorPos)}`, {
-            isCompletionSuggestion: true
+          const promptText = `${DOM.promptUserSpan.textContent}${Config.TERMINAL.PROMPT_AT}${DOM.promptHostSpan.textContent}${Config.TERMINAL.PROMPT_SEPARATOR}${DOM.promptPathSpan.textContent}${Config.TERMINAL.PROMPT_CHAR} `; //
+          OutputManager.appendToOutput(`${promptText}${textBeforeCursor.substring(0, startOfWordIndex) + lcp}${fullInput.substring(cursorPos)}`, { //
+            isCompletionSuggestion: true //
           });
-          if (DOM.outputDiv) DOM.outputDiv.scrollTop = DOM.outputDiv.scrollHeight;
+          if (DOM.outputDiv) DOM.outputDiv.scrollTop = DOM.outputDiv.scrollHeight; //
           return {
-            textToInsert,
-            newCursorPos
+            textToInsert, //
+            newCursorPos //
           };
         } else {
-          OutputManager.appendToOutput(suggestions.join("    "), {
-            typeClass: Config.CSS_CLASSES.CONSOLE_LOG_MSG,
-            isCompletionSuggestion: true
+          OutputManager.appendToOutput(suggestions.join("    "), { //
+            typeClass: Config.CSS_CLASSES.CONSOLE_LOG_MSG, //
+            isCompletionSuggestion: true //
           });
-          const promptText = `${DOM.promptUserSpan.textContent}${Config.TERMINAL.PROMPT_AT}${DOM.promptHostSpan.textContent}${Config.TERMINAL.PROMPT_SEPARATOR}${DOM.promptPathSpan.textContent}${Config.TERMINAL.PROMPT_CHAR} `;
-          OutputManager.appendToOutput(`${promptText}${fullInput}`, {
-            isCompletionSuggestion: true
+          const promptText = `${DOM.promptUserSpan.textContent}${Config.TERMINAL.PROMPT_AT}${DOM.promptHostSpan.textContent}${Config.TERMINAL.PROMPT_SEPARATOR}${DOM.promptPathSpan.textContent}${Config.TERMINAL.PROMPT_CHAR} `; //
+          OutputManager.appendToOutput(`${promptText}${fullInput}`, { //
+            isCompletionSuggestion: true //
           });
-          if (DOM.outputDiv) DOM.outputDiv.scrollTop = DOM.outputDiv.scrollHeight;
+          if (DOM.outputDiv) DOM.outputDiv.scrollTop = DOM.outputDiv.scrollHeight; //
           return {
-            textToInsert: null,
-            newCursorPos: cursorPos
+            textToInsert: null, //
+            newCursorPos: cursorPos //
           };
         }
       }
-    } else if (PATH_COMMANDS.includes(baseCommandForPath)) {
-      if (baseCommandForPath === "grep" && tokensInitial.length < ((tokensInitial[1] && tokensInitial[1].startsWith("-")) ? 3 : 2) && !lastCharIsSpace && (startOfWordIndex <= (textBeforeCursor.indexOf(tokensInitial[1] || "") + (tokensInitial[1] || "").length))) return {
-        textToInsert: null,
-        newCursorPos: cursorPos
+    } else if (baseCommandForPath === "help") { // NEW: Handle completion for 'help' command arguments
+        const allCommands = CommandExecutor.getCommands();
+        suggestions = Object.keys(allCommands).filter((cmdName) => cmdName.startsWith(currentWordPrefix)).sort();
+
+        if (suggestions.length === 0) {
+            return { textToInsert: null, newCursorPos: cursorPos };
+        } else if (suggestions.length === 1) {
+            const completedSegment = suggestions[0];
+            const textToInsert = textBeforeCursor.substring(0, startOfWordIndex) + completedSegment + fullInput.substring(cursorPos);
+            const newCursorPos = startOfWordIndex + completedSegment.length;
+            return { textToInsert, newCursorPos };
+        } else {
+            const lcp = findLongestCommonPrefix(suggestions);
+            if (lcp.length > currentWordPrefix.length) {
+                const textToInsert = textBeforeCursor.substring(0, startOfWordIndex) + lcp + fullInput.substring(cursorPos);
+                const newCursorPos = startOfWordIndex + lcp.length;
+                OutputManager.appendToOutput(suggestions.join("    "), { typeClass: Config.CSS_CLASSES.CONSOLE_LOG_MSG, isCompletionSuggestion: true });
+                const promptText = `${DOM.promptUserSpan.textContent}${Config.TERMINAL.PROMPT_AT}${DOM.promptHostSpan.textContent}${Config.TERMINAL.PROMPT_SEPARATOR}${DOM.promptPathSpan.textContent}${Config.TERMINAL.PROMPT_CHAR} `;
+                OutputManager.appendToOutput(`${promptText}${textBeforeCursor.substring(0, startOfWordIndex) + lcp}${fullInput.substring(cursorPos)}`, { isCompletionSuggestion: true });
+                if (DOM.outputDiv) DOM.outputDiv.scrollTop = DOM.outputDiv.scrollHeight;
+                return { textToInsert, newCursorPos };
+            } else {
+                OutputManager.appendToOutput(suggestions.join("    "), { typeClass: Config.CSS_CLASSES.CONSOLE_LOG_MSG, isCompletionSuggestion: true });
+                const promptText = `${DOM.promptUserSpan.textContent}${Config.TERMINAL.PROMPT_AT}${DOM.promptHostSpan.textContent}${Config.TERMINAL.PROMPT_SEPARATOR}${DOM.promptPathSpan.textContent}${Config.TERMINAL.PROMPT_CHAR} `;
+                OutputManager.appendToOutput(`${promptText}${fullInput}`, { isCompletionSuggestion: true });
+                if (DOM.outputDiv) DOM.outputDiv.scrollTop = DOM.outputDiv.scrollHeight;
+                return { textToInsert: null, newCursorPos: cursorPos };
+            }
+        }
+    } else if (PATH_COMMANDS.includes(baseCommandForPath)) { //
+      if (baseCommandForPath === "grep" && tokensInitial.length < ((tokensInitial[1] && tokensInitial[1].startsWith("-")) ? 3 : 2) && !lastCharIsSpace && (startOfWordIndex <= (textBeforeCursor.indexOf(tokensInitial[1] || "") + (tokensInitial[1] || "").length))) return { //
+        textToInsert: null, //
+        newCursorPos: cursorPos //
       };
-      if (baseCommandForPath === "gemini") {
-        if (lastCharIsSpace && tokensInitial.length === 2) return {
-          textToInsert: null,
-          newCursorPos: cursorPos
+      if (baseCommandForPath === "gemini") { //
+        if (lastCharIsSpace && tokensInitial.length === 2) return { //
+          textToInsert: null, //
+          newCursorPos: cursorPos //
         };
-        if (tokensInitial.length > 2) {
-          const endOfFirstArgInText = textBeforeCursor.indexOf(tokensInitial[1]) + tokensInitial[1].length;
-          if (startOfWordIndex > endOfFirstArgInText) return {
-            textToInsert: null,
-            newCursorPos: cursorPos
+        if (tokensInitial.length > 2) { //
+          const endOfFirstArgInText = textBeforeCursor.indexOf(tokensInitial[1]) + tokensInitial[1].length; //
+          if (startOfWordIndex > endOfFirstArgInText) return { //
+            textToInsert: null, //
+            newCursorPos: cursorPos //
           };
         }
       }
-      let isActivelyQuoted = false;
-      let originalQuoteChar = '';
-      let contentInsideQuotes = "";
-      if (currentWordPrefix.startsWith("'") && currentWordPrefix.endsWith("'") && currentWordPrefix.length >= 2) {
-        isActivelyQuoted = false;
-        originalQuoteChar = "'";
-        contentInsideQuotes = currentWordPrefix.substring(1, currentWordPrefix.length - 1);
-      } else if (currentWordPrefix.startsWith('"') && currentWordPrefix.endsWith('"') && currentWordPrefix.length >= 2) {
-        isActivelyQuoted = false;
-        originalQuoteChar = '"';
-        contentInsideQuotes = currentWordPrefix.substring(1, currentWordPrefix.length - 1);
-      } else if (currentWordPrefix.startsWith("'")) {
-        isActivelyQuoted = true;
-        originalQuoteChar = "'";
-        contentInsideQuotes = currentWordPrefix.substring(1);
-      } else if (currentWordPrefix.startsWith('"')) {
-        isActivelyQuoted = true;
-        originalQuoteChar = '"';
-        contentInsideQuotes = currentWordPrefix.substring(1);
+      let isActivelyQuoted = false; //
+      let originalQuoteChar = ''; //
+      let contentInsideQuotes = ""; //
+      if (currentWordPrefix.startsWith("'") && currentWordPrefix.endsWith("'") && currentWordPrefix.length >= 2) { //
+        isActivelyQuoted = false; //
+        originalQuoteChar = "'"; //
+        contentInsideQuotes = currentWordPrefix.substring(1, currentWordPrefix.length - 1); //
+      } else if (currentWordPrefix.startsWith('"') && currentWordPrefix.endsWith('"') && currentWordPrefix.length >= 2) { //
+        isActivelyQuoted = false; //
+        originalQuoteChar = '"'; //
+        contentInsideQuotes = currentWordPrefix.substring(1, currentWordPrefix.length - 1); //
+      } else if (currentWordPrefix.startsWith("'")) { //
+        isActivelyQuoted = true; //
+        originalQuoteChar = "'"; //
+        contentInsideQuotes = currentWordPrefix.substring(1); //
+      } else if (currentWordPrefix.startsWith('"')) { //
+        isActivelyQuoted = true; //
+        originalQuoteChar = '"'; //
+        contentInsideQuotes = currentWordPrefix.substring(1); //
       } else {
-        isActivelyQuoted = false;
-        originalQuoteChar = '';
-        contentInsideQuotes = currentWordPrefix;
+        isActivelyQuoted = false; //
+        originalQuoteChar = ''; //
+        contentInsideQuotes = currentWordPrefix; //
       }
-      let pathPrefixForFS = "";
-      let segmentToMatchForFS = "";
-      const lastSlashIndexInContent = contentInsideQuotes.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR);
-      if (lastSlashIndexInContent !== -1) {
-        pathPrefixForFS = contentInsideQuotes.substring(0, lastSlashIndexInContent + 1);
-        segmentToMatchForFS = contentInsideQuotes.substring(lastSlashIndexInContent + 1);
+      let pathPrefixForFS = ""; //
+      let segmentToMatchForFS = ""; //
+      const lastSlashIndexInContent = contentInsideQuotes.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR); //
+      if (lastSlashIndexInContent !== -1) { //
+        pathPrefixForFS = contentInsideQuotes.substring(0, lastSlashIndexInContent + 1); //
+        segmentToMatchForFS = contentInsideQuotes.substring(lastSlashIndexInContent + 1); //
       } else {
-        pathPrefixForFS = "";
-        segmentToMatchForFS = contentInsideQuotes;
+        pathPrefixForFS = ""; //
+        segmentToMatchForFS = contentInsideQuotes; //
       }
-      const effectiveBasePathForFS = FileSystemManager.getAbsolutePath(pathPrefixForFS, FileSystemManager.getCurrentPath());
-      const baseNode = FileSystemManager.getNodeByPath(effectiveBasePathForFS);
-      const currentUser = UserManager.getCurrentUser().name;
-      if (baseNode && baseNode.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE && FileSystemManager.hasPermission(baseNode, currentUser, "read")) {
-        suggestions = Object.keys(baseNode.children).filter((name) => name.startsWith(segmentToMatchForFS)).map((name) => {
-          const childNode = baseNode.children[name];
-          return childNode.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE ? name + Config.FILESYSTEM.PATH_SEPARATOR : name;
-        }).sort();
+      const effectiveBasePathForFS = FileSystemManager.getAbsolutePath(pathPrefixForFS, FileSystemManager.getCurrentPath()); //
+      const baseNode = FileSystemManager.getNodeByPath(effectiveBasePathForFS); //
+      const currentUser = UserManager.getCurrentUser().name; //
+      if (baseNode && baseNode.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE && FileSystemManager.hasPermission(baseNode, currentUser, "read")) { //
+        suggestions = Object.keys(baseNode.children).filter((name) => name.startsWith(segmentToMatchForFS)).map((name) => { //
+          const childNode = baseNode.children[name]; //
+          return childNode.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE ? name + Config.FILESYSTEM.PATH_SEPARATOR : name; //
+        }).sort(); //
       }
-      if (suggestions.length === 0) return {
-        textToInsert: null,
-        newCursorPos: cursorPos
+      if (suggestions.length === 0) return { //
+        textToInsert: null, //
+        newCursorPos: cursorPos //
       };
-      const textBeforeArg = textBeforeCursor.substring(0, startOfWordIndex);
-      const textAfterCursor = fullInput.substring(cursorPos);
-      if (suggestions.length === 1) {
-        const completedNamePart = suggestions[0];
-        const isDirSuggestion = completedNamePart.endsWith(Config.FILESYSTEM.PATH_SEPARATOR);
-        let finalCompletedFullArg;
-        if (originalQuoteChar) {
-          finalCompletedFullArg = originalQuoteChar + pathPrefixForFS + completedNamePart;
-          if (!isDirSuggestion) finalCompletedFullArg += originalQuoteChar;
+      const textBeforeArg = textBeforeCursor.substring(0, startOfWordIndex); //
+      const textAfterCursor = fullInput.substring(cursorPos); //
+      if (suggestions.length === 1) { //
+        const completedNamePart = suggestions[0]; //
+        const isDirSuggestion = completedNamePart.endsWith(Config.FILESYSTEM.PATH_SEPARATOR); //
+        let finalCompletedFullArg; //
+        if (originalQuoteChar) { //
+          finalCompletedFullArg = originalQuoteChar + pathPrefixForFS + completedNamePart; //
+          if (!isDirSuggestion) finalCompletedFullArg += originalQuoteChar; //
         } else {
-          const fullSuggestedPathSegment = pathPrefixForFS + completedNamePart;
-          if (fullSuggestedPathSegment.includes(" ")) {
-            finalCompletedFullArg = "'" + fullSuggestedPathSegment;
-            if (!isDirSuggestion) finalCompletedFullArg += "'";
-          } else finalCompletedFullArg = fullSuggestedPathSegment;
+          const fullSuggestedPathSegment = pathPrefixForFS + completedNamePart; //
+          if (fullSuggestedPathSegment.includes(" ")) { //
+            finalCompletedFullArg = "'" + fullSuggestedPathSegment; //
+            if (!isDirSuggestion) finalCompletedFullArg += "'"; //
+          } else finalCompletedFullArg = fullSuggestedPathSegment; //
         }
-        const spaceAfter = !isDirSuggestion;
-        const textToInsert = textBeforeArg + finalCompletedFullArg + (spaceAfter ? " " : "") + textAfterCursor;
-        const newCursorPos = textBeforeArg.length + finalCompletedFullArg.length + (spaceAfter ? 1 : 0);
+        const spaceAfter = !isDirSuggestion; //
+        const textToInsert = textBeforeArg + finalCompletedFullArg + (spaceAfter ? " " : "") + textAfterCursor; //
+        const newCursorPos = textBeforeArg.length + finalCompletedFullArg.length + (spaceAfter ? 1 : 0); //
         return {
-          textToInsert,
-          newCursorPos
+          textToInsert, //
+          newCursorPos //
         };
       } else {
-        const lcpOfSuggestions = findLongestCommonPrefix(suggestions);
-        if (lcpOfSuggestions.length > segmentToMatchForFS.length) {
-          let completedArgPart;
-          if (originalQuoteChar) completedArgPart = originalQuoteChar + pathPrefixForFS + lcpOfSuggestions;
-          else completedArgPart = pathPrefixForFS + lcpOfSuggestions;
-          const textToInsert = textBeforeArg + completedArgPart + textAfterCursor;
-          const newCursorPos = textBeforeArg.length + completedArgPart.length;
-          OutputManager.appendToOutput(suggestions.join("    "), {
-            typeClass: Config.CSS_CLASSES.CONSOLE_LOG_MSG,
-            isCompletionSuggestion: true
+        const lcpOfSuggestions = findLongestCommonPrefix(suggestions); //
+        if (lcpOfSuggestions.length > segmentToMatchForFS.length) { //
+          let completedArgPart; //
+          if (originalQuoteChar) completedArgPart = originalQuoteChar + pathPrefixForFS + lcpOfSuggestions; //
+          else completedArgPart = pathPrefixForFS + lcpOfSuggestions; //
+          const textToInsert = textBeforeArg + completedArgPart + textAfterCursor; //
+          const newCursorPos = textBeforeArg.length + completedArgPart.length; //
+          OutputManager.appendToOutput(suggestions.join("    "), { //
+            typeClass: Config.CSS_CLASSES.CONSOLE_LOG_MSG, //
+            isCompletionSuggestion: true //
           });
-          const promptText = `${DOM.promptUserSpan.textContent}${Config.TERMINAL.PROMPT_AT}${DOM.promptHostSpan.textContent}${Config.TERMINAL.PROMPT_SEPARATOR}${DOM.promptPathSpan.textContent}${Config.TERMINAL.PROMPT_CHAR} `;
-          OutputManager.appendToOutput(`${promptText}${textBeforeArg + completedArgPart}${textAfterCursor}`, {
-            isCompletionSuggestion: true
+          const promptText = `${DOM.promptUserSpan.textContent}${Config.TERMINAL.PROMPT_AT}${DOM.promptHostSpan.textContent}${Config.TERMINAL.PROMPT_SEPARATOR}${DOM.promptPathSpan.textContent}${Config.TERMINAL.PROMPT_CHAR} `; //
+          OutputManager.appendToOutput(`${promptText}${textBeforeArg + completedArgPart}${textAfterCursor}`, { //
+            isCompletionSuggestion: true //
           });
-          if (DOM.outputDiv) DOM.outputDiv.scrollTop = DOM.outputDiv.scrollHeight;
+          if (DOM.outputDiv) DOM.outputDiv.scrollTop = DOM.outputDiv.scrollHeight; //
           return {
-            textToInsert,
-            newCursorPos
+            textToInsert, //
+            newCursorPos //
           };
         } else {
-          OutputManager.appendToOutput(suggestions.join("    "), {
-            typeClass: Config.CSS_CLASSES.CONSOLE_LOG_MSG,
-            isCompletionSuggestion: true
+          OutputManager.appendToOutput(suggestions.join("    "), { //
+            typeClass: Config.CSS_CLASSES.CONSOLE_LOG_MSG, //
+            isCompletionSuggestion: true //
           });
-          const promptText = `${DOM.promptUserSpan.textContent}${Config.TERMINAL.PROMPT_AT}${DOM.promptHostSpan.textContent}${Config.TERMINAL.PROMPT_SEPARATOR}${DOM.promptPathSpan.textContent}${Config.TERMINAL.PROMPT_CHAR} `;
-          OutputManager.appendToOutput(`${promptText}${fullInput}`, {
-            isCompletionSuggestion: true
+          const promptText = `${DOM.promptUserSpan.textContent}${Config.TERMINAL.PROMPT_AT}${DOM.promptHostSpan.textContent}${Config.TERMINAL.PROMPT_SEPARATOR}${DOM.promptPathSpan.textContent}${Config.TERMINAL.PROMPT_CHAR} `; //
+          OutputManager.appendToOutput(`${promptText}${fullInput}`, { //
+            isCompletionSuggestion: true //
           });
-          if (DOM.outputDiv) DOM.outputDiv.scrollTop = DOM.outputDiv.scrollHeight;
+          if (DOM.outputDiv) DOM.outputDiv.scrollTop = DOM.outputDiv.scrollHeight; //
           return {
-            textToInsert: null,
-            newCursorPos: cursorPos
+            textToInsert: null, //
+            newCursorPos: cursorPos //
           };
         }
       }
     }
-    return {
-      textToInsert: null,
-      newCursorPos: cursorPos
+    return { //
+      textToInsert: null, //
+      newCursorPos: cursorPos //
     };
   }
-  return {
-    getSuggestions
+  return { //
+    getSuggestions //
   };
 })();
 
+// =========== CHANGE 3: Update the main keydown event listener ===========
 function initializeTerminalEventListeners() {
   if (!DOM.terminalDiv || !DOM.editableInputDiv) {
     console.error("Terminal event listeners cannot be initialized: Core DOM elements not found.");
@@ -2318,39 +2615,55 @@ function initializeTerminalEventListeners() {
       if (DOM.editableInputDiv.contentEditable === "true") TerminalUI.focusInput();
     }
   });
+
   const getCurrentInputTarget = () => DOM.editableInputDiv;
+
   document.addEventListener("keydown", async (e) => {
-        // --- NEW: Handle password input before other handlers ---
-        if (PasswordPromptManager.isAwaitingPassword()) {
-          const activeInput = getCurrentInputTarget();
-          if (!activeInput || activeInput.contentEditable !== "true") return;
-    
-          e.preventDefault(); // Prevent default browser behavior (e.g., echoing characters)
-    
-          if (e.key === "Enter") {
-            await PasswordPromptManager.handlePasswordInput(PasswordPromptManager.getActualObscuredInput());
-            return; // Stop further processing
-          } else if (e.key.startsWith("Arrow") || e.key === "Tab" || e.key === "Home" || e.key === "End") {
-            // Allow navigation within the obscured input visually, without changing content
-            PasswordPromptManager.updateObscuredDisplay(e.key, null, DOM.editableInputDiv.selectionStart);
-            return;
-          } else if (e.key === "Backspace" || e.key === "Delete") {
-            PasswordPromptManager.updateObscuredDisplay(e.key, null, DOM.editableInputDiv.selectionStart);
-            return;
-          } else if (e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey) { // Regular character input
-            // Only update display; the actual content is stored internally by PasswordPromptManager
-            PasswordPromptManager.updateObscuredDisplay(e.key, e.key, DOM.editableInputDiv.selectionStart);
-            return;
-          }
+    // If the modal input is active, it gets priority.
+    if (ModalInputManager.isAwaiting()) {
+      
+      // Check if the current modal input is for a password (obscured).
+      if (ModalInputManager.isObscured()) {
+        // For obscured input, we prevent the character from appearing
+        // and manually handle it to build the hidden string and display asterisks.
+        e.preventDefault();
+        
+        if (e.key === "Enter") {
+          await ModalInputManager.handleInput();
+        } else {
+          // Manually build the hidden input string.
+          ModalInputManager.updateInput(e.key, e.key.length === 1 ? e.key : null);
         }
-    if (CommandExecutor.isScriptRunning() && !ConfirmationManager.isAwaiting()) {
+      } else {
+        // For REGULAR input (like the API key), we let the browser handle typing.
+        // We only intercept the "Enter" key to submit the input.
+        if (e.key === "Enter") {
+          e.preventDefault(); // Prevent the default action (e.g., adding a new line).
+          await ModalInputManager.handleInput();
+        }
+        // For all other keys (letters, backspace, etc.), we do nothing here.
+        // The browser's default behavior for a contentEditable div will handle it correctly.
+      }
+      return; // Stop further processing of the key event.
+    }
+
+    // --- The rest of the handler for normal command-line operation ---
+    const activeInput = getCurrentInputTarget();
+    
+    if (CommandExecutor.isScriptRunning() && !ModalManager.isAwaiting()) {
       if (e.key === "Enter" || e.key === "Tab" || e.key.startsWith("Arrow")) e.preventDefault();
       return;
-    }
-    if (EditorManager.isActive() && !ConfirmationManager.isAwaiting()) return;
-    const activeInput = getCurrentInputTarget();
+    } 
+    
+    if (EditorManager.isActive() && !ModalManager.isAwaiting()) {
+      // The editor's own event handler will manage this.
+      return;
+    } 
+    
+    // Default command-line processing
     if (!activeInput || (document.activeElement !== activeInput && !activeInput.contains(document.activeElement)) || activeInput.contentEditable !== "true") return;
     TerminalUI.setIsNavigatingHistory(false);
+    
     if (e.key === "Enter") {
       e.preventDefault();
       await CommandExecutor.processSingleCommand(TerminalUI.getCurrentInputValue(), true);
@@ -2389,6 +2702,7 @@ function initializeTerminalEventListeners() {
       }
     }
   });
+
   if (DOM.editableInputDiv) {
     DOM.editableInputDiv.addEventListener("paste", (e) => {
       e.preventDefault();
@@ -2399,6 +2713,7 @@ function initializeTerminalEventListeners() {
   }
 }
 
+
 window.onload = async () => {
   DOM = {
     terminalBezel: document.getElementById("terminal-bezel"),
@@ -2408,6 +2723,7 @@ window.onload = async () => {
     promptUserSpan: document.getElementById("prompt-user"),
     promptHostSpan: document.getElementById("prompt-host"),
     promptPathSpan: document.getElementById("prompt-path"),
+    promptCharSpan: document.getElementById("prompt-char"),
     editableInputContainer: document.getElementById("editable-input-container"),
     editableInputDiv: document.getElementById("editable-input"),
     adventureModal: document.getElementById('adventure-modal'),
@@ -2421,7 +2737,9 @@ window.onload = async () => {
     await FileSystemManager.load(); // This creates the FS structure if it's the first time.
     
     // Initialize default user credentials (incl. root password) after FS is ready.
-    await UserManager.initializeDefaultUsers(); 
+    await UserManager.initializeDefaultUsers();
+
+    await Config.loadFromFile(); 
     
     SessionManager.loadAutomaticState(Config.USER.DEFAULT_NAME);
 
