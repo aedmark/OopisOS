@@ -1,4 +1,4 @@
-// lexpar.js - OopisOS Lexer/Parser Logic v2.2
+// lexpar.js - OopisOS Lexer/Parser Logic v2.3
 
   const TokenType = {
   WORD: "WORD",

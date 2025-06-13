@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OopisOS Icon</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --os-green: #34d399;
+            --os-dark-bg: #0a0a0a;
+            --os-bezel-bg: #27272a;
+        }
+
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #18181b; /* A neutral dark background for viewing */
+        }
+
+        .icon-container {
+            width: 256px;
+            height: 256px;
+            background-color: var(--os-bezel-bg);
+            border-radius: 28px; /* Slightly rounded corners for a modern "squircle" look */
+            padding: 16px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2), inset 0 0 15px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-screen {
+            width: 100%;
+            height: 100%;
+            background-color: var(--os-dark-bg);
+            border-radius: 12px;
+            box-shadow: inset 0 0 20px rgba(52, 211, 153, 0.2);
+            font-family: 'VT323', monospace;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5.5rem; /* Large font size for impact */
+            color: var(--os-green);
+            text-shadow: 0 0 10px rgba(52, 211, 153, 0.7);
+        }
+
+        .cursor {
+            animation: blink 1s step-end infinite;
+            margin-left: 2px;
+            position: relative;
+            top: -0.05em; /* Fine-tune cursor vertical alignment */
+        }
+
+        @keyframes blink {
+            from, to {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="icon-container">
+        <div class="icon-screen">
+            <span>OOS</span><span class="prompt-char">&gt;</span><span class="cursor">_</span>
+        </div>
+    </div>
+
+</body>
+</html>

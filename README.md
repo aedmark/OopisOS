@@ -1,55 +1,49 @@
-Of course\! It's a bit like giving a map a set of actual GPS coordinates instead of just circling the general area and saying "It's around here somewhere." Much more useful\!
+# OopisOS v2.3 - A Browser-Based OS Simulation
 
-Here is the revised `README.md` with the Table of Contents updated to link to the corresponding sections within the document.
+***OopisOS v2.3: A refined, feature-rich operating system simulation for education, development, and interactive entertainment.***
 
------
+OopisOS is a sophisticated, fully client-side application that simulates a desktop operating system environment entirely within a web browser. It features a retro-style terminal, a persistent hierarchical file system, a multi-user model with password authentication, an advanced text editor, an AI interaction layer, an interactive text adventure engine, and a suite of command-line utilities with support for I/O redirection, piping, background processes, and scripting.
 
-# OopisOS v2.2 - A Browser-Based OS Simulation
+## Key Features (v2.3)
 
-***OopisOS v2.2: A refined, feature-rich operating system simulation for education, development, and interactive entertainment.***
-
-OopisOS is a sophisticated, fully client-side HTML application that simulates a desktop operating system environment entirely within a web browser. It features a retro-style terminal, a persistent hierarchical file system, multi-user management with password authentication, session handling, an advanced built-in text editor, an AI interaction layer, an interactive text adventure game engine, and a suite of command-line utilities with support for I/O redirection, piping, background processes, and scripting.
-
-## Introduction
-
-Welcome to **OopisOS v2.2**. This project, a collaborative effort by Andrew Edmark and Gemini, aims to provide an engaging and educational experience by simulating core operating system functionalities in a completely client-side environment. Whether you are a student learning OS concepts, a developer seeking a sandboxed command-line environment, or a retro-computing enthusiast, OopisOS offers a rich set of tools and features to explore.
-
-The entire system is self-contained and modular, with its logic distributed across `oopisos2_1.js` (core OS framework), `lexpar2_1.js` (lexical analysis and parsing), `commexec2_1.js` (command execution), `editor2_1.js` (text editor), and `adventure2_1.js` (game engine).
-
-## Key Features (v2.2)
-
-  - **100% Client-Side:** Runs entirely in the browser with no server-side dependencies.
-  - **Advanced Terminal Interface:** An interactive command-line interface with history, tab completion, command pipelining (`|`), command sequencing (`;`), background processes (`&`), and I/O redirection (`>` and `>>`).
-  - **Persistent Hierarchical File System:** A robust VFS managed via IndexedDB. Features a comprehensive suite of file management commands:
-      - `ls`: Supports flags `-l`, `-a`, `-R`, `-r`, `-t`, `-S`, `-X`, `-U`, `-d`.
-      - `find`: Supports predicates like `-name`, `-type`, `-user`, `-perm`, `-mtime` and actions like `-print`, `-exec`, `-delete`.
-      - Standard commands: `mkdir`, `cd`, `touch`, `cat`, `cp`, `mv`, `rm`, `pwd`, `tree`.
-  - **Multi-User System with Password Authentication:**
-      - Register users (`useradd`) with secure password prompts.
-      - Login/logout (`login`, `logout`) and switch users (`su`), including to a `root` user with full system privileges (default password: `mcgoopis`).
-      - User management commands: `whoami`, `listusers`, `removeuser`.
-      - Each user has a dedicated, permission-controlled home directory (`/home/<username>`).
-  - **Comprehensive Session Management:** Automatic session saving per user, manual `savestate`/`loadstate`, full file system `backup`/`restore` via JSON, and system/home directory `reset`/`clearfs` capabilities.
-  - **Enhanced Built-in Text Editor (`edit`):**
-      - Full-screen editor for plain text, Markdown, and HTML with live preview.
-      - Features include line numbers, toggleable word wrap, status bar, and a formatting toolbar.
-      - Keyboard shortcuts: `Ctrl+S` (save/exit), `Ctrl+O` (exit/confirm), `Ctrl+P` (toggle preview), `Ctrl+B`/`I` (format).
-  - **AI Integration (`gemini`):** Send a prompt, with or without file content, to a Gemini AI model and display the response directly in the terminal.
-  - **Interactive Text Adventure Game (`adventure`):** Launch and play text-based adventure games within a dedicated modal window. Supports loading custom adventures from JSON files.
-  - **Scripting Engine (`run`):** Execute sequences of OopisOS commands from script files. Supports comments (`#`), shebangs, and argument passing (`$1`, `$@`, `$#`).
-  - **Common Utilities:** `echo`, `date`, `help`, `clear`, `history`, `export`, `upload`, `chmod`, `chown`, `grep` (with `-i`, `-v`, `-n`, `-c`, `-R`), and `printscreen`.
+  * **100% Client-Side:** Runs entirely in the browser with no server-side dependencies. All user data is stored locally using IndexedDB and LocalStorage.
+  * **Advanced Terminal Interface:** An interactive command-line interface with history, tab completion, command pipelining (`|`), command sequencing (`;`), background processes (`&`), and I/O redirection (`>` and `>>`).
+  * **Persistent Hierarchical File System:** A robust VFS managed via IndexedDB. Features a comprehensive suite of file management commands:
+      * `ls`: Supports flags `-l`, `-a`, `-R`, `-r`, `-t`, `-S`, `-X`, `-U`, `-d`.
+      * `find`: Supports predicates like `-name`, `-type`, `-user`, `-perm`, `-mtime` and actions like `-print`, `-exec`, `-delete`.
+      * Standard commands: `mkdir`, `cd`, `touch`, `cat`, `cp`, `mv`, `rm`, `pwd`, `tree`.
+  * **Multi-User System with Password Authentication:**
+      * Register users (`useradd`) with secure, obscured password prompts.
+      * Login/logout (`login`, `logout`) and switch users (`su`), including to a `root` user with full system privileges (default password: `mcgoopis`).
+      * User management commands: `whoami`, `listusers`, `removeuser`.
+      * Each user has a dedicated, permission-controlled home directory (`/home/<username>`).
+  * **Comprehensive Session Management:** Automatic session saving per user, manual `savestate`/`loadstate`, full file system `backup`/`restore` via JSON, and system/home directory `reset`/`clearfs` capabilities.
+  * **Enhanced Built-in Text Editor (`edit`):**
+      * Full-screen editor for plain text, Markdown, and HTML with live preview.
+      * Features include line numbers, toggleable word wrap, status bar, and a formatting toolbar.
+      * Keyboard shortcuts: `Ctrl+S` (save/exit), `Ctrl+O` (exit/confirm), `Ctrl+P` (toggle preview), `Ctrl+B`/`I` (format).
+  * **AI Integration (`gemini`):** Send a prompt, with or without file content, to a Gemini AI model and display the response directly in the terminal.
+  * **Interactive Text Adventure Game (`adventure`):** Launch and play text-based adventure games within a dedicated modal window. Supports loading custom adventures from JSON files.
+  * **Scripting Engine (`run`):** Execute sequences of OopisOS commands from script files. Supports comments (`#`) and argument passing (`$1`, `$@`, `$#`).
+  * **Common Utilities:** `echo`, `date`, `help`, `clear`, `history`, `export`, `upload`, `chmod`, `chown`, `grep` (with `-i`, `-v`, `-n`, `-c`, `-R`), and `printscreen`.
 
 ## Getting Started
 
-1.  **Download:** Obtain `index.html` and the required JavaScript files (`oopisos2_1.js`, `lexpar2_1.js`, `commexec2_1.js`, `editor2_1.js`, `adventure2_1.js`) and support files.
+1.  **Download:** Obtain `index.html`, all `.js` files, and `terminal.css`.
 2.  **Open:** Open `index.html` in any modern web browser.
 3.  **Interact:** The OopisOS terminal will load. You are logged in as "Guest". Start by typing `help` to see a list of available commands.
 
 **First Commands to Try:**
 
-```
-# Explore the pre-populated environment
-run /inflate2_2.sh
+```bash
+# To get a feel for the system, populate the Guest home directory with a rich set of example files.
+run /inflate2_3.sh
+
+# Explore the newly created files and directories
+ls -R /home/Guest
+
+# Test the search capabilities
+grep -iR "duck" /home/Guest
 
 # Create a new user with a password
 useradd myuser
@@ -62,10 +56,7 @@ mkdir my_project && cd my_project
 edit my_script.sh
 # Inside editor: type 'echo "My script works on $@" && adventure', then Ctrl+S
 chmod 70 my_script.sh
-run ./my_script.sh "OopisOS v2.2"
-
-# Interact with the AI
-gemini ./reports/financials_q2.txt "Summarize this report."
+run ./my_script.sh "OopisOS v2.3"
 ```
 
 ## Core Concepts
@@ -74,88 +65,88 @@ gemini ./reports/financials_q2.txt "Summarize this report."
 
 OopisOS provides a standard command-line interface with advanced shell features:
 
-  - **Piping (`|`):** Send the output of one command to the input of another. `history | grep "ls"`
-  - **Redirection (`>`, `>>`):** Write command output to a file (overwrite with `>` or append with `>>`). `date >> /system.log`
-  - **Sequencing (`;`):** Execute multiple commands on a single line. `cd / && ls -a`
-  - **Backgrounding (`&`):** Run a command asynchronously. `delay 5000 &`
+  * **Piping (`|`):** Send the output of one command to the input of another. `history | grep "ls"`
+  * **Redirection (`>`, `>>`):** Write command output to a file (overwrite with `>` or append with `>>`). `date >> /data/logs/system.log`
+  * **Sequencing (`;`):** Execute multiple commands on a single line. `cd / && ls -a`
+  * **Backgrounding (`&`):** Run a command asynchronously. `delay 5000 &`
 
 ### The File System
 
-OopisOS implements a persistent, hierarchical file system stored in IndexedDB.
+OopisOS implements a persistent, hierarchical file system stored in the browser's IndexedDB.
 
-  - The root is `/`.
-  - Each user has a home directory at `/home/<username>`.
-  - Supports standard navigation (`cd`, `pwd`) and file manipulation (`mkdir`, `touch`, `cp`, `mv`, `rm`).
-  - The `find` command allows for powerful, expression-based file searches.
+  * The root is `/`.
+  * Each user has a home directory at `/home/<username>`.
+  * Supports standard navigation (`cd`, `pwd`) and file manipulation (`mkdir`, `touch`, `cp`, `mv`, `rm`).
+  * The `find` command allows for powerful, expression-based file searches.
 
 ### User and Permission Model
 
 OopisOS features a multi-user environment with a simplified Unix-like permission system.
 
-  - **Default Users:**
-      - `Guest`: The initial user. Has no password.
-      - `root`: The "superuser." Can bypass all file permission checks. Default password is `mcgoopis`.
-      - `userDiag`: A special user for testing with the password `pantload`.
-  - **Authentication:** `login` and `su` will prompt for a password if the target account has one.
-  - **Permissions (`chmod`):** The `chmod` command uses a two-digit octal mode. The first digit is for the owner, the second for others. Each is a sum of Read (4), Write (2), and Execute (1). Example: `chmod 75 script.sh` gives `rwx` to the owner and `r-x` to others.
-  - **Ownership (`chown`):** Only the file's owner or the `root` user can change its ownership.
+  * **Default Users:**
+      * `Guest`: The initial user. Has no password.
+      * `root`: The "superuser." Can bypass all file permission checks. Default password is `mcgoopis`.
+      * `userDiag`: A special user for testing with the password `pantload`.
+  * **Authentication:** `login` and `su` will prompt for a password if the target account has one.
+  * **Permissions (`chmod`):** The `chmod` command uses a two-digit octal mode. The first digit is for the owner, the second for others. Each is a sum of Read (4), Write (2), and Execute (1). Example: `chmod 75 script.sh` gives `rwx` to the owner and `r-x` to others.
+  * **Ownership (`chown`):** Only the `root` user can change a file's ownership.
 
 ### The Text Editor (`edit`)
 
 A powerful, full-screen text editor with features for both developers and writers.
 
-  - **Modes:** Auto-detects plain text, Markdown, and HTML files for special features.
-  - **Live Preview:** Renders Markdown and HTML in a toggleable preview pane (`Ctrl+P`).
-  - **Formatting Toolbar:** Provides quick access to common formatting actions for Markdown and HTML.
-  - **Key Shortcuts:** `Ctrl+S` (Save & Exit), `Ctrl+O` (Exit/Confirm Discard), `Ctrl+P` (Toggle Preview), `Ctrl+B`/`I` (Format).
+  * **Modes:** Auto-detects plain text, Markdown, and HTML files for special features.
+  * **Live Preview:** Renders Markdown and HTML in a toggleable preview pane (`Ctrl+P`).
+  * **Formatting Toolbar:** Provides quick access to common formatting actions for Markdown and HTML.
+  * **Key Shortcuts:** `Ctrl+S` (Save & Exit), `Ctrl+O` (Exit/Confirm Discard), `Ctrl+P` (Toggle Preview), `Ctrl+B`/`I` (Format).
 
 ### AI Integration (`gemini`)
 
 Interact with a Gemini AI model directly from the command line.
 
-  - **Syntax:** `gemini [filepath] "<prompt>"`
-  - **Functionality:** Send a text prompt, optionally with the content of a file, to the AI and receive a response in the terminal.
+  * **Syntax:** `gemini [-n] [filepath] "<prompt>"`
+  * **Functionality:** Send a text prompt to the AI, optionally with the content of a file. Use `-n` to start a new conversation. Receive a response in the terminal.
 
 ### Scripting Engine (`run`)
 
 Automate tasks by writing shell scripts.
 
-  - Create a text file containing a sequence of OopisOS commands.
-  - **Features:** Supports comments (`#`), shebangs (ignored), and argument passing (`$1`, `$@`, `$#`).
-  - **Execution:** `chmod 70 your_script.sh` then `run ./your_script.sh arg1 arg2`.
+  * Create a text file containing a sequence of OopisOS commands (conventionally with a `.sh` extension).
+  * **Features:** Supports comments (`#`) and argument passing (`$1`, `$@`, `$#`).
+  * **Execution:** `chmod 70 your_script.sh` then `run ./your_script.sh arg1 arg2`.
 
 ### Interactive Gaming (`adventure`)
 
 A built-in text adventure game engine.
 
-  - **Launch:** Type `adventure` to play the default game.
-  - **Custom Games:** Load your own adventures from JSON files in the VFS: `adventure /path/to/game.json`.
+  * **Launch:** Type `adventure` to play the default game.
+  * **Custom Games:** Load your own adventures from JSON files in the VFS: `adventure /path/to/game.json`.
 
 ## Utility Scripts: `inflate` & `diag`
 
-  - `inflate2_2.sh`: Run this script (`run /inflate2_2.sh`) to populate the file system with a diverse set of example files and directories. This is perfect for creating a "showcase" environment.
-  - `diag2_2.sh`: This is a comprehensive diagnostic test suite (`run /diag2_2.sh`) that verifies the core functionality of most commands, including their flags, error handling, and interaction with the permission system.
+  * **`inflate2_3.sh`:** Run this script (`run /inflate2_3.sh`) to populate the `/home/Guest` directory with a diverse set of example files and directories. This is perfect for creating a "showcase" environment to explore.
+  * **`diag2_3.sh`:** This is a comprehensive, non-interactive diagnostic test suite (`run /diag2_3.sh`) that verifies the core functionality of most commands, their flags, error handling, and interaction with the permission system.
 
 ## Developer Guide
 
 ### Project Structure
 
-  - `oopisos2_1.js`: Core OS framework, managers, and utilities.
-  - `lexpar2_1.js`: Lexer and Parser for command-line input.
-  - `commexec2_1.js`: Command Executor and definitions for all built-in commands.
-  - `editor2_1.js`: All logic for the text editor.
-  - `adventure2_1.js`: All logic for the text adventure game engine.
+  * `oopisos2_3.js`: Core OS framework, managers (File System, User, Session), and utilities.
+  * `lexpar2_3.js`: Lexer and Parser for command-line input.
+  * `commexec2_3.js`: Command Executor and definitions for all built-in commands.
+  * `editor2_3.js`: All logic for the text editor.
+  * `adventure2_3.js`: All logic for the text adventure game engine.
 
-### Adding a New Command (The v2.2 Way)
+### Adding a New Command (The v2.3 Way)
 
-1.  Open `commexec2_1.js`.
+1.  Open `commexec2_3.js`.
 2.  Define your command's logic and validation rules using the declarative `createCommandHandler` pattern.
 3.  Add the new command definition to the `commands` object.
 
 <!-- end list -->
 
 ```javascript
-// In commexec2_1.js:
+// In commexec2_3.js:
 
 const myNewCmdDefinition = {
   commandName: "mycmd",
@@ -174,34 +165,26 @@ const myNewCmdDefinition = {
 };
 
 // 3. Add it to the main commands object
-const commands = {
-    // ... other commands
-    mycmd: {
-        handler: createCommandHandler(myNewCmdDefinition),
-        description: "A one-line summary for the 'help' command.",
-        helpText: "Usage: mycmd [file]\n\nExplain your command in detail here."
-    },
-    // ... more commands
+commands.mycmd = {
+    handler: createCommandHandler(myNewCmdDefinition),
+    description: "A one-line summary for the 'help' command.",
+    helpText: "Usage: mycmd [file]\n\nExplain your command in detail here."
 };
 ```
 
 ## Technology Stack
 
-  - **Frontend & Logic:** HTML5, CSS3 (Tailwind CSS), Vanilla JavaScript (ES6+).
-  - **Markdown Parsing:** Marked.js.
-  - **AI Interaction:** Google Gemini API.
-  - **Persistent Storage:** IndexedDB (for the file system) and LocalStorage (for session states, user list, editor preferences).
+  * **Frontend & Logic:** HTML5, CSS3 (Tailwind CSS), Vanilla JavaScript (ES6+).
+  * **Markdown Parsing:** Marked.js.
+  * **AI Interaction:** Google Gemini API.
+  * **Persistent Storage:** IndexedDB (for the file system) and LocalStorage (for session states, user list, editor preferences).
 
 ## Contributing
 
-Contributions are welcome\! Fork the repository, create a new branch, make your changes, and submit a pull request with a clear description of your work. Please ensure your changes pass the diagnostic script (`diag2_2.sh`) and update documentation as needed.
+Contributions are welcome\! Fork the repository, create a new branch, make your changes, and submit a pull request with a clear description of your work. Please ensure your changes pass the diagnostic script (`diag2_3.sh`) and update documentation as needed.
 
 ## License
 
 This code was designed with the help of Google Gemini.
 
 Copyright (c) 2025 Andrew Edmark and Gemini. (MIT Licensed)
-
-For the full license text, please see the [User Guide](https://gemini.google.com/app/guide.html#about "null").
-
-[https://github.com/aedmark/OopisOS](https://github.com/aedmark/OopisOS "null")

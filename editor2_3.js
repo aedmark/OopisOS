@@ -1,4 +1,4 @@
-// editor.js - OopisOS Live Markdown Text Editor v2.2
+// editor.js - OopisOS Live Markdown Text Editor v2.3.1
 
 const EditorAppConfig = {
   EDITOR: {
@@ -296,7 +296,6 @@ const EditorUI = (() => {
         scroll: eventCallbacks.onScroll,
         click: eventCallbacks.onSelectionChange,
         keyup: eventCallbacks.onSelectionChange,
-        keydown: eventCallbacks.onKeydown
       },
     });
     elements.textareaWrapper = Utils.createElement("div", {
@@ -813,11 +812,13 @@ const EditorManager = (() => {
     isDirty = false;
     const isPreviewable = currentFileMode === EditorAppConfig.EDITOR.MODES.MARKDOWN || currentFileMode === EditorAppConfig.EDITOR.MODES.HTML;
     currentViewMode = EditorAppConfig.EDITOR.VIEW_MODES.EDIT_ONLY;
+    
+    document.addEventListener('keydown', handleKeyDown);
+
     EditorUI.buildLayout(DOM.terminalDiv, {
       onInput: _handleEditorInput.bind(this),
       onScroll: _handleEditorScroll.bind(this),
       onSelectionChange: _handleEditorSelectionChange.bind(this),
-      onKeydown: handleKeyDown.bind(this),
       onViewToggle: _toggleViewModeHandler.bind(this),
       onExportPreview: exportPreviewAsHtml.bind(this),
       onWordWrapToggle: _toggleWordWrap.bind(this),
@@ -842,6 +843,8 @@ const EditorManager = (() => {
   }
 
   async function _performExitActions() {
+    document.removeEventListener('keydown', handleKeyDown);
+
     EditorUI.destroyLayout();
     isActiveState = false;
 
@@ -977,7 +980,8 @@ const EditorManager = (() => {
 
   async function handleKeyDown(event) {
     if (!isActiveState) return;
-    if (event.key === "Tab") {
+    
+    if (event.key === "Tab" && document.activeElement === EditorUI.elements.textarea) {
       event.preventDefault();
       const selection = EditorUI.getTextareaSelection();
       const content = EditorUI.getTextareaContent();
@@ -986,6 +990,7 @@ const EditorManager = (() => {
       _handleEditorInput();
       return;
     }
+
     if (event.ctrlKey) {
       switch (event.key.toLowerCase()) {
         case "s":
@@ -1007,11 +1012,13 @@ const EditorManager = (() => {
           }
           break;
         case "i":
-          if (currentFileMode === EditorAppConfig.EDITOR.MODES.MARKDOWN || currentFileMode === EditorAppConfig.EDITOR.MODES.HTML) {
-            event.preventDefault();
-            _applyTextManipulation('italic');
-          }
-          break;
+    // ONLY trigger if Shift is NOT pressed
+    if (!event.shiftKey && (currentFileMode === EditorAppConfig.EDITOR.MODES.MARKDOWN || currentFileMode === EditorAppConfig.EDITOR.MODES.HTML)) {
+        event.preventDefault();
+        _applyTextManipulation('italic');
+    }
+    // If Shift IS pressed, we do nothing, letting the browser handle it.
+    break;
       }
     }
     setTimeout(_handleEditorSelectionChange, 0);
