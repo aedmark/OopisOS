@@ -1,16 +1,9 @@
 // oopisos.js - OopisOS Core Logic v2.3
-
 const Utils = (() => {
 	"use strict";
 
 	function formatConsoleArgs(args) {
-		return Array.from(args)
-			.map((arg) =>
-				typeof arg === "object" && arg !== null ?
-				JSON.stringify(arg) :
-				String(arg),
-			)
-			.join(" ");
+		return Array.from(args).map((arg) => typeof arg === "object" && arg !== null ? JSON.stringify(arg) : String(arg), ).join(" ");
 	}
 
 	function deepCopyNode(node) {
@@ -18,7 +11,7 @@ const Utils = (() => {
 	}
 
 	function formatBytes(bytes, decimals = 2) {
-		if (bytes === 0) return "0 B";
+		if(bytes === 0) return "0 B";
 		const k = 1024;
 		const dm = decimals < 0 ? 0 : decimals;
 		const sizes = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
@@ -27,12 +20,10 @@ const Utils = (() => {
 	}
 
 	function getFileExtension(filePath) {
-		if (!filePath || typeof filePath !== "string") return "";
-		const name = filePath.substring(
-			filePath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR) + 1,
-		);
+		if(!filePath || typeof filePath !== "string") return "";
+		const name = filePath.substring(filePath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR) + 1, );
 		const lastDot = name.lastIndexOf(".");
-		if (lastDot === -1 || lastDot === 0 || lastDot === name.length - 1) {
+		if(lastDot === -1 || lastDot === 0 || lastDot === name.length - 1) {
 			return "";
 		}
 		return name.substring(lastDot + 1).toLowerCase();
@@ -40,40 +31,40 @@ const Utils = (() => {
 
 	function createElement(tag, attributes = {}, ...childrenArgs) {
 		const element = document.createElement(tag);
-		for (const key in attributes) {
-			if (attributes.hasOwnProperty(key)) {
+		for(const key in attributes) {
+			if(attributes.hasOwnProperty(key)) {
 				const value = attributes[key];
-				if (key === "textContent") {
+				if(key === "textContent") {
 					element.textContent = value;
-				} else if (key === "innerHTML") {
+				} else if(key === "innerHTML") {
 					element.innerHTML = value;
-				} else if (key === "classList" && Array.isArray(value)) {
+				} else if(key === "classList" && Array.isArray(value)) {
 					value.forEach((cls) => {
-						if (typeof cls === "string") {
+						if(typeof cls === "string") {
 							cls.split(" ").forEach((c) => {
-								if (c) element.classList.add(c);
+								if(c) element.classList.add(c);
 							});
 						}
 					});
-				} else if (key === "className" && typeof value === "string") {
+				} else if(key === "className" && typeof value === "string") {
 					value.split(" ").forEach((c) => {
-						if (c) element.classList.add(c);
+						if(c) element.classList.add(c);
 					});
-				} else if (key === "style" && typeof value === "object") {
-					for (const styleProp in value) {
-						if (value.hasOwnProperty(styleProp)) {
+				} else if(key === "style" && typeof value === "object") {
+					for(const styleProp in value) {
+						if(value.hasOwnProperty(styleProp)) {
 							element.style[styleProp] = value[styleProp];
 						}
 					}
-				} else if (key === "eventListeners" && typeof value === "object") {
-					for (const eventType in value) {
-						if (value.hasOwnProperty(eventType) && typeof value[eventType] === "function") {
+				} else if(key === "eventListeners" && typeof value === "object") {
+					for(const eventType in value) {
+						if(value.hasOwnProperty(eventType) && typeof value[eventType] === "function") {
 							element.addEventListener(eventType, value[eventType]);
 						}
 					}
-				} else if (value !== null && value !== undefined) {
-					if (typeof value === "boolean") {
-						if (value) element.setAttribute(key, "");
+				} else if(value !== null && value !== undefined) {
+					if(typeof value === "boolean") {
+						if(value) element.setAttribute(key, "");
 						else element.removeAttribute(key);
 					} else {
 						element.setAttribute(key, value);
@@ -83,26 +74,26 @@ const Utils = (() => {
 		}
 		const childrenToProcess = childrenArgs.length === 1 && Array.isArray(childrenArgs[0]) ? childrenArgs[0] : childrenArgs;
 		childrenToProcess.forEach((child) => {
-			if (child instanceof Node) element.appendChild(child);
-			else if (typeof child === "string") element.appendChild(document.createTextNode(child));
-			else if (child !== null && child !== undefined) console.warn("Utils.createElement: Skipping unexpected child type:", child);
+			if(child instanceof Node) element.appendChild(child);
+			else if(typeof child === "string") element.appendChild(document.createTextNode(child));
+			else if(child !== null && child !== undefined) console.warn("Utils.createElement: Skipping unexpected child type:", child);
 		});
 		return element;
 	}
 
 	function validateArguments(argsArray, config = {}) {
 		const argCount = argsArray.length;
-		if (typeof config.exact === "number") {
-			if (argCount !== config.exact) return {
+		if(typeof config.exact === "number") {
+			if(argCount !== config.exact) return {
 				isValid: false,
 				errorDetail: `expected exactly ${config.exact} argument(s) but got ${argCount}`
 			};
 		} else {
-			if (typeof config.min === "number" && argCount < config.min) return {
+			if(typeof config.min === "number" && argCount < config.min) return {
 				isValid: false,
 				errorDetail: `expected at least ${config.min} argument(s), but got ${argCount}`
 			};
-			if (typeof config.max === "number" && argCount > config.max) return {
+			if(typeof config.max === "number" && argCount > config.max) return {
 				isValid: false,
 				errorDetail: `expected at most ${config.max} argument(s), but got ${argCount}`
 			};
@@ -117,19 +108,19 @@ const Utils = (() => {
 			allowFloat = false, allowNegative = false, min, max
 		} = options;
 		const num = allowFloat ? parseFloat(argString) : parseInt(argString, 10);
-		if (isNaN(num)) return {
+		if(isNaN(num)) return {
 			value: null,
 			error: "is not a valid number"
 		};
-		if (!allowNegative && num < 0) return {
+		if(!allowNegative && num < 0) return {
 			value: null,
 			error: "must be a non-negative number"
 		};
-		if (min !== undefined && num < min) return {
+		if(min !== undefined && num < min) return {
 			value: null,
 			error: `must be at least ${min}`
 		};
-		if (max !== undefined && num > max) return {
+		if(max !== undefined && num > max) return {
 			value: null,
 			error: `must be at most ${max}`
 		};
@@ -140,23 +131,23 @@ const Utils = (() => {
 	}
 
 	function validateUsernameFormat(username) {
-		if (!username || typeof username !== "string" || username.trim() === "") return {
+		if(!username || typeof username !== "string" || username.trim() === "") return {
 			isValid: false,
 			error: "Username cannot be empty."
 		};
-		if (username.includes(" ")) return {
+		if(username.includes(" ")) return {
 			isValid: false,
 			error: "Username cannot contain spaces."
 		};
-		if (Config.USER.RESERVED_USERNAMES.includes(username.toLowerCase())) return {
+		if(Config.USER.RESERVED_USERNAMES.includes(username.toLowerCase())) return {
 			isValid: false,
 			error: `Cannot use '${username}'. This username is reserved.`
 		};
-		if (username.length < Config.USER.MIN_USERNAME_LENGTH) return {
+		if(username.length < Config.USER.MIN_USERNAME_LENGTH) return {
 			isValid: false,
 			error: `Username must be at least ${Config.USER.MIN_USERNAME_LENGTH} characters long.`
 		};
-		if (username.length > Config.USER.MAX_USERNAME_LENGTH) return {
+		if(username.length > Config.USER.MAX_USERNAME_LENGTH) return {
 			isValid: false,
 			error: `Username cannot exceed ${Config.USER.MAX_USERNAME_LENGTH} characters.`
 		};
@@ -169,39 +160,33 @@ const Utils = (() => {
 	function parseFlags(argsArray, flagDefinitions) {
 		const flags = {};
 		const remainingArgs = [];
-
 		// Initialize all defined flag names to their default state
 		flagDefinitions.forEach((def) => {
 			flags[def.name] = def.takesValue ? null : false;
 		});
-
-		for (let i = 0; i < argsArray.length; i++) {
+		for(let i = 0; i < argsArray.length; i++) {
 			const arg = argsArray[i];
 			let consumedAsFlag = false;
-
 			// Function to check if an argument matches a flag definition (including aliases)
 			const isFlagMatch = (definition, argument) => {
 				const allIdentifiers = [definition.long, definition.short, ...(definition.aliases || [])];
 				return allIdentifiers.includes(argument);
 			};
-
 			// Function to find the definition that matches the argument
 			const findDef = (argument) => {
-				for (const def of flagDefinitions) {
-					if (isFlagMatch(def, argument)) {
+				for(const def of flagDefinitions) {
+					if(isFlagMatch(def, argument)) {
 						return def;
 					}
 				}
 				return null;
 			};
-
-			if (arg.startsWith("-") && arg.length > 1) {
+			if(arg.startsWith("-") && arg.length > 1) {
 				// Handle long flags (--flag) and exact short flags (-f)
 				const def = findDef(arg);
-
-				if (def) {
-					if (def.takesValue) {
-						if (i + 1 < argsArray.length) {
+				if(def) {
+					if(def.takesValue) {
+						if(i + 1 < argsArray.length) {
 							flags[def.name] = argsArray[i + 1];
 							i++; // Consume the value
 						} else {
@@ -214,21 +199,19 @@ const Utils = (() => {
 					consumedAsFlag = true;
 				}
 				// Handle combined short flags like -la (but not if it was an exact match above)
-				else if (arg.startsWith("-") && !arg.startsWith("--") && arg.length > 2) {
+				else if(arg.startsWith("-") && !arg.startsWith("--") && arg.length > 2) {
 					const chars = arg.substring(1);
 					let allCharsAreFlags = true;
 					let tempCombinedFlags = {};
 					let valueTaken = false;
-
-					for (let j = 0; j < chars.length; j++) {
+					for(let j = 0; j < chars.length; j++) {
 						const charAsFlag = '-' + chars[j];
 						const charDef = findDef(charAsFlag);
-
-						if (charDef) {
-							if (charDef.takesValue) {
+						if(charDef) {
+							if(charDef.takesValue) {
 								// A value-taking flag must be the last in a combined group
-								if (j === chars.length - 1) {
-									if (i + 1 < argsArray.length) {
+								if(j === chars.length - 1) {
+									if(i + 1 < argsArray.length) {
 										tempCombinedFlags[charDef.name] = argsArray[i + 1];
 										valueTaken = true; // Mark that the next arg is consumed
 									} else {
@@ -248,18 +231,16 @@ const Utils = (() => {
 							break;
 						}
 					}
-
-					if (allCharsAreFlags) {
+					if(allCharsAreFlags) {
 						Object.assign(flags, tempCombinedFlags);
 						consumedAsFlag = true;
-						if (valueTaken) {
+						if(valueTaken) {
 							i++; // Consume the value for the last flag in the group
 						}
 					}
 				}
 			}
-
-			if (!consumedAsFlag) {
+			if(!consumedAsFlag) {
 				remainingArgs.push(arg);
 			}
 		}
@@ -271,48 +252,49 @@ const Utils = (() => {
 
 	function globToRegex(glob) {
 		let regexStr = "^";
-		for (let i = 0; i < glob.length; i++) {
+		for(let i = 0; i < glob.length; i++) {
 			const char = glob[i];
-			switch (char) {
+			switch(char) {
 				case "*":
 					regexStr += ".*";
 					break;
 				case "?":
 					regexStr += ".";
 					break;
-				case "[": {
-					let charClass = "[";
-					let k = i + 1;
-					if (k < glob.length && (glob[k] === "!" || glob[k] === "^")) {
-						charClass += "^";
-						k++;
-					}
-					if (k < glob.length && glob[k] === "]") {
-						charClass += "\\]";
-						k++;
-					}
-					while (k < glob.length && glob[k] !== "]") {
-						if (glob[k] === "-" && charClass.length > 1 && charClass[charClass.length - 1] !== "[" && charClass[charClass.length - 1] !== "^" && k + 1 < glob.length && glob[k + 1] !== "]") {
-							charClass += "-";
-						} else if (/[.^${}()|[\]\\]/.test(glob[k])) {
-							charClass += "\\" + glob[k];
-						} else {
-							charClass += glob[k];
+				case "[":
+					{
+						let charClass = "[";
+						let k = i + 1;
+						if(k < glob.length && (glob[k] === "!" || glob[k] === "^")) {
+							charClass += "^";
+							k++;
 						}
-						k++;
+						if(k < glob.length && glob[k] === "]") {
+							charClass += "\\]";
+							k++;
+						}
+						while(k < glob.length && glob[k] !== "]") {
+							if(glob[k] === "-" && charClass.length > 1 && charClass[charClass.length - 1] !== "[" && charClass[charClass.length - 1] !== "^" && k + 1 < glob.length && glob[k + 1] !== "]") {
+								charClass += "-";
+							} else if(/[.^${}()|[\]\\]/.test(glob[k])) {
+								charClass += "\\" + glob[k];
+							} else {
+								charClass += glob[k];
+							}
+							k++;
+						}
+						if(k < glob.length && glob[k] === "]") {
+							charClass += "]";
+							i = k;
+						} else {
+							regexStr += "\\[";
+							continue;
+						}
+						regexStr += charClass;
+						break;
 					}
-					if (k < glob.length && glob[k] === "]") {
-						charClass += "]";
-						i = k;
-					} else {
-						regexStr += "\\[";
-						continue;
-					}
-					regexStr += charClass;
-					break;
-				}
 				default:
-					if (/[.^${}()|[\]\\]/.test(char)) {
+					if(/[.^${}()|[\]\\]/.test(char)) {
 						regexStr += "\\";
 					}
 					regexStr += char;
@@ -321,12 +303,11 @@ const Utils = (() => {
 		regexStr += "$";
 		try {
 			return new RegExp(regexStr);
-		} catch (e) {
+		} catch(e) {
 			console.warn(`Utils.globToRegex: Failed to convert glob "${glob}" to regex: ${e.message}`);
 			return null;
 		}
 	}
-
 	return {
 		formatConsoleArgs,
 		deepCopyNode,
@@ -340,10 +321,8 @@ const Utils = (() => {
 		globToRegex,
 	};
 })();
-
 const Config = (() => {
 	"use strict";
-
 	const defaultConfig = {
 		DATABASE: {
 			NAME: "OopisOsDB",
@@ -394,13 +373,14 @@ const Config = (() => {
 			DEFAULT_DIRECTORY_TYPE: "directory",
 			DEFAULT_FILE_TYPE: "file",
 			PATH_SEPARATOR: "/",
-			DEFAULT_FILE_MODE: 0o60,
+			DEFAULT_FILE_MODE: 0o64,
 			DEFAULT_DIR_MODE: 0o70,
 			DEFAULT_SCRIPT_MODE: 0o70,
 			DEFAULT_SH_MODE: 0o70,
 			PERMISSION_BIT_READ: 0b100,
 			PERMISSION_BIT_WRITE: 0b010,
 			PERMISSION_BIT_EXECUTE: 0b001,
+			MAX_VFS_SIZE: 640 * 1024 * 1024,
 		},
 		MESSAGES: {
 			PERMISSION_DENIED_SUFFIX: ": Permission denied",
@@ -471,10 +451,8 @@ const Config = (() => {
 			SOURCE_NOT_FOUND_IN_PARENT_SUFFIX: "'",
 		},
 	};
-
 	// The active configuration object, initialized with defaults
 	let currentConfig = Utils.deepCopyNode(defaultConfig);
-
 	/**
 	 * Helper to set a nested property on an object using a dot-notation path.
 	 * @param {object} obj - The object to modify.
@@ -484,28 +462,26 @@ const Config = (() => {
 	function setNestedProperty(obj, path, value) {
 		const parts = path.split('.');
 		let current = obj;
-		for (let i = 0; i < parts.length - 1; i++) {
-			if (!current[parts[i]] || typeof current[parts[i]] !== 'object') {
+		for(let i = 0; i < parts.length - 1; i++) {
+			if(!current[parts[i]] || typeof current[parts[i]] !== 'object') {
 				current[parts[i]] = {}; // Create nested object if it doesn't exist
 			}
 			current = current[parts[i]];
 		}
 		current[parts[parts.length - 1]] = parseConfigValue(value);
 	}
-
 	/**
 	 * Helper to parse string values from config file into appropriate types.
 	 * @param {string} valueStr - The string value from the config file.
 	 * @returns {*} The parsed value (number, boolean, or string).
 	 */
 	function parseConfigValue(valueStr) {
-		if (valueStr === 'true') return true;
-		if (valueStr === 'false') return false;
-		if (valueStr === 'null') return null; // Added for completeness, though not currently used.
-		if (!isNaN(valueStr) && !isNaN(parseFloat(valueStr))) return parseFloat(valueStr);
+		if(valueStr === 'true') return true;
+		if(valueStr === 'false') return false;
+		if(valueStr === 'null') return null; // Added for completeness, though not currently used.
+		if(!isNaN(valueStr) && !isNaN(parseFloat(valueStr))) return parseFloat(valueStr);
 		return valueStr;
 	}
-
 	/**
 	 * Attempts to load configuration overrides from /etc/oopis.conf.
 	 * This function should be called after FileSystemManager is loaded.
@@ -515,59 +491,51 @@ const Config = (() => {
 		// Using try-catch to handle potential errors during FS access or parsing.
 		try {
 			const configNode = FileSystemManager.getNodeByPath(configFilePath);
-
 			// If the file doesn't exist, we just use the defaults and log a warning.
 			// This should ideally not happen if initialize() creates it reliably.
-			if (!configNode) {
+			if(!configNode) {
 				console.warn(`Config: '${configFilePath}' not found. Using default configuration.`);
 				return;
 			}
-
 			// Basic validation for the config file node.
-			if (configNode.type !== defaultConfig.FILESYSTEM.DEFAULT_FILE_TYPE) {
+			if(configNode.type !== defaultConfig.FILESYSTEM.DEFAULT_FILE_TYPE) {
 				console.warn(`Config: '${configFilePath}' is not a file. Using default configuration.`);
 				return;
 			}
-
 			// Check read permission on the config file. Root user or owner needs read access.
 			// We explicitly allow root to read anything.
 			const currentUser = UserManager.getCurrentUser().name;
-			if (!FileSystemManager.hasPermission(configNode, currentUser, "read")) {
+			if(!FileSystemManager.hasPermission(configNode, currentUser, "read")) {
 				console.warn(`Config: Permission denied to read '${configFilePath}'. Using default configuration.`);
 				return;
 			}
-
 			const content = configNode.content || "";
 			const lines = content.split('\n');
-
-			for (const line of lines) {
+			for(const line of lines) {
 				const trimmedLine = line.trim();
 				// Skip comments and empty lines.
-				if (trimmedLine.startsWith('#') || trimmedLine === '') {
+				if(trimmedLine.startsWith('#') || trimmedLine === '') {
 					continue;
 				}
-
 				const parts = trimmedLine.split('=');
-				if (parts.length >= 2) {
+				if(parts.length >= 2) {
 					const key = parts[0].trim();
 					// Join the rest of the parts in case the value itself contains an '='
 					const value = parts.slice(1).join('=').trim();
-
 					// Only apply overrides for keys that exist in our defaultConfig structure.
 					// This prevents accidental creation of new config properties.
 					let tempCheck = defaultConfig;
 					let keyExistsInDefaults = true;
 					const keyParts = key.split('.');
-					for (const part of keyParts) {
-						if (tempCheck && typeof tempCheck === 'object' && tempCheck.hasOwnProperty(part)) {
+					for(const part of keyParts) {
+						if(tempCheck && typeof tempCheck === 'object' && tempCheck.hasOwnProperty(part)) {
 							tempCheck = tempCheck[part];
 						} else {
 							keyExistsInDefaults = false;
 							break;
 						}
 					}
-
-					if (keyExistsInDefaults) {
+					if(keyExistsInDefaults) {
 						setNestedProperty(currentConfig, key, value);
 					} else {
 						console.warn(`Config: Unknown or invalid key path '${key}' in '${configFilePath}'. Ignoring.`);
@@ -577,31 +545,25 @@ const Config = (() => {
 				}
 			}
 			console.log(`Config: Configuration loaded from '${configFilePath}'.`);
-		} catch (error) {
+		} catch(error) {
 			console.error(`Config: Error loading or parsing '${configFilePath}':`, error);
 			// Fallback to default configuration in case of any runtime error during loading.
 		}
 	}
-
 	// Return the currentConfig object directly. This allows existing code
 	// like `Config.TERMINAL.PROMPT_CHAR` to continue working without modification.
 	// We also expose the `loadFromFile` method for external use.
-	return {
-		...currentConfig, // Spreads all properties of currentConfig
+	return {...currentConfig, // Spreads all properties of currentConfig
 		loadFromFile, // Exposes the function to load config from file
 		// If you need a getter for dynamic access *after* initial load (e.g., if you modify Config.currentConfig directly later)
 		// you could add: get: (key) => { const parts = key.split('.'); let value = currentConfig; for (const p of parts) { if (value && value.hasOwnProperty(p)) value = value[p]; else return undefined; } return value; }
 	};
 })();
-
 let DOM = {};
-
 const ModalManager = (() => {
 	"use strict";
-
 	let isAwaitingTerminalInput = false;
 	let activeModalContext = null;
-
 	// Private function to render the graphical modal (logic from EditorModal)
 	function _renderGraphicalModal(options) {
 		const {
@@ -609,32 +571,28 @@ const ModalManager = (() => {
 			onConfirm,
 			onCancel,
 			confirmText = 'OK',
-			cancelText = 'Cancel'
+				cancelText = 'Cancel'
 		} = options;
-
 		const parentContainer = DOM.terminalBezel;
-		if (!parentContainer) {
+		if(!parentContainer) {
 			console.error("ModalManager: Cannot find terminal-bezel to attach modal.");
-			if (options.onCancel) options.onCancel();
+			if(options.onCancel) options.onCancel();
 			return;
 		}
-
 		// The CSS for #editor-modal-dialog uses `position: absolute`, so its parent
 		// needs a non-static position. We'll ensure it's relative.
 		const originalParentPosition = parentContainer.style.position;
-		if (window.getComputedStyle(parentContainer).position === 'static') {
+		if(window.getComputedStyle(parentContainer).position === 'static') {
 			parentContainer.style.position = 'relative';
 		}
-
 		const removeModal = () => {
 			const modal = document.getElementById('editor-modal-dialog');
-			if (modal && modal.parentNode) {
+			if(modal && modal.parentNode) {
 				modal.parentNode.removeChild(modal);
 			}
 			// Restore original position style to avoid side-effects
 			parentContainer.style.position = originalParentPosition;
 		};
-
 		// Use the specific CSS classes and IDs from terminal.css
 		const confirmButton = Utils.createElement('button', {
 			className: 'btn-editor-modal btn-confirm',
@@ -642,104 +600,89 @@ const ModalManager = (() => {
 			eventListeners: {
 				click: () => {
 					removeModal();
-					if (onConfirm) onConfirm();
+					if(onConfirm) onConfirm();
 				}
 			}
 		});
-
 		const cancelButton = Utils.createElement('button', {
 			className: 'btn-editor-modal btn-cancel',
 			textContent: cancelText,
 			eventListeners: {
 				click: () => {
 					removeModal();
-					if (onCancel) onCancel();
+					if(onCancel) onCancel();
 				}
 			}
 		});
-
 		const buttonContainer = Utils.createElement('div', {
 			className: 'editor-modal-buttons'
 		}, [confirmButton, cancelButton]);
-
 		const messageContainer = Utils.createElement('div');
 		messageLines.forEach(line => {
 			messageContainer.appendChild(Utils.createElement('p', {
 				textContent: line
 			}));
 		});
-
 		const modalDialog = Utils.createElement('div', {
 			id: 'editor-modal-dialog'
 		}, [messageContainer, buttonContainer]);
-
 		parentContainer.appendChild(modalDialog);
 	}
-
 	// --- FIX STARTS HERE ---
 	// The missing function is defined and now includes logic to restore the input line.
 	function _renderTerminalPrompt(options) {
-		if (isAwaitingTerminalInput) {
+		if(isAwaitingTerminalInput) {
 			OutputManager.appendToOutput("ModalManager: Another terminal prompt is already active.", {
 				typeClass: Config.CSS_CLASSES.WARNING_MSG
 			});
-			if (options.onCancel) options.onCancel();
+			if(options.onCancel) options.onCancel();
 			return;
 		}
-
 		isAwaitingTerminalInput = true;
 		activeModalContext = {
 			onConfirm: options.onConfirm,
 			onCancel: options.onCancel,
 			data: options.data || {}
 		};
-
 		options.messageLines.forEach(line => {
 			OutputManager.appendToOutput(line, {
 				typeClass: Config.CSS_CLASSES.WARNING_MSG
 			});
 		});
-
 		OutputManager.appendToOutput(Config.MESSAGES.CONFIRMATION_PROMPT, {
 			typeClass: Config.CSS_CLASSES.CONSOLE_LOG_MSG
 		});
-
 		// This is the crucial part: The command executor hides the input line
 		// before running the command. A modal that requires terminal input
 		// must explicitly un-hide it to break the deadlock.
-		if (DOM.inputLineContainerDiv) {
+		if(DOM.inputLineContainerDiv) {
 			DOM.inputLineContainerDiv.classList.remove(Config.CSS_CLASSES.HIDDEN);
 		}
 		TerminalUI.setInputState(true); // Also ensure it's editable.
 		TerminalUI.focusInput();
 		TerminalUI.clearInput();
-
-		if (DOM.outputDiv) {
+		if(DOM.outputDiv) {
 			DOM.outputDiv.scrollTop = DOM.outputDiv.scrollHeight;
 		}
 	}
 	// --- FIX ENDS HERE ---
-
 	// The main public API
 	function request(options) {
-		if (options.context === 'graphical') {
+		if(options.context === 'graphical') {
 			_renderGraphicalModal(options);
 		} else { // Default to terminal
 			_renderTerminalPrompt(options);
 		}
 	}
-
 	// New function to handle input when a terminal prompt is active
 	async function handleTerminalInput(input) {
-		if (!isAwaitingTerminalInput) return false;
-
+		if(!isAwaitingTerminalInput) return false;
 		const promptString = `${DOM.promptUserSpan.textContent}${Config.TERMINAL.PROMPT_AT}${DOM.promptHostSpan.textContent}${Config.TERMINAL.PROMPT_SEPARATOR}${DOM.promptPathSpan.textContent}${Config.TERMINAL.PROMPT_CHAR} `;
 		await OutputManager.appendToOutput(`${promptString}${input.trim()}`);
-
-		if (input.trim() === 'YES') {
+		if(input.trim() === 'YES') {
 			await activeModalContext.onConfirm(activeModalContext.data);
 		} else {
-			if (typeof activeModalContext.onCancel === 'function') {
+			if(typeof activeModalContext.onCancel === 'function') {
 				await activeModalContext.onCancel(activeModalContext.data);
 			} else {
 				OutputManager.appendToOutput(Config.MESSAGES.OPERATION_CANCELLED, {
@@ -747,7 +690,6 @@ const ModalManager = (() => {
 				});
 			}
 		}
-
 		isAwaitingTerminalInput = false;
 		activeModalContext = null;
 		return true; // Indicates the input was consumed by the modal manager
@@ -756,14 +698,12 @@ const ModalManager = (() => {
 	function isAwaiting() {
 		return isAwaitingTerminalInput;
 	}
-
 	return {
 		request,
 		handleTerminalInput,
 		isAwaiting,
 	};
 })();
-
 const TimestampParser = (() => {
 	"use strict";
 
@@ -771,50 +711,50 @@ const TimestampParser = (() => {
 		let year, monthVal, day, hours, minutes, seconds = 0;
 		const currentDate = new Date();
 		let s = stampStr;
-		if (s.includes(".")) {
+		if(s.includes(".")) {
 			const parts = s.split(".");
-			if (parts.length !== 2 || parts[1].length !== 2 || isNaN(parseInt(parts[1], 10))) return null;
+			if(parts.length !== 2 || parts[1].length !== 2 || isNaN(parseInt(parts[1], 10))) return null;
 			seconds = parseInt(parts[1], 10);
-			if (seconds < 0 || seconds > 59) return null;
+			if(seconds < 0 || seconds > 59) return null;
 			s = parts[0];
 		}
-		if (s.length === 12) {
+		if(s.length === 12) {
 			year = parseInt(s.substring(0, 4), 10);
 			monthVal = parseInt(s.substring(4, 6), 10);
 			day = parseInt(s.substring(6, 8), 10);
 			hours = parseInt(s.substring(8, 10), 10);
 			minutes = parseInt(s.substring(10, 12), 10);
-		} else if (s.length === 10) {
+		} else if(s.length === 10) {
 			const YY = parseInt(s.substring(0, 2), 10);
-			if (isNaN(YY)) return null;
+			if(isNaN(YY)) return null;
 			year = YY < 69 ? 2000 + YY : 1900 + YY;
 			monthVal = parseInt(s.substring(2, 4), 10);
 			day = parseInt(s.substring(4, 6), 10);
 			hours = parseInt(s.substring(6, 8), 10);
 			minutes = parseInt(s.substring(8, 10), 10);
-		} else if (s.length === 8) {
+		} else if(s.length === 8) {
 			year = currentDate.getFullYear();
 			monthVal = parseInt(s.substring(0, 2), 10);
 			day = parseInt(s.substring(2, 4), 10);
 			hours = parseInt(s.substring(4, 6), 10);
 			minutes = parseInt(s.substring(6, 8), 10);
 		} else return null;
-		if (isNaN(year) || isNaN(monthVal) || isNaN(day) || isNaN(hours) || isNaN(minutes)) return null;
-		if (monthVal < 1 || monthVal > 12 || day < 1 || day > 31 || hours < 0 || hours > 23 || minutes < 0 || minutes > 59) return null;
+		if(isNaN(year) || isNaN(monthVal) || isNaN(day) || isNaN(hours) || isNaN(minutes)) return null;
+		if(monthVal < 1 || monthVal > 12 || day < 1 || day > 31 || hours < 0 || hours > 23 || minutes < 0 || minutes > 59) return null;
 		const dateObj = new Date(Date.UTC(year, monthVal - 1, day, hours, minutes, seconds));
-		if (dateObj.getUTCFullYear() !== year || dateObj.getUTCMonth() !== monthVal - 1 || dateObj.getUTCDate() !== day || dateObj.getUTCHours() !== hours || dateObj.getUTCMinutes() !== minutes || dateObj.getUTCSeconds() !== seconds) return null;
+		if(dateObj.getUTCFullYear() !== year || dateObj.getUTCMonth() !== monthVal - 1 || dateObj.getUTCDate() !== day || dateObj.getUTCHours() !== hours || dateObj.getUTCMinutes() !== minutes || dateObj.getUTCSeconds() !== seconds) return null;
 		return dateObj.toISOString();
 	}
 
 	function resolveTimestampFromCommandFlags(flags, commandName) {
 		const nowActualISO = new Date().toISOString();
-		if (flags.dateString && flags.stamp) return {
+		if(flags.dateString && flags.stamp) return {
 			timestampISO: null,
 			error: `${commandName}: cannot specify both --date and -t`
 		};
-		if (flags.dateString) {
+		if(flags.dateString) {
 			const d = new Date(flags.dateString);
-			if (isNaN(d.getTime())) return {
+			if(isNaN(d.getTime())) return {
 				timestampISO: null,
 				error: `${commandName}: invalid date string '${flags.dateString}'`
 			};
@@ -823,9 +763,9 @@ const TimestampParser = (() => {
 				error: null
 			};
 		}
-		if (flags.stamp) {
+		if(flags.stamp) {
 			const parsedISO = parseStampToISO(flags.stamp);
-			if (!parsedISO) return {
+			if(!parsedISO) return {
 				timestampISO: null,
 				error: `${commandName}: invalid stamp format '${flags.stamp}' (expected [[CC]YY]MMDDhhmm[.ss])`
 			};
@@ -843,7 +783,6 @@ const TimestampParser = (() => {
 		resolveTimestampFromCommandFlags
 	};
 })();
-
 const OutputManager = (() => {
 	"use strict";
 	let isEditorActive = false;
@@ -855,15 +794,15 @@ const OutputManager = (() => {
 		isEditorActive = status;
 	}
 	async function appendToOutput(text, options = {}) {
-		if (isEditorActive && options.typeClass !== Config.CSS_CLASSES.EDITOR_MSG && !options.isCompletionSuggestion) return;
-		if (!DOM.outputDiv) {
+		if(isEditorActive && options.typeClass !== Config.CSS_CLASSES.EDITOR_MSG && !options.isCompletionSuggestion) return;
+		if(!DOM.outputDiv) {
 			originalConsoleError("OutputManager.appendToOutput: DOM.outputDiv is not defined. Message:", text);
 			return;
 		}
 		const {
 			typeClass = null, isBackground = false
 		} = options;
-		if (isBackground && DOM.inputLineContainerDiv && !DOM.inputLineContainerDiv.classList.contains(Config.CSS_CLASSES.HIDDEN)) {
+		if(isBackground && DOM.inputLineContainerDiv && !DOM.inputLineContainerDiv.classList.contains(Config.CSS_CLASSES.HIDDEN)) {
 			const promptText = `${DOM.promptUserSpan.textContent}${Config.TERMINAL.PROMPT_AT}${DOM.promptHostSpan.textContent}${Config.TERMINAL.PROMPT_SEPARATOR}${DOM.promptPathSpan.textContent}${Config.TERMINAL.PROMPT_CHAR} `;
 			const currentInputVal = TerminalUI.getCurrentInputValue();
 			const echoLine = Utils.createElement("div", {
@@ -874,17 +813,17 @@ const OutputManager = (() => {
 		}
 		const lines = String(text).split("\n");
 		const fragment = document.createDocumentFragment();
-		for (const line of lines) {
+		for(const line of lines) {
 			const lineClasses = Config.CSS_CLASSES.OUTPUT_LINE.split(" ");
 			const lineAttributes = {
 				classList: [...lineClasses],
 				innerHTML: line
 			};
-			if (typeClass) typeClass.split(" ").forEach((cls) => {
-				if (cls) lineAttributes.classList.push(cls);
+			if(typeClass) typeClass.split(" ").forEach((cls) => {
+				if(cls) lineAttributes.classList.push(cls);
 			});
-			else if (options.isError) Config.CSS_CLASSES.ERROR_MSG.split(" ").forEach((cls) => {
-				if (cls) lineAttributes.classList.push(cls);
+			else if(options.isError) Config.CSS_CLASSES.ERROR_MSG.split(" ").forEach((cls) => {
+				if(cls) lineAttributes.classList.push(cls);
 			});
 			fragment.appendChild(Utils.createElement("div", lineAttributes));
 		}
@@ -893,32 +832,32 @@ const OutputManager = (() => {
 	}
 
 	function clearOutput() {
-		if (!isEditorActive && DOM.outputDiv) DOM.outputDiv.innerHTML = "";
+		if(!isEditorActive && DOM.outputDiv) DOM.outputDiv.innerHTML = "";
 	}
 
 	function _consoleLogOverride(...args) {
-		if (DOM.outputDiv && typeof Utils !== "undefined" && typeof Utils.formatConsoleArgs === "function") appendToOutput(`LOG: ${Utils.formatConsoleArgs(args)}`, {
+		if(DOM.outputDiv && typeof Utils !== "undefined" && typeof Utils.formatConsoleArgs === "function") appendToOutput(`LOG: ${Utils.formatConsoleArgs(args)}`, {
 			typeClass: Config.CSS_CLASSES.CONSOLE_LOG_MSG
 		});
 		originalConsoleLog.apply(console, args);
 	}
 
 	function _consoleWarnOverride(...args) {
-		if (DOM.outputDiv && typeof Utils !== "undefined" && typeof Utils.formatConsoleArgs === "function") appendToOutput(`WARN: ${Utils.formatConsoleArgs(args)}`, {
+		if(DOM.outputDiv && typeof Utils !== "undefined" && typeof Utils.formatConsoleArgs === "function") appendToOutput(`WARN: ${Utils.formatConsoleArgs(args)}`, {
 			typeClass: Config.CSS_CLASSES.WARNING_MSG
 		});
 		originalConsoleWarn.apply(console, args);
 	}
 
 	function _consoleErrorOverride(...args) {
-		if (DOM.outputDiv && typeof Utils !== "undefined" && typeof Utils.formatConsoleArgs === "function") appendToOutput(`ERROR: ${Utils.formatConsoleArgs(args)}`, {
+		if(DOM.outputDiv && typeof Utils !== "undefined" && typeof Utils.formatConsoleArgs === "function") appendToOutput(`ERROR: ${Utils.formatConsoleArgs(args)}`, {
 			typeClass: Config.CSS_CLASSES.ERROR_MSG
 		});
 		originalConsoleError.apply(console, args);
 	}
 
 	function initializeConsoleOverrides() {
-		if (typeof Utils === "undefined" || typeof Utils.formatConsoleArgs !== "function") {
+		if(typeof Utils === "undefined" || typeof Utils.formatConsoleArgs !== "function") {
 			originalConsoleError("OutputManager: Cannot initialize console overrides, Utils or Utils.formatConsoleArgs is not defined.");
 			return;
 		}
@@ -933,24 +872,23 @@ const OutputManager = (() => {
 		initializeConsoleOverrides
 	};
 })();
-
 const StorageManager = (() => {
 	"use strict";
 
 	function loadItem(key, itemName, defaultValue = null) {
 		try {
 			const storedValue = localStorage.getItem(key);
-			if (storedValue !== null) {
-				if (key === Config.STORAGE_KEYS.EDITOR_WORD_WRAP_ENABLED) return storedValue === "true";
+			if(storedValue !== null) {
+				if(key === Config.STORAGE_KEYS.EDITOR_WORD_WRAP_ENABLED) return storedValue === "true";
 				try {
 					return JSON.parse(storedValue);
-				} catch (e) {
+				} catch(e) {
 					return storedValue;
 				}
 			}
-		} catch (e) {
+		} catch(e) {
 			const errorMsg = `Warning: Could not load ${itemName} for key '${key}' from localStorage. Error: ${e.message}. Using default value.`;
-			if (typeof OutputManager !== "undefined" && typeof OutputManager.appendToOutput === "function") OutputManager.appendToOutput(errorMsg, {
+			if(typeof OutputManager !== "undefined" && typeof OutputManager.appendToOutput === "function") OutputManager.appendToOutput(errorMsg, {
 				typeClass: Config.CSS_CLASSES.WARNING_MSG
 			});
 			else console.warn(errorMsg);
@@ -963,9 +901,9 @@ const StorageManager = (() => {
 			const valueToStore = typeof data === "object" && data !== null ? JSON.stringify(data) : String(data);
 			localStorage.setItem(key, valueToStore);
 			return true;
-		} catch (e) {
+		} catch(e) {
 			const errorMsg = `Error saving ${itemName} for key '${key}' to localStorage. Data may be lost. Error: ${e.message}`;
-			if (typeof OutputManager !== "undefined" && typeof OutputManager.appendToOutput === "function") OutputManager.appendToOutput(errorMsg, {
+			if(typeof OutputManager !== "undefined" && typeof OutputManager.appendToOutput === "function") OutputManager.appendToOutput(errorMsg, {
 				typeClass: Config.CSS_CLASSES.ERROR_MSG
 			});
 			else console.error(errorMsg);
@@ -976,7 +914,7 @@ const StorageManager = (() => {
 	function removeItem(key) {
 		try {
 			localStorage.removeItem(key);
-		} catch (e) {
+		} catch(e) {
 			console.warn(`StorageManager: Could not remove item for key '${key}'. Error: ${e.message}`);
 		}
 	}
@@ -984,11 +922,11 @@ const StorageManager = (() => {
 	function getAllLocalStorageKeys() {
 		const keys = [];
 		try {
-			for (let i = 0; i < localStorage.length; i++) {
+			for(let i = 0; i < localStorage.length; i++) {
 				const key = localStorage.key(i);
-				if (key !== null) keys.push(key);
+				if(key !== null) keys.push(key);
 			}
-		} catch (e) {
+		} catch(e) {
 			console.error(`StorageManager: Could not retrieve all localStorage keys. Error: ${e.message}`);
 		}
 		return keys;
@@ -1000,7 +938,6 @@ const StorageManager = (() => {
 		getAllLocalStorageKeys
 	};
 })();
-
 const IndexedDBManager = (() => {
 	"use strict";
 	let dbInstance = null;
@@ -1008,13 +945,13 @@ const IndexedDBManager = (() => {
 
 	function init() {
 		return new Promise((resolve, reject) => {
-			if (dbInstance) {
+			if(dbInstance) {
 				resolve(dbInstance);
 				return;
 			}
-			if (!window.indexedDB) {
+			if(!window.indexedDB) {
 				const errorMsg = "Error: IndexedDB is not supported by your browser. File system features will be unavailable.";
-				if (typeof OutputManager !== "undefined" && typeof OutputManager.appendToOutput === "function") OutputManager.appendToOutput(errorMsg, {
+				if(typeof OutputManager !== "undefined" && typeof OutputManager.appendToOutput === "function") OutputManager.appendToOutput(errorMsg, {
 					typeClass: Config.CSS_CLASSES.ERROR_MSG
 				});
 				else console.error(errorMsg);
@@ -1024,14 +961,14 @@ const IndexedDBManager = (() => {
 			const request = indexedDB.open(Config.DATABASE.NAME, Config.DATABASE.VERSION);
 			request.onupgradeneeded = (event) => {
 				const tempDb = event.target.result;
-				if (!tempDb.objectStoreNames.contains(Config.DATABASE.FS_STORE_NAME)) tempDb.createObjectStore(Config.DATABASE.FS_STORE_NAME, {
+				if(!tempDb.objectStoreNames.contains(Config.DATABASE.FS_STORE_NAME)) tempDb.createObjectStore(Config.DATABASE.FS_STORE_NAME, {
 					keyPath: "id"
 				});
 			};
 			request.onsuccess = (event) => {
 				dbInstance = event.target.result;
-				if (!hasLoggedNormalInitialization) {
-					if (typeof OutputManager !== "undefined" && typeof OutputManager.appendToOutput === "function") setTimeout(() => OutputManager.appendToOutput("FileSystem DB initialized.", {
+				if(!hasLoggedNormalInitialization) {
+					if(typeof OutputManager !== "undefined" && typeof OutputManager.appendToOutput === "function") setTimeout(() => OutputManager.appendToOutput("FileSystem DB initialized.", {
 						typeClass: Config.CSS_CLASSES.CONSOLE_LOG_MSG
 					}), 100);
 					else console.log("FileSystem DB initialized (OutputManager not ready for terminal log).");
@@ -1041,7 +978,7 @@ const IndexedDBManager = (() => {
 			};
 			request.onerror = (event) => {
 				const errorMsg = "Error: OopisOs could not access its file system storage. This might be due to browser settings (e.g., private Browse mode, disabled storage, or full storage). Please check your browser settings and try again. Some features may be unavailable.";
-				if (typeof OutputManager !== "undefined" && typeof OutputManager.appendToOutput === "function") OutputManager.appendToOutput(errorMsg, {
+				if(typeof OutputManager !== "undefined" && typeof OutputManager.appendToOutput === "function") OutputManager.appendToOutput(errorMsg, {
 					typeClass: Config.CSS_CLASSES.ERROR_MSG
 				});
 				else console.error(errorMsg);
@@ -1052,9 +989,9 @@ const IndexedDBManager = (() => {
 	}
 
 	function getDbInstance() {
-		if (!dbInstance) {
+		if(!dbInstance) {
 			const errorMsg = "Error: OopisOs file system storage (IndexedDB) is not available. Please ensure browser storage is enabled and the page is reloaded.";
-			if (typeof OutputManager !== "undefined" && typeof OutputManager.appendToOutput === "function") OutputManager.appendToOutput(errorMsg, {
+			if(typeof OutputManager !== "undefined" && typeof OutputManager.appendToOutput === "function") OutputManager.appendToOutput(errorMsg, {
 				typeClass: Config.CSS_CLASSES.ERROR_MSG
 			});
 			else console.error(errorMsg);
@@ -1067,7 +1004,6 @@ const IndexedDBManager = (() => {
 		getDbInstance
 	};
 })();
-
 const FileSystemManager = (() => {
 	"use strict";
 	let fsData = {};
@@ -1076,7 +1012,6 @@ const FileSystemManager = (() => {
 OS.DEFAULT_HOST_NAME=OopisOS
 MESSAGES.WELCOME_PREFIX=Greetings and Salutations,
 MESSAGES.WELCOME_SUFFIX=! Welcome to OopisOS!`;
-
 	async function initialize(guestUsername) { // guestUsername param is now effectively just Config.USER.DEFAULT_NAME
 		const nowISO = new Date().toISOString();
 		fsData = {
@@ -1102,7 +1037,7 @@ MESSAGES.WELCOME_SUFFIX=! Welcome to OopisOS!`;
 		await createUserHomeDirectory(guestUsername); // which is 'Guest'
 		await createUserHomeDirectory('userDiag');
 		const rootNode = fsData[Config.FILESYSTEM.ROOT_PATH];
-		if (rootNode) { // Create /etc directory
+		if(rootNode) { // Create /etc directory
 			rootNode.children['etc'] = {
 				type: Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE,
 				children: {},
@@ -1111,9 +1046,8 @@ MESSAGES.WELCOME_SUFFIX=! Welcome to OopisOS!`;
 				mtime: nowISO
 			};
 			rootNode.mtime = nowISO; // Update root's modification time
-
 			const etcNode = rootNode.children['etc'];
-			if (etcNode) {
+			if(etcNode) {
 				// Create oopis.conf inside /etc
 				etcNode.children['oopis.conf'] = {
 					type: Config.FILESYSTEM.DEFAULT_FILE_TYPE,
@@ -1130,14 +1064,13 @@ MESSAGES.WELCOME_SUFFIX=! Welcome to OopisOS!`;
 			console.error("FileSystemManager: Root node not found during initialization. Critical error.");
 		}
 	}
-
 	async function createUserHomeDirectory(username) {
-		if (!fsData['/']?.children?.home) {
+		if(!fsData['/'] ?.children ?.home) {
 			console.error("FileSystemManager: Cannot create user home directory, /home does not exist.");
 			return;
 		}
 		const homeDirNode = fsData['/'].children.home;
-		if (!homeDirNode.children[username]) {
+		if(!homeDirNode.children[username]) {
 			homeDirNode.children[username] = {
 				type: Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE,
 				children: {},
@@ -1148,12 +1081,23 @@ MESSAGES.WELCOME_SUFFIX=! Welcome to OopisOS!`;
 			homeDirNode.mtime = new Date().toISOString();
 		}
 	}
-
 	async function save() {
+		// --- Quota Check ---
+		const totalSize = _calculateTotalSize();
+		if(totalSize > Config.FILESYSTEM.MAX_VFS_SIZE) {
+			const errorMsg = `Disk quota exceeded. (Usage: ${Utils.formatBytes(totalSize)} / ${Utils.formatBytes(Config.FILESYSTEM.MAX_VFS_SIZE)}). Reverting last operation.`;
+			OutputManager.appendToOutput(errorMsg, {
+				typeClass: Config.CSS_CLASSES.ERROR_MSG
+			});
+			// Critical: Roll back the in-memory FS to the last saved state to prevent corruption.
+			await load();
+			return false; // Indicate save failure
+		}
+		// --- Original Save Logic (if quota check passes) ---
 		let db;
 		try {
 			db = IndexedDBManager.getDbInstance();
-		} catch (e) {
+		} catch(e) {
 			OutputManager.appendToOutput("Error: File system storage not available for saving.", {
 				typeClass: Config.CSS_CLASSES.ERROR_MSG
 			});
@@ -1175,23 +1119,21 @@ MESSAGES.WELCOME_SUFFIX=! Welcome to OopisOS!`;
 			};
 		});
 	}
-
 	async function load() {
 		let db;
 		try {
 			db = IndexedDBManager.getDbInstance();
-		} catch (e) {
+		} catch(e) {
 			await initialize(Config.USER.DEFAULT_NAME);
 			return Promise.reject(Config.INTERNAL_ERRORS.DB_NOT_INITIALIZED_FS_LOAD);
 		}
-		return new Promise(async (resolve, reject) => {
+		return new Promise(async(resolve, reject) => {
 			const transaction = db.transaction([Config.DATABASE.FS_STORE_NAME], "readonly");
 			const store = transaction.objectStore(Config.DATABASE.FS_STORE_NAME);
 			const request = store.get(Config.DATABASE.UNIFIED_FS_KEY);
-
-			request.onsuccess = async (event) => {
+			request.onsuccess = async(event) => {
 				const result = event.target.result;
-				if (result && result.data) {
+				if(result && result.data) {
 					fsData = result.data;
 				} else {
 					OutputManager.appendToOutput("No file system found. Initializing new one.", {
@@ -1202,7 +1144,7 @@ MESSAGES.WELCOME_SUFFIX=! Welcome to OopisOS!`;
 				}
 				resolve();
 			};
-			request.onerror = async (event) => {
+			request.onerror = async(event) => {
 				await initialize(Config.USER.DEFAULT_NAME);
 				reject(event.target.error);
 			};
@@ -1210,20 +1152,19 @@ MESSAGES.WELCOME_SUFFIX=! Welcome to OopisOS!`;
 	}
 
 	function _ensurePermissionsAndMtimeRecursive(node, defaultOwner, defaultMode) {
-		if (!node) return;
-		if (typeof node.owner === "undefined") node.owner = defaultOwner;
-		if (typeof node.mode === "undefined") node.mode = node.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE ? Config.FILESYSTEM.DEFAULT_DIR_MODE : Config.FILESYSTEM.DEFAULT_FILE_MODE;
-		if (typeof node.mtime === "undefined") node.mtime = new Date().toISOString();
-		if (node.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE && node.children) {
-			for (const childName in node.children) _ensurePermissionsAndMtimeRecursive(node.children[childName], defaultOwner, defaultMode);
+		if(!node) return;
+		if(typeof node.owner === "undefined") node.owner = defaultOwner;
+		if(typeof node.mode === "undefined") node.mode = node.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE ? Config.FILESYSTEM.DEFAULT_DIR_MODE : Config.FILESYSTEM.DEFAULT_FILE_MODE;
+		if(typeof node.mtime === "undefined") node.mtime = new Date().toISOString();
+		if(node.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE && node.children) {
+			for(const childName in node.children) _ensurePermissionsAndMtimeRecursive(node.children[childName], defaultOwner, defaultMode);
 		}
 	}
-
 	async function clearAllFS() {
 		let db;
 		try {
 			db = IndexedDBManager.getDbInstance();
-		} catch (e) {
+		} catch(e) {
 			OutputManager.appendToOutput("Error: File system storage not available for clearing all data.", {
 				typeClass: Config.CSS_CLASSES.ERROR_MSG
 			});
@@ -1261,56 +1202,50 @@ MESSAGES.WELCOME_SUFFIX=! Welcome to OopisOS!`;
 	}
 
 	function getAbsolutePath(targetPath, basePath) {
-		if (!targetPath) targetPath = Config.FILESYSTEM.CURRENT_DIR_SYMBOL;
+		if(!targetPath) targetPath = Config.FILESYSTEM.CURRENT_DIR_SYMBOL;
 		let effectiveBasePath = basePath;
-		if (targetPath.startsWith(Config.FILESYSTEM.PATH_SEPARATOR)) effectiveBasePath = Config.FILESYSTEM.ROOT_PATH;
+		if(targetPath.startsWith(Config.FILESYSTEM.PATH_SEPARATOR)) effectiveBasePath = Config.FILESYSTEM.ROOT_PATH;
 		const baseSegments = effectiveBasePath === Config.FILESYSTEM.ROOT_PATH ? [] : effectiveBasePath.substring(1).split(Config.FILESYSTEM.PATH_SEPARATOR).filter((s) => s && s !== Config.FILESYSTEM.CURRENT_DIR_SYMBOL);
 		let resolvedSegments = [...baseSegments];
 		const targetSegments = targetPath.split(Config.FILESYSTEM.PATH_SEPARATOR);
-		for (const segment of targetSegments) {
-			if (segment === "" || segment === Config.FILESYSTEM.CURRENT_DIR_SYMBOL) {
-				if (targetPath.startsWith(Config.FILESYSTEM.PATH_SEPARATOR) && resolvedSegments.length === 0 && segment === "") {}
+		for(const segment of targetSegments) {
+			if(segment === "" || segment === Config.FILESYSTEM.CURRENT_DIR_SYMBOL) {
+				if(targetPath.startsWith(Config.FILESYSTEM.PATH_SEPARATOR) && resolvedSegments.length === 0 && segment === "") {}
 				continue;
 			}
-			if (segment === Config.FILESYSTEM.PARENT_DIR_SYMBOL) {
-				if (resolvedSegments.length > 0) resolvedSegments.pop();
+			if(segment === Config.FILESYSTEM.PARENT_DIR_SYMBOL) {
+				if(resolvedSegments.length > 0) resolvedSegments.pop();
 			} else resolvedSegments.push(segment);
 		}
-		if (resolvedSegments.length === 0) return Config.FILESYSTEM.ROOT_PATH;
+		if(resolvedSegments.length === 0) return Config.FILESYSTEM.ROOT_PATH;
 		return Config.FILESYSTEM.PATH_SEPARATOR + resolvedSegments.join(Config.FILESYSTEM.PATH_SEPARATOR);
 	}
 
 	function getNodeByPath(absolutePath) {
 		const currentUser = UserManager.getCurrentUser().name;
-
-		if (absolutePath === Config.FILESYSTEM.ROOT_PATH) {
+		if(absolutePath === Config.FILESYSTEM.ROOT_PATH) {
 			return fsData[Config.FILESYSTEM.ROOT_PATH];
 		}
-
 		const segments = absolutePath.substring(1).split(Config.FILESYSTEM.PATH_SEPARATOR).filter((s) => s);
 		let currentNode = fsData[Config.FILESYSTEM.ROOT_PATH];
-
-		for (const segment of segments) {
-			if (!hasPermission(currentNode, currentUser, "execute")) {
+		for(const segment of segments) {
+			if(!hasPermission(currentNode, currentUser, "execute")) {
 				return null;
 			}
-
-			if (!currentNode.children || !currentNode.children[segment]) {
+			if(!currentNode.children || !currentNode.children[segment]) {
 				return null;
 			}
-
 			currentNode = currentNode.children[segment];
 		}
-
 		return currentNode;
 	}
 
 	function calculateNodeSize(node) {
-		if (!node) return 0;
-		if (node.type === Config.FILESYSTEM.DEFAULT_FILE_TYPE) return (node.content || "").length;
-		if (node.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE) {
+		if(!node) return 0;
+		if(node.type === Config.FILESYSTEM.DEFAULT_FILE_TYPE) return(node.content || "").length;
+		if(node.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE) {
 			let totalSize = 0;
-			for (const childName in node.children) totalSize += calculateNodeSize(node.children[childName]);
+			for(const childName in node.children) totalSize += calculateNodeSize(node.children[childName]);
 			return totalSize;
 		}
 		return 0;
@@ -1318,41 +1253,41 @@ MESSAGES.WELCOME_SUFFIX=! Welcome to OopisOS!`;
 
 	function _updateNodeAndParentMtime(nodePath, nowISO) {
 		// This function already deals with absolute paths, so it can use the new internal function.
-		if (!nodePath || !nowISO) return;
+		if(!nodePath || !nowISO) return;
 		const node = getNodeByPath(nodePath);
-		if (node) node.mtime = nowISO;
-		if (nodePath !== Config.FILESYSTEM.ROOT_PATH) {
+		if(node) node.mtime = nowISO;
+		if(nodePath !== Config.FILESYSTEM.ROOT_PATH) {
 			const parentPath = nodePath.substring(0, nodePath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR)) || Config.FILESYSTEM.ROOT_PATH;
 			// Changed from the non-existent _getNodeByAbsolutePath to the correct getNodeByPath
 			const parentNode = getNodeByPath(parentPath);
-			if (parentNode && parentNode.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE) parentNode.mtime = nowISO;
+			if(parentNode && parentNode.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE) parentNode.mtime = nowISO;
 		}
 	}
 
 	function createParentDirectoriesIfNeeded(fullPath) {
 		const currentUserForCPDIF = UserManager.getCurrentUser().name;
 		const nowISO = new Date().toISOString();
-		if (fullPath === Config.FILESYSTEM.ROOT_PATH) return {
+		if(fullPath === Config.FILESYSTEM.ROOT_PATH) return {
 			parentNode: null,
 			error: "Cannot create directory structure for root."
 		};
 		const lastSlashIndex = fullPath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR);
 		const parentPathForSegments = lastSlashIndex === 0 ? Config.FILESYSTEM.ROOT_PATH : fullPath.substring(0, lastSlashIndex);
 		const finalDirNameInPath = fullPath.substring(lastSlashIndex + 1);
-		if (!finalDirNameInPath || finalDirNameInPath === Config.FILESYSTEM.CURRENT_DIR_SYMBOL || finalDirNameInPath === Config.FILESYSTEM.PARENT_DIR_SYMBOL) {}
-		if (parentPathForSegments === Config.FILESYSTEM.ROOT_PATH) return {
+		if(!finalDirNameInPath || finalDirNameInPath === Config.FILESYSTEM.CURRENT_DIR_SYMBOL || finalDirNameInPath === Config.FILESYSTEM.PARENT_DIR_SYMBOL) {}
+		if(parentPathForSegments === Config.FILESYSTEM.ROOT_PATH) return {
 			parentNode: fsData[Config.FILESYSTEM.ROOT_PATH],
 			error: null
 		};
 		const segmentsToCreate = parentPathForSegments.substring(1).split(Config.FILESYSTEM.PATH_SEPARATOR).filter((s) => s);
 		let currentParentNode = fsData[Config.FILESYSTEM.ROOT_PATH];
 		let currentProcessedPath = Config.FILESYSTEM.ROOT_PATH;
-		if (!currentParentNode || typeof currentParentNode.owner === "undefined" || typeof currentParentNode.mode === "undefined") return {
+		if(!currentParentNode || typeof currentParentNode.owner === "undefined" || typeof currentParentNode.mode === "undefined") return {
 			parentNode: null,
 			error: "Internal error: Root FS node is malformed."
 		};
-		for (const segment of segmentsToCreate) {
-			if (!currentParentNode.children || typeof currentParentNode.children !== "object") {
+		for(const segment of segmentsToCreate) {
+			if(!currentParentNode.children || typeof currentParentNode.children !== "object") {
 				const errorMsg = `Internal error: currentParentNode.children is not an object at path "${currentProcessedPath}" for segment "${segment}". FS may be corrupted.`;
 				console.error(errorMsg, currentParentNode);
 				return {
@@ -1360,8 +1295,8 @@ MESSAGES.WELCOME_SUFFIX=! Welcome to OopisOS!`;
 					error: errorMsg
 				};
 			}
-			if (!currentParentNode.children[segment]) {
-				if (!hasPermission(currentParentNode, currentUserForCPDIF, "write")) {
+			if(!currentParentNode.children[segment]) {
+				if(!hasPermission(currentParentNode, currentUserForCPDIF, "write")) {
 					const errorMsg = `Cannot create directory '${segment}' in '${currentProcessedPath}'${Config.MESSAGES.PERMISSION_DENIED_SUFFIX}`;
 					return {
 						parentNode: null,
@@ -1376,7 +1311,7 @@ MESSAGES.WELCOME_SUFFIX=! Welcome to OopisOS!`;
 					mtime: nowISO
 				};
 				currentParentNode.mtime = nowISO;
-			} else if (currentParentNode.children[segment].type !== Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE) {
+			} else if(currentParentNode.children[segment].type !== Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE) {
 				const errorMsg = `Path component '${getAbsolutePath(segment, currentProcessedPath)}' is not a directory.`;
 				return {
 					parentNode: null,
@@ -1385,7 +1320,7 @@ MESSAGES.WELCOME_SUFFIX=! Welcome to OopisOS!`;
 			}
 			currentParentNode = currentParentNode.children[segment];
 			currentProcessedPath = getAbsolutePath(segment, currentProcessedPath);
-			if (!currentParentNode || typeof currentParentNode.owner === "undefined" || typeof currentParentNode.mode === "undefined") return {
+			if(!currentParentNode || typeof currentParentNode.owner === "undefined" || typeof currentParentNode.mode === "undefined") return {
 				parentNode: null,
 				error: `Internal error: Node for "${currentProcessedPath}" became malformed during parent creation.`
 			};
@@ -1403,10 +1338,9 @@ MESSAGES.WELCOME_SUFFIX=! Welcome to OopisOS!`;
 		const effectivePathArg = pathArg === "" && defaultToCurrentIfEmpty ? Config.FILESYSTEM.CURRENT_DIR_SYMBOL : pathArg;
 		const resolvedPath = getAbsolutePath(effectivePathArg, currentPath);
 		const node = getNodeByPath(resolvedPath);
-
-		if (commandName.startsWith("cd") && node) {
+		if(commandName.startsWith("cd") && node) {
 			const currentUser = UserManager.getCurrentUser().name;
-			if (!hasPermission(node, currentUser, "execute")) {
+			if(!hasPermission(node, currentUser, "execute")) {
 				return {
 					error: `cd: '${pathArg}'${Config.MESSAGES.PERMISSION_DENIED_SUFFIX}`,
 					node,
@@ -1415,15 +1349,14 @@ MESSAGES.WELCOME_SUFFIX=! Welcome to OopisOS!`;
 				};
 			}
 		}
-
-		if (disallowRoot && resolvedPath === Config.FILESYSTEM.ROOT_PATH) return {
+		if(disallowRoot && resolvedPath === Config.FILESYSTEM.ROOT_PATH) return {
 			error: `${commandName}: '${pathArg}' (resolved to root) is not a valid target for this operation.`,
 			node: null,
 			resolvedPath,
 			optionsUsed: options
 		};
-		if (!node) {
-			if (allowMissing) return {
+		if(!node) {
+			if(allowMissing) return {
 				error: null,
 				node: null,
 				resolvedPath,
@@ -1436,7 +1369,7 @@ MESSAGES.WELCOME_SUFFIX=! Welcome to OopisOS!`;
 				optionsUsed: options
 			};
 		}
-		if (expectedType && node.type !== expectedType) {
+		if(expectedType && node.type !== expectedType) {
 			const typeName = expectedType === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE ? "directory" : "file";
 			const actualTypeName = node.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE ? "directory" : node.type === Config.FILESYSTEM.DEFAULT_FILE_TYPE ? "file" : "unknown type";
 			return {
@@ -1446,7 +1379,6 @@ MESSAGES.WELCOME_SUFFIX=! Welcome to OopisOS!`;
 				optionsUsed: options
 			};
 		}
-
 		return {
 			error: null,
 			node,
@@ -1456,16 +1388,15 @@ MESSAGES.WELCOME_SUFFIX=! Welcome to OopisOS!`;
 	}
 
 	function hasPermission(node, username, permissionType) {
-		if (username === 'root') {
+		if(username === 'root') {
 			return true;
 		}
-
-		if (!node || typeof node.mode !== "number" || typeof node.owner !== "string") {
+		if(!node || typeof node.mode !== "number" || typeof node.owner !== "string") {
 			console.warn("hasPermission: Invalid node or missing permissions info.", node);
 			return false;
 		}
 		let permissionMask;
-		switch (permissionType) {
+		switch(permissionType) {
 			case "read":
 				permissionMask = Config.FILESYSTEM.PERMISSION_BIT_READ;
 				break;
@@ -1481,30 +1412,26 @@ MESSAGES.WELCOME_SUFFIX=! Welcome to OopisOS!`;
 		}
 		const isOwner = node.owner === username;
 		let effectiveModeBits;
-		if (isOwner) {
+		if(isOwner) {
 			effectiveModeBits = (node.mode >> 3) & 0b111;
 		} else {
 			effectiveModeBits = node.mode & 0b111;
 		}
-
 		const result = (effectiveModeBits & permissionMask) === permissionMask;
 		return result;
 	}
 
 	function formatModeToString(node) {
-		if (!node || typeof node.mode !== "number") return "---------";
+		if(!node || typeof node.mode !== "number") return "---------";
 		const mode = node.mode;
 		const typeChar = node.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE ? "d" : "-";
-
 		// Use string conversion to handle octal digits explicitly and safely
 		const modeStr = node.mode.toString(8).padStart(2, '0');
 		const ownerPerms = parseInt(modeStr[0], 8);
 		const otherPerms = parseInt(modeStr[1], 8);
-
 		const r = Config.FILESYSTEM.PERMISSION_BIT_READ;
 		const w = Config.FILESYSTEM.PERMISSION_BIT_WRITE;
 		const x = Config.FILESYSTEM.PERMISSION_BIT_EXECUTE;
-
 		let str = typeChar;
 		// Owner permissions
 		str += (ownerPerms & r) ? "r" : "-";
@@ -1516,10 +1443,8 @@ MESSAGES.WELCOME_SUFFIX=! Welcome to OopisOS!`;
 		str += (otherPerms & r) ? "r" : "-";
 		str += (otherPerms & w) ? "w" : "-";
 		str += (otherPerms & x) ? "x" : "-";
-
 		return str;
 	}
-
 	// *** NEW: Centralized Recursive Deletion Utility ***
 	async function deleteNodeRecursive(path, options = {}) {
 		const {
@@ -1528,10 +1453,9 @@ MESSAGES.WELCOME_SUFFIX=! Welcome to OopisOS!`;
 		const pathValidation = validatePath("delete", path, {
 			disallowRoot: true
 		});
-
-		if (pathValidation.error) {
+		if(pathValidation.error) {
 			// With 'force', we ignore "not found" errors, just like `rm -f`.
-			if (force && !pathValidation.node) {
+			if(force && !pathValidation.node) {
 				return {
 					success: true,
 					messages: []
@@ -1542,7 +1466,6 @@ MESSAGES.WELCOME_SUFFIX=! Welcome to OopisOS!`;
 				messages: [pathValidation.error]
 			};
 		}
-
 		const node = pathValidation.node;
 		const resolvedPath = pathValidation.resolvedPath;
 		const parentPath = resolvedPath.substring(0, resolvedPath.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR)) || Config.FILESYSTEM.ROOT_PATH;
@@ -1551,9 +1474,8 @@ MESSAGES.WELCOME_SUFFIX=! Welcome to OopisOS!`;
 		const nowISO = new Date().toISOString();
 		let messages = [];
 		let anyChangeMade = false;
-
 		// Check for write permission in the parent directory, which is required to delete an item.
-		if (!parentNode || !hasPermission(parentNode, currentUser, "write")) {
+		if(!parentNode || !hasPermission(parentNode, currentUser, "write")) {
 			const permError = `cannot remove '${path}'${Config.MESSAGES.PERMISSION_DENIED_SUFFIX}`;
 			// In force mode, permission errors are suppressed.
 			return {
@@ -1561,15 +1483,14 @@ MESSAGES.WELCOME_SUFFIX=! Welcome to OopisOS!`;
 				messages: force ? [] : [permError]
 			};
 		}
-
-		if (node.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE) {
+		if(node.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE) {
 			// Recursively delete children first (post-order traversal)
 			const childrenNames = Object.keys(node.children || {});
-			for (const childName of childrenNames) {
+			for(const childName of childrenNames) {
 				const childPath = getAbsolutePath(childName, resolvedPath);
 				const result = await deleteNodeRecursive(childPath, options);
 				messages.push(...result.messages);
-				if (!result.success) {
+				if(!result.success) {
 					// If any child deletion fails, the entire operation fails.
 					return {
 						success: false,
@@ -1578,12 +1499,10 @@ MESSAGES.WELCOME_SUFFIX=! Welcome to OopisOS!`;
 				}
 			}
 		}
-
 		// After handling children (if any), delete the node itself.
 		delete parentNode.children[itemName];
 		parentNode.mtime = nowISO;
 		anyChangeMade = true;
-
 		return {
 			success: true,
 			messages,
@@ -1605,6 +1524,10 @@ MESSAGES.WELCOME_SUFFIX=! Welcome to OopisOS!`;
 		};
 	}
 
+	function _calculateTotalSize() {
+		if(!fsData || !fsData[Config.FILESYSTEM.ROOT_PATH]) return 0;
+		return calculateNodeSize(fsData[Config.FILESYSTEM.ROOT_PATH]);
+	}
 	return {
 		initialize,
 		createUserHomeDirectory,
@@ -1626,26 +1549,25 @@ MESSAGES.WELCOME_SUFFIX=! Welcome to OopisOS!`;
 		_ensurePermissionsAndMtimeRecursive,
 		_createNewFileNode,
 		deleteNodeRecursive,
+		_calculateTotalSize,
 	};
 })();
-
 const HistoryManager = (() => {
-
 	"use strict";
 	let commandHistory = [];
 	let historyIndex = 0;
 
 	function add(command) {
 		const trimmedCommand = command.trim();
-		if (trimmedCommand && (commandHistory.length === 0 || commandHistory[commandHistory.length - 1] !== trimmedCommand)) {
+		if(trimmedCommand && (commandHistory.length === 0 || commandHistory[commandHistory.length - 1] !== trimmedCommand)) {
 			commandHistory.push(trimmedCommand);
-			if (commandHistory.length > Config.TERMINAL.MAX_HISTORY_SIZE) commandHistory.shift();
+			if(commandHistory.length > Config.TERMINAL.MAX_HISTORY_SIZE) commandHistory.shift();
 		}
 		historyIndex = commandHistory.length;
 	}
 
 	function getPrevious() {
-		if (commandHistory.length > 0 && historyIndex > 0) {
+		if(commandHistory.length > 0 && historyIndex > 0) {
 			historyIndex--;
 			return commandHistory[historyIndex];
 		}
@@ -1653,10 +1575,10 @@ const HistoryManager = (() => {
 	}
 
 	function getNext() {
-		if (historyIndex < commandHistory.length - 1) {
+		if(historyIndex < commandHistory.length - 1) {
 			historyIndex++;
 			return commandHistory[historyIndex];
-		} else if (historyIndex >= commandHistory.length - 1) {
+		} else if(historyIndex >= commandHistory.length - 1) {
 			historyIndex = commandHistory.length;
 			return "";
 		}
@@ -1678,7 +1600,7 @@ const HistoryManager = (() => {
 
 	function setHistory(newHistory) {
 		commandHistory = Array.isArray(newHistory) ? [...newHistory] : [];
-		if (commandHistory.length > Config.TERMINAL.MAX_HISTORY_SIZE) commandHistory = commandHistory.slice(commandHistory.length - Config.TERMINAL.MAX_HISTORY_SIZE);
+		if(commandHistory.length > Config.TERMINAL.MAX_HISTORY_SIZE) commandHistory = commandHistory.slice(commandHistory.length - Config.TERMINAL.MAX_HISTORY_SIZE);
 		historyIndex = commandHistory.length;
 	}
 	return {
@@ -1691,49 +1613,40 @@ const HistoryManager = (() => {
 		setHistory
 	};
 })();
-
 const AliasManager = (() => {
 	"use strict";
 	let aliases = {}; // In-memory cache of aliases
-
 	// Load aliases from localStorage on startup
 	function initialize() {
 		aliases = StorageManager.loadItem(Config.STORAGE_KEYS.ALIAS_DEFINITIONS, "Aliases", {});
 	}
-
 	// Save aliases to localStorage
 	function _save() {
 		StorageManager.saveItem(Config.STORAGE_KEYS.ALIAS_DEFINITIONS, aliases, "Aliases");
 	}
-
 	// Set or update an alias
 	function setAlias(name, value) {
-		if (!name || typeof value !== 'string') return false;
+		if(!name || typeof value !== 'string') return false;
 		aliases[name] = value;
 		_save();
 		return true;
 	}
-
 	// Remove an alias
 	function removeAlias(name) {
-		if (!aliases[name]) return false;
+		if(!aliases[name]) return false;
 		delete aliases[name];
 		_save();
 		return true;
 	}
-
 	// Get a specific alias's value
 	function getAlias(name) {
 		return aliases[name] || null;
 	}
-
 	// Get all aliases
 	function getAllAliases() {
-		return {
-			...aliases
+		return {...aliases
 		};
 	}
-
 	// Recursively expand an alias to its final command
 	function resolveAlias(commandString) {
 		const parts = commandString.split(/\s+/);
@@ -1741,8 +1654,7 @@ const AliasManager = (() => {
 		const remainingArgs = parts.slice(1).join(" ");
 		const MAX_RECURSION = 10;
 		let count = 0;
-
-		while (aliases[commandName] && count < MAX_RECURSION) {
+		while(aliases[commandName] && count < MAX_RECURSION) {
 			const aliasValue = aliases[commandName];
 			const aliasParts = aliasValue.split(/\s+/);
 			commandName = aliasParts[0];
@@ -1750,18 +1662,15 @@ const AliasManager = (() => {
 			commandString = `${commandName} ${aliasArgs} ${remainingArgs}`.trim();
 			count++;
 		}
-
-		if (count === MAX_RECURSION) {
+		if(count === MAX_RECURSION) {
 			return {
 				error: `Alias loop detected for '${parts[0]}'`
 			};
 		}
-
 		return {
 			newCommand: commandString
 		};
 	}
-
 	return {
 		initialize,
 		setAlias,
@@ -1771,36 +1680,34 @@ const AliasManager = (() => {
 		resolveAlias
 	};
 })();
-
 const TerminalUI = (() => {
 	"use strict";
 	let isNavigatingHistory = false;
 	let _isObscuredInputMode = false;
 	let isInputFocused = false; // <<< FIX: State variable to track focus
-
 	function updatePrompt() {
 		const user = typeof UserManager !== "undefined" ? UserManager.getCurrentUser() : {
 			name: Config.USER.DEFAULT_NAME
 		};
-		if (DOM.promptUserSpan) {
+		if(DOM.promptUserSpan) {
 			DOM.promptUserSpan.textContent = user ? user.name : Config.USER.DEFAULT_NAME;
 			DOM.promptUserSpan.className = "prompt-user mr-0.5 text-sky-400";
 		}
-		if (DOM.promptHostSpan) DOM.promptHostSpan.textContent = Config.OS.DEFAULT_HOST_NAME;
+		if(DOM.promptHostSpan) DOM.promptHostSpan.textContent = Config.OS.DEFAULT_HOST_NAME;
 		const currentPathDisplay = typeof FileSystemManager !== "undefined" ? FileSystemManager.getCurrentPath() : Config.FILESYSTEM.ROOT_PATH;
-		if (DOM.promptPathSpan) DOM.promptPathSpan.textContent = currentPathDisplay === Config.FILESYSTEM.ROOT_PATH && currentPathDisplay.length > 1 ? Config.FILESYSTEM.ROOT_PATH : currentPathDisplay;
-		if (DOM.promptCharSpan) DOM.promptCharSpan.textContent = Config.TERMINAL.PROMPT_CHAR;
+		if(DOM.promptPathSpan) DOM.promptPathSpan.textContent = currentPathDisplay === Config.FILESYSTEM.ROOT_PATH && currentPathDisplay.length > 1 ? Config.FILESYSTEM.ROOT_PATH : currentPathDisplay;
+		if(DOM.promptCharSpan) DOM.promptCharSpan.textContent = Config.TERMINAL.PROMPT_CHAR;
 	}
 
 	function focusInput() {
-		if (DOM.editableInputDiv && DOM.editableInputDiv.contentEditable === "true") {
+		if(DOM.editableInputDiv && DOM.editableInputDiv.contentEditable === "true") {
 			DOM.editableInputDiv.focus();
-			if (DOM.editableInputDiv.textContent.length === 0) setCaretToEnd(DOM.editableInputDiv);
+			if(DOM.editableInputDiv.textContent.length === 0) setCaretToEnd(DOM.editableInputDiv);
 		}
 	}
 
 	function clearInput() {
-		if (DOM.editableInputDiv) DOM.editableInputDiv.textContent = "";
+		if(DOM.editableInputDiv) DOM.editableInputDiv.textContent = "";
 	}
 
 	function getCurrentInputValue() {
@@ -1808,19 +1715,19 @@ const TerminalUI = (() => {
 	}
 
 	function setCurrentInputValue(value, setAtEnd = true) {
-		if (DOM.editableInputDiv) {
+		if(DOM.editableInputDiv) {
 			DOM.editableInputDiv.textContent = value;
-			if (setAtEnd) setCaretToEnd(DOM.editableInputDiv);
+			if(setAtEnd) setCaretToEnd(DOM.editableInputDiv);
 		}
 	}
 
 	function setCaretToEnd(element) {
-		if (!element || typeof window.getSelection === "undefined" || typeof document.createRange === "undefined") return;
+		if(!element || typeof window.getSelection === "undefined" || typeof document.createRange === "undefined") return;
 		const range = document.createRange();
 		const sel = window.getSelection();
 		range.selectNodeContents(element);
 		range.collapse(false);
-		if (sel) {
+		if(sel) {
 			sel.removeAllRanges();
 			sel.addRange(range);
 		}
@@ -1828,36 +1735,36 @@ const TerminalUI = (() => {
 	}
 
 	function setCaretPosition(element, position) {
-		if (!element || typeof position !== "number" || typeof window.getSelection === "undefined" || typeof document.createRange === "undefined") return;
+		if(!element || typeof position !== "number" || typeof window.getSelection === "undefined" || typeof document.createRange === "undefined") return;
 		const sel = window.getSelection();
-		if (!sel) return;
+		if(!sel) return;
 		const range = document.createRange();
 		let charCount = 0;
 		let foundNode = false;
 
 		function findTextNodeAndSet(node) {
-			if (node.nodeType === Node.TEXT_NODE) {
+			if(node.nodeType === Node.TEXT_NODE) {
 				const nextCharCount = charCount + node.length;
-				if (!foundNode && position >= charCount && position <= nextCharCount) {
+				if(!foundNode && position >= charCount && position <= nextCharCount) {
 					range.setStart(node, position - charCount);
 					range.collapse(true);
 					foundNode = true;
 				}
 				charCount = nextCharCount;
 			} else {
-				for (let i = 0; i < node.childNodes.length; i++) {
-					if (findTextNodeAndSet(node.childNodes[i])) return true;
-					if (foundNode) break;
+				for(let i = 0; i < node.childNodes.length; i++) {
+					if(findTextNodeAndSet(node.childNodes[i])) return true;
+					if(foundNode) break;
 				}
 			}
 			return foundNode;
 		}
-		if (element.childNodes.length === 0 && position === 0) {
+		if(element.childNodes.length === 0 && position === 0) {
 			range.setStart(element, 0);
 			range.collapse(true);
 			foundNode = true;
 		} else findTextNodeAndSet(element);
-		if (foundNode) {
+		if(foundNode) {
 			sel.removeAllRanges();
 			sel.addRange(range);
 		} else setCaretToEnd(element);
@@ -1865,11 +1772,11 @@ const TerminalUI = (() => {
 	}
 
 	function setInputState(isEditable, obscured = false) {
-		if (DOM.editableInputDiv) {
+		if(DOM.editableInputDiv) {
 			DOM.editableInputDiv.contentEditable = isEditable ? "true" : "false";
 			DOM.editableInputDiv.style.opacity = isEditable ? "1" : "0.5";
 			_isObscuredInputMode = obscured; // Set the obscured mode flag
-			if (!isEditable) DOM.editableInputDiv.blur();
+			if(!isEditable) DOM.editableInputDiv.blur();
 		}
 	}
 
@@ -1889,10 +1796,9 @@ const TerminalUI = (() => {
 		const sel = window.getSelection();
 		let start = 0,
 			end = 0;
-
-		if (sel && sel.rangeCount > 0) {
+		if(sel && sel.rangeCount > 0) {
 			const range = sel.getRangeAt(0);
-			if (DOM.editableInputDiv && DOM.editableInputDiv.contains(range.commonAncestorContainer)) {
+			if(DOM.editableInputDiv && DOM.editableInputDiv.contains(range.commonAncestorContainer)) {
 				const preSelectionRange = range.cloneRange();
 				preSelectionRange.selectNodeContents(DOM.editableInputDiv);
 				preSelectionRange.setEnd(range.startContainer, range.startOffset);
@@ -1909,7 +1815,6 @@ const TerminalUI = (() => {
 			end
 		};
 	}
-
 	// <<< FIX: Add functions to manage and check focus state >>>
 	function setInputFocusState(state) {
 		isInputFocused = state;
@@ -1918,7 +1823,6 @@ const TerminalUI = (() => {
 	function getIsInputFocused() {
 		return isInputFocused;
 	}
-
 	return {
 		updatePrompt,
 		focusInput,
@@ -1935,25 +1839,22 @@ const TerminalUI = (() => {
 		getIsInputFocused, // <<< FIX: Export new function
 	};
 })();
-
 const ModalInputManager = (() => {
 	"use strict";
 	let _isAwaitingInput = false;
 	let _inputContext = null; // { onInputReceived, onCancelled, isObscured, currentInput }
-
 	function isObscured() {
 		return _isAwaitingInput && _inputContext && _inputContext.isObscured;
 	}
 
 	function requestInput(promptMessage, onInputReceivedCallback, onCancelledCallback, isObscured = false) {
-		if (_isAwaitingInput) {
+		if(_isAwaitingInput) {
 			OutputManager.appendToOutput("Another modal input prompt is already pending.", {
 				typeClass: Config.CSS_CLASSES.WARNING_MSG
 			});
-			if (onCancelledCallback) onCancelledCallback();
+			if(onCancelledCallback) onCancelledCallback();
 			return;
 		}
-
 		_isAwaitingInput = true;
 		_inputContext = {
 			onInputReceived: onInputReceivedCallback,
@@ -1961,92 +1862,75 @@ const ModalInputManager = (() => {
 			isObscured: isObscured,
 			currentInput: '' // Start with empty input
 		};
-
-		if (DOM.inputLineContainerDiv) {
+		if(DOM.inputLineContainerDiv) {
 			DOM.inputLineContainerDiv.classList.remove(Config.CSS_CLASSES.HIDDEN);
 		}
-
 		OutputManager.appendToOutput(promptMessage, {
 			typeClass: Config.CSS_CLASSES.CONSOLE_LOG_MSG
 		});
 		TerminalUI.clearInput();
 		TerminalUI.setInputState(true, false);
 		TerminalUI.focusInput();
-		if (DOM.outputDiv) DOM.outputDiv.scrollTop = DOM.outputDiv.scrollHeight;
+		if(DOM.outputDiv) DOM.outputDiv.scrollTop = DOM.outputDiv.scrollHeight;
 	}
-
 	async function handleInput() {
-		if (!_isAwaitingInput || !_inputContext) return false;
-
-		const finalInput = _inputContext.isObscured ?
-			_inputContext.currentInput :
-			TerminalUI.getCurrentInputValue();
-
+		if(!_isAwaitingInput || !_inputContext) return false;
+		const finalInput = _inputContext.isObscured ? _inputContext.currentInput : TerminalUI.getCurrentInputValue();
 		const callback = _inputContext.onInputReceived;
-
 		_isAwaitingInput = false;
 		_inputContext = null;
-
 		TerminalUI.clearInput();
-
-		if (typeof callback === "function") {
+		if(typeof callback === "function") {
 			await callback(finalInput.trim());
 		}
 		return true;
 	}
 
 	function updateInput(key, rawChar) {
-		if (!_isAwaitingInput) return;
-
+		if(!_isAwaitingInput) return;
 		let inputArray = Array.from(_inputContext.currentInput);
 		const selection = TerminalUI.getSelection();
 		let {
 			start,
 			end
 		} = selection;
-
-		if (key === 'Backspace') {
-			if (start === end && start > 0) {
+		if(key === 'Backspace') {
+			if(start === end && start > 0) {
 				inputArray.splice(start - 1, 1);
 				start--;
-			} else if (start !== end) {
+			} else if(start !== end) {
 				inputArray.splice(start, end - start);
 			}
-		} else if (key === 'Delete') {
-			if (start === end && start < inputArray.length) {
+		} else if(key === 'Delete') {
+			if(start === end && start < inputArray.length) {
 				inputArray.splice(start, 1);
-			} else if (start !== end) {
+			} else if(start !== end) {
 				inputArray.splice(start, end - start);
 			}
-		} else if (rawChar) {
+		} else if(rawChar) {
 			inputArray.splice(start, end - start, rawChar);
 			start += rawChar.length;
 		}
-
 		_inputContext.currentInput = inputArray.join('');
 		const displayText = _inputContext.isObscured ? '*'.repeat(_inputContext.currentInput.length) : _inputContext.currentInput;
-
 		TerminalUI.setCurrentInputValue(displayText, false);
 		TerminalUI.setCaretPosition(DOM.editableInputDiv, start);
 	}
-
 	return {
 		requestInput,
 		handleInput,
 		updateInput,
 		isAwaiting: () => _isAwaitingInput,
-		isObscured,
+			isObscured,
 	};
 })();
-
 const UserManager = (() => {
 	"use strict";
 	let currentUser = {
 		name: Config.USER.DEFAULT_NAME
 	};
-
 	async function _secureHashPassword(password) {
-		if (!password || typeof password !== 'string' || password.trim() === '') {
+		if(!password || typeof password !== 'string' || password.trim() === '') {
 			return null;
 		}
 		try {
@@ -2056,7 +1940,7 @@ const UserManager = (() => {
 			const hashArray = Array.from(new Uint8Array(hashBuffer));
 			const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 			return hashHex;
-		} catch (error) {
+		} catch(error) {
 			console.error("Password hashing failed:", error);
 			return null;
 		}
@@ -2065,23 +1949,19 @@ const UserManager = (() => {
 	function getCurrentUser() {
 		return currentUser;
 	}
-
 	async function register(username, password) {
 		const formatValidation = Utils.validateUsernameFormat(username);
-		if (!formatValidation.isValid) return {
+		if(!formatValidation.isValid) return {
 			success: false,
 			error: formatValidation.error
 		};
-
 		const users = StorageManager.loadItem(Config.STORAGE_KEYS.USER_CREDENTIALS, "User list", {});
-
-		if (users[username]) return {
+		if(users[username]) return {
 			success: false,
 			error: `User '${username}' already exists.`
 		};
-
 		const passwordHash = password ? await _secureHashPassword(password) : null;
-		if (password && !passwordHash) {
+		if(password && !passwordHash) {
 			return {
 				success: false,
 				error: "Failed to securely process password."
@@ -2090,10 +1970,8 @@ const UserManager = (() => {
 		users[username] = {
 			passwordHash: passwordHash
 		};
-
 		await FileSystemManager.createUserHomeDirectory(username);
-
-		if (StorageManager.saveItem(Config.STORAGE_KEYS.USER_CREDENTIALS, users, "User list") && await FileSystemManager.save()) {
+		if(StorageManager.saveItem(Config.STORAGE_KEYS.USER_CREDENTIALS, users, "User list") && await FileSystemManager.save()) {
 			return {
 				success: true,
 				message: `User '${username}' registered. Home directory created at /home/${username}.`
@@ -2105,28 +1983,23 @@ const UserManager = (() => {
 			};
 		}
 	}
-
 	async function login(username, providedPassword = null) {
-		if (currentUser.name === username) return {
+		if(currentUser.name === username) return {
 			success: true,
 			message: `...`,
 			noAction: true
 		};
 		const users = StorageManager.loadItem(Config.STORAGE_KEYS.USER_CREDENTIALS, "User list", {});
-
 		const userEntry = users[username];
-
-		if (!userEntry && username !== Config.USER.DEFAULT_NAME && username !== 'root') {
+		if(!userEntry && username !== Config.USER.DEFAULT_NAME && username !== 'root') {
 			return {
 				success: false,
 				error: "Invalid username."
 			};
 		}
-
 		const storedPasswordHash = userEntry ? userEntry.passwordHash : null;
-
-		if (storedPasswordHash !== null) {
-			if (providedPassword === null) {
+		if(storedPasswordHash !== null) {
+			if(providedPassword === null) {
 				return {
 					success: false,
 					error: "Password required.",
@@ -2134,105 +2007,88 @@ const UserManager = (() => {
 				};
 			}
 			const providedPasswordHash = await _secureHashPassword(providedPassword);
-			if (providedPasswordHash !== storedPasswordHash) {
+			if(providedPasswordHash !== storedPasswordHash) {
 				return {
 					success: false,
 					error: Config.MESSAGES.INVALID_PASSWORD
 				};
 			}
 		} else {
-			if (providedPassword !== null) {
+			if(providedPassword !== null) {
 				return {
 					success: false,
 					error: "This account does not require a password."
 				};
 			}
 		}
-
-
-		if (currentUser.name !== Config.USER.DEFAULT_NAME) {
+		if(currentUser.name !== Config.USER.DEFAULT_NAME) {
 			SessionManager.saveAutomaticState(currentUser.name);
 		}
-
 		currentUser = {
 			name: username
 		};
-
 		SessionManager.loadAutomaticState(username);
-
 		const homePath = `/home/${username}`;
-		if (FileSystemManager.getNodeByPath(homePath)) {
+		if(FileSystemManager.getNodeByPath(homePath)) {
 			FileSystemManager.setCurrentPath(homePath);
 		} else {
 			FileSystemManager.setCurrentPath(Config.FILESYSTEM.ROOT_PATH);
 		}
-
 		TerminalUI.updatePrompt();
 		return {
 			success: true,
 			message: `Logged in as ${username}.`
 		};
 	}
-
 	async function logout() {
-		if (currentUser.name === Config.USER.DEFAULT_NAME) return {
+		if(currentUser.name === Config.USER.DEFAULT_NAME) return {
 			success: true,
 			message: `...`,
 			noAction: true
 		};
 		SessionManager.saveAutomaticState(currentUser.name);
-
 		const prevUserName = currentUser.name;
 		currentUser = {
 			name: Config.USER.DEFAULT_NAME
 		};
-
 		SessionManager.loadAutomaticState(Config.USER.DEFAULT_NAME);
-
 		const guestHome = `/home/${Config.USER.DEFAULT_NAME}`;
-		if (FileSystemManager.getNodeByPath(guestHome)) {
+		if(FileSystemManager.getNodeByPath(guestHome)) {
 			FileSystemManager.setCurrentPath(guestHome);
 		} else {
 			FileSystemManager.setCurrentPath(Config.FILESYSTEM.ROOT_PATH);
 		}
-
 		TerminalUI.updatePrompt();
 		return {
 			success: true,
 			message: `User ${prevUserName} logged out. Now logged in as ${Config.USER.DEFAULT_NAME}.`
 		};
 	}
-
 	async function initializeDefaultUsers() {
 		const users = StorageManager.loadItem(Config.STORAGE_KEYS.USER_CREDENTIALS, "User list", {});
 		let changesMade = false;
-
-		if (!users['root']) {
+		if(!users['root']) {
 			users['root'] = {
 				passwordHash: await _secureHashPassword('mcgoopis')
 			};
 			changesMade = true;
 		}
-
-		if (!users[Config.USER.DEFAULT_NAME]) {
+		if(!users[Config.USER.DEFAULT_NAME]) {
 			users[Config.USER.DEFAULT_NAME] = {
 				passwordHash: null
 			};
 			changesMade = true;
 		}
-
-		if (!users['userDiag']) {
+		if(!users['userDiag']) {
 			users['userDiag'] = {
 				passwordHash: await _secureHashPassword('pantload')
 			};
 			changesMade = true;
 		}
-
-		if (changesMade) {
+		if(changesMade) {
 			StorageManager.saveItem(Config.STORAGE_KEYS.USER_CREDENTIALS, users, "User list");
 		}
 	}
-
 	return {
 		getCurrentUser,
 		register,
@@ -2241,7 +2097,6 @@ const UserManager = (() => {
 		initializeDefaultUsers
 	};
 })();
-
 const SessionManager = (() => {
 	"use strict";
 
@@ -2255,7 +2110,7 @@ const SessionManager = (() => {
 	}
 
 	function saveAutomaticState(username) {
-		if (!username) {
+		if(!username) {
 			console.warn("saveAutomaticState: No username provided. State not saved.");
 			return;
 		}
@@ -2270,22 +2125,22 @@ const SessionManager = (() => {
 	}
 
 	function loadAutomaticState(username) {
-		if (!username) {
+		if(!username) {
 			console.warn("loadAutomaticState: No username provided. Cannot load state.");
-			if (DOM.outputDiv) DOM.outputDiv.innerHTML = "";
+			if(DOM.outputDiv) DOM.outputDiv.innerHTML = "";
 			TerminalUI.setCurrentInputValue("");
 			FileSystemManager.setCurrentPath(Config.FILESYSTEM.ROOT_PATH);
 			HistoryManager.clearHistory();
 			OutputManager.appendToOutput(`${Config.MESSAGES.WELCOME_PREFIX} ${Config.USER.DEFAULT_NAME}${Config.MESSAGES.WELCOME_SUFFIX}`);
 			TerminalUI.updatePrompt();
-			if (DOM.outputDiv) DOM.outputDiv.scrollTop = DOM.outputDiv.scrollHeight;
+			if(DOM.outputDiv) DOM.outputDiv.scrollTop = DOM.outputDiv.scrollHeight;
 			return false;
 		}
 		const autoState = StorageManager.loadItem(_getAutomaticSessionStateKey(username), `Auto session for ${username}`);
-		if (autoState) {
+		if(autoState) {
 			FileSystemManager.setCurrentPath(autoState.currentPath || Config.FILESYSTEM.ROOT_PATH);
-			if (DOM.outputDiv) {
-				if (autoState.hasOwnProperty("outputHTML")) {
+			if(DOM.outputDiv) {
+				if(autoState.hasOwnProperty("outputHTML")) {
 					DOM.outputDiv.innerHTML = autoState.outputHTML || "";
 				} else {
 					DOM.outputDiv.innerHTML = "";
@@ -2295,10 +2150,10 @@ const SessionManager = (() => {
 			TerminalUI.setCurrentInputValue(autoState.currentInput || "");
 			HistoryManager.setHistory(autoState.commandHistory || []);
 		} else {
-			if (DOM.outputDiv) DOM.outputDiv.innerHTML = "";
+			if(DOM.outputDiv) DOM.outputDiv.innerHTML = "";
 			TerminalUI.setCurrentInputValue("");
 			const homePath = `/home/${username}`;
-			if (FileSystemManager.getNodeByPath(homePath)) {
+			if(FileSystemManager.getNodeByPath(homePath)) {
 				FileSystemManager.setCurrentPath(homePath);
 			} else {
 				FileSystemManager.setCurrentPath(Config.FILESYSTEM.ROOT_PATH);
@@ -2307,10 +2162,9 @@ const SessionManager = (() => {
 			OutputManager.appendToOutput(`${Config.MESSAGES.WELCOME_PREFIX} ${username}${Config.MESSAGES.WELCOME_SUFFIX}`);
 		}
 		TerminalUI.updatePrompt();
-		if (DOM.outputDiv) DOM.outputDiv.scrollTop = DOM.outputDiv.scrollHeight;
+		if(DOM.outputDiv) DOM.outputDiv.scrollTop = DOM.outputDiv.scrollHeight;
 		return !!autoState;
 	}
-
 	async function saveManualState() {
 		const currentUser = UserManager.getCurrentUser();
 		const currentInput = TerminalUI.getCurrentInputValue();
@@ -2324,7 +2178,7 @@ const SessionManager = (() => {
 			fsDataSnapshot: Utils.deepCopyNode(FileSystemManager.getFsData()),
 			commandHistory: HistoryManager.getFullHistory()
 		};
-		if (StorageManager.saveItem(_getManualUserTerminalStateKey(currentUser), manualStateData, `Manual save for ${currentUser.name}`)) return {
+		if(StorageManager.saveItem(_getManualUserTerminalStateKey(currentUser), manualStateData, `Manual save for ${currentUser.name}`)) return {
 			success: true,
 			message: `${Config.MESSAGES.SESSION_SAVED_FOR_PREFIX}${currentUser.name}.`
 		};
@@ -2333,12 +2187,11 @@ const SessionManager = (() => {
 			error: "Failed to save session manually."
 		};
 	}
-
 	async function loadManualState() {
 		const currentUser = UserManager.getCurrentUser();
 		const manualStateData = StorageManager.loadItem(_getManualUserTerminalStateKey(currentUser), `Manual save for ${currentUser.name}`);
-		if (manualStateData) {
-			if (manualStateData.user && manualStateData.user !== currentUser.name) {
+		if(manualStateData) {
+			if(manualStateData.user && manualStateData.user !== currentUser.name) {
 				OutputManager.appendToOutput(`Warning: Saved state is for user '${manualStateData.user}'. Current user is '${currentUser.name}'. Load aborted. Use 'login ${manualStateData.user}' then 'loadstate'.`, {
 					typeClass: Config.CSS_CLASSES.WARNING_MSG
 				});
@@ -2354,7 +2207,7 @@ const SessionManager = (() => {
 					pendingData: manualStateData,
 					userNameToRestoreTo: currentUser.name
 				},
-				onConfirm: async (data) => {
+				onConfirm: async(data) => {
 					FileSystemManager.setFsData(Utils.deepCopyNode(data.pendingData.fsDataSnapshot) || {
 						[Config.FILESYSTEM.ROOT_PATH]: {
 							type: Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE,
@@ -2365,7 +2218,7 @@ const SessionManager = (() => {
 						}
 					});
 					FileSystemManager.setCurrentPath(data.pendingData.currentPath || Config.FILESYSTEM.ROOT_PATH);
-					if (DOM.outputDiv) DOM.outputDiv.innerHTML = data.pendingData.outputHTML || "";
+					if(DOM.outputDiv) DOM.outputDiv.innerHTML = data.pendingData.outputHTML || "";
 					TerminalUI.setCurrentInputValue(data.pendingData.currentInput || "");
 					HistoryManager.setHistory(data.pendingData.commandHistory || []);
 					await FileSystemManager.save(data.userNameToRestoreTo);
@@ -2373,7 +2226,7 @@ const SessionManager = (() => {
 						typeClass: Config.CSS_CLASSES.SUCCESS_MSG
 					});
 					TerminalUI.updatePrompt();
-					if (DOM.outputDiv) DOM.outputDiv.scrollTop = DOM.outputDiv.scrollHeight;
+					if(DOM.outputDiv) DOM.outputDiv.scrollTop = DOM.outputDiv.scrollHeight;
 				},
 				onCancel: () => {
 					OutputManager.appendToOutput(Config.MESSAGES.LOAD_STATE_CANCELLED, {
@@ -2392,7 +2245,7 @@ const SessionManager = (() => {
 	}
 
 	function clearUserSessionStates(username) {
-		if (!username || typeof username !== "string") {
+		if(!username || typeof username !== "string") {
 			console.warn("SessionManager.clearUserSessionStates: Invalid username provided.", username);
 			return false;
 		}
@@ -2400,53 +2253,42 @@ const SessionManager = (() => {
 			StorageManager.removeItem(_getAutomaticSessionStateKey(username));
 			StorageManager.removeItem(_getManualUserTerminalStateKey(username));
 			const users = StorageManager.loadItem(Config.STORAGE_KEYS.USER_CREDENTIALS, "User list", {});
-			if (users.hasOwnProperty(username)) {
+			if(users.hasOwnProperty(username)) {
 				delete users[username];
 				StorageManager.saveItem(Config.STORAGE_KEYS.USER_CREDENTIALS, users, "User list");
 			}
 			return true;
-		} catch (e) {
+		} catch(e) {
 			console.error(`Error clearing session states for user '${username}':`, e);
 			return false;
 		}
 	}
-
 	async function performFullReset() {
 		OutputManager.clearOutput();
 		TerminalUI.clearInput();
 		const allKeys = StorageManager.getAllLocalStorageKeys();
 		allKeys.forEach((key) => {
-			const shouldRemove = (
-				key.startsWith(Config.STORAGE_KEYS.USER_TERMINAL_STATE_PREFIX) ||
-				key.startsWith(Config.STORAGE_KEYS.MANUAL_TERMINAL_STATE_PREFIX) ||
-				key === Config.STORAGE_KEYS.USER_CREDENTIALS ||
-				key === Config.STORAGE_KEYS.EDITOR_WORD_WRAP_ENABLED
-			);
-
-			if (shouldRemove && key !== Config.STORAGE_KEYS.GEMINI_API_KEY) {
+			const shouldRemove = (key.startsWith(Config.STORAGE_KEYS.USER_TERMINAL_STATE_PREFIX) || key.startsWith(Config.STORAGE_KEYS.MANUAL_TERMINAL_STATE_PREFIX) || key === Config.STORAGE_KEYS.USER_CREDENTIALS || key === Config.STORAGE_KEYS.EDITOR_WORD_WRAP_ENABLED);
+			if(shouldRemove && key !== Config.STORAGE_KEYS.GEMINI_API_KEY) {
 				StorageManager.removeItem(key);
 			}
 		});
-
 		await OutputManager.appendToOutput("All session states, credentials, and editor settings cleared from local storage.");
 		try {
 			await FileSystemManager.clearAllFS();
 			await OutputManager.appendToOutput("All user filesystems cleared from DB.");
-		} catch (error) {
+		} catch(error) {
 			await OutputManager.appendToOutput(`Warning: Could not fully clear all user filesystems from DB. Error: ${error.message}`, {
 				typeClass: Config.CSS_CLASSES.WARNING_MSG
 			});
 		}
-
 		await OutputManager.appendToOutput("Reset complete. Rebooting OopisOS...", {
 			typeClass: Config.CSS_CLASSES.SUCCESS_MSG
 		});
-
 		TerminalUI.setInputState(false);
-		if (DOM.inputLineContainerDiv) {
+		if(DOM.inputLineContainerDiv) {
 			DOM.inputLineContainerDiv.classList.add(Config.CSS_CLASSES.HIDDEN);
 		}
-
 		setTimeout(() => {
 			window.location.reload();
 		}, 1500);
@@ -2460,375 +2302,217 @@ const SessionManager = (() => {
 		performFullReset
 	};
 })();
-
 const TabCompletionManager = (() => {
 	"use strict";
-	const PATH_COMMANDS = ["ls", "cd", "cat", "edit", "run", "mv", "cp", "rm", "mkdir", "touch", "export", "find", "tree", "chmod", "chown", "grep", "adventure", "printscreen", "gemini"];
+	let suggestionsCache = [];
+	let cycleIndex = -1;
+	let lastCompletionInput = null; // The full input string at the time of the last multi-suggestion tab
+	function resetCycle() {
+		suggestionsCache = [];
+		cycleIndex = -1;
+		lastCompletionInput = null;
+	}
 
 	function findLongestCommonPrefix(strs) {
-		if (!strs || strs.length === 0) return "";
-		if (strs.length === 1) return strs[0];
+		if(!strs || strs.length === 0) return "";
+		if(strs.length === 1) return strs[0];
 		let prefix = strs[0];
-		for (let i = 1; i < strs.length; i++) {
-			while (strs[i].indexOf(prefix) !== 0) {
+		for(let i = 1; i < strs.length; i++) {
+			while(strs[i].indexOf(prefix) !== 0) {
 				prefix = prefix.substring(0, prefix.length - 1);
-				if (prefix === "") return "";
+				if(prefix === "") return "";
 			}
 		}
 		return prefix;
 	}
 
-	function getSuggestions(fullInput, cursorPos) {
-		const textBeforeCursor = fullInput.substring(0, cursorPos);
-		const tokensInitial = textBeforeCursor.trimStart().split(/\s+/);
-		let currentWordPrefix = "";
-		let isCompletingCommandName = false;
-		let baseCommandForPath = "";
-		const lastCharIsSpace = /\s$/.test(textBeforeCursor) || textBeforeCursor.length === 0;
-		let startOfWordIndex = 0;
-		let effectiveArgStart = 0;
-		if (tokensInitial.length === 0 || (tokensInitial.length === 1 && !lastCharIsSpace && tokensInitial[0] !== "")) {
-			isCompletingCommandName = true;
-			currentWordPrefix = tokensInitial.length > 0 ? tokensInitial[0] : "";
-			if (textBeforeCursor.length > 0 && !/\s$/.test(textBeforeCursor.charAt(0))) {
-				startOfWordIndex = textBeforeCursor.indexOf(currentWordPrefix);
-				if (startOfWordIndex === -1 && currentWordPrefix === "") startOfWordIndex = cursorPos;
-				else if (startOfWordIndex === -1) startOfWordIndex = 0;
-			} else {
-				startOfWordIndex = textBeforeCursor.lastIndexOf(currentWordPrefix);
-				if (startOfWordIndex === -1 && currentWordPrefix === "") startOfWordIndex = cursorPos;
-				else if (startOfWordIndex === -1) startOfWordIndex = 0;
-			}
-		} else {
-			isCompletingCommandName = false;
-			baseCommandForPath = tokensInitial[0].toLowerCase();
-			if (lastCharIsSpace) {
-				currentWordPrefix = "";
-				effectiveArgStart = cursorPos;
-			} else {
-				const commandEndPos = textBeforeCursor.indexOf(tokensInitial[0]) + tokensInitial[0].length;
-				let currentFragmentStart = commandEndPos;
-				if (textBeforeCursor.length > commandEndPos && textBeforeCursor[commandEndPos] === ' ') currentFragmentStart = commandEndPos + 1;
-				let tempInSingleQuote = false;
-				let tempInDoubleQuote = false;
-				for (let i = currentFragmentStart; i < cursorPos; i++) {
-					const char = textBeforeCursor[i];
-					if (char === "'" && (i === 0 || textBeforeCursor[i - 1] !== '\\')) {
-						if (!tempInDoubleQuote) tempInSingleQuote = !tempInSingleQuote;
-					} else if (char === '"' && (i === 0 || textBeforeCursor[i - 1] !== '\\')) {
-						if (!tempInSingleQuote) tempInDoubleQuote = !tempInDoubleQuote;
-					} else if (char === ' ' && !tempInSingleQuote && !tempInDoubleQuote) currentFragmentStart = i + 1;
-				}
-				effectiveArgStart = currentFragmentStart;
-				currentWordPrefix = textBeforeCursor.substring(effectiveArgStart, cursorPos);
-			}
-			startOfWordIndex = effectiveArgStart;
-		}
-		if (startOfWordIndex < 0) startOfWordIndex = 0;
-		let suggestions = [];
-		if (isCompletingCommandName) {
-			const allCommands = CommandExecutor.getCommands();
-			if (allCommands) suggestions = Object.keys(allCommands).filter((cmdName) => cmdName.startsWith(currentWordPrefix)).sort();
-			if (suggestions.length === 0) return {
-				textToInsert: null,
-				newCursorPos: cursorPos
-			};
-			if (suggestions.length === 1) {
-				const completedSegment = suggestions[0] + " ";
-				const textToInsert = textBeforeCursor.substring(0, startOfWordIndex) + completedSegment + fullInput.substring(cursorPos);
-				const newCursorPos = startOfWordIndex + completedSegment.length;
-				return {
-					textToInsert,
-					newCursorPos
-				};
-			} else {
-				const lcp = findLongestCommonPrefix(suggestions);
-				if (lcp.length > currentWordPrefix.length) {
-					const textToInsert = textBeforeCursor.substring(0, startOfWordIndex) + lcp + fullInput.substring(cursorPos);
-					const newCursorPos = startOfWordIndex + lcp.length;
-					OutputManager.appendToOutput(suggestions.join("    "), {
-						typeClass: Config.CSS_CLASSES.CONSOLE_LOG_MSG,
-						isCompletionSuggestion: true
-					});
-					const promptText = `${DOM.promptUserSpan.textContent}${Config.TERMINAL.PROMPT_AT}${DOM.promptHostSpan.textContent}${Config.TERMINAL.PROMPT_SEPARATOR}${DOM.promptPathSpan.textContent}${Config.TERMINAL.PROMPT_CHAR} `;
-					OutputManager.appendToOutput(`${promptText}${textBeforeCursor.substring(0, startOfWordIndex) + lcp}${fullInput.substring(cursorPos)}`, {
-						isCompletionSuggestion: true
-					});
-					if (DOM.outputDiv) DOM.outputDiv.scrollTop = DOM.outputDiv.scrollHeight;
-					return {
-						textToInsert,
-						newCursorPos
-					};
-				} else {
-					OutputManager.appendToOutput(suggestions.join("    "), {
-						typeClass: Config.CSS_CLASSES.CONSOLE_LOG_MSG,
-						isCompletionSuggestion: true
-					});
-					const promptText = `${DOM.promptUserSpan.textContent}${Config.TERMINAL.PROMPT_AT}${DOM.promptHostSpan.textContent}${Config.TERMINAL.PROMPT_SEPARATOR}${DOM.promptPathSpan.textContent}${Config.TERMINAL.PROMPT_CHAR} `;
-					OutputManager.appendToOutput(`${promptText}${fullInput}`, {
-						isCompletionSuggestion: true
-					});
-					if (DOM.outputDiv) DOM.outputDiv.scrollTop = DOM.outputDiv.scrollHeight;
-					return {
-						textToInsert: null,
-						newCursorPos: cursorPos
-					};
-				}
-			}
-		} else if (baseCommandForPath === "help") {
-			const allCommands = CommandExecutor.getCommands();
-			suggestions = Object.keys(allCommands).filter((cmdName) => cmdName.startsWith(currentWordPrefix)).sort();
+	function _applyCompletion(fullInput, startOfWordIndex, currentWordPrefixLength, completion) {
+		const textBeforeWord = fullInput.substring(0, startOfWordIndex);
+		const textAfterWord = fullInput.substring(startOfWordIndex + currentWordPrefixLength);
+		const newText = textBeforeWord + completion + textAfterWord;
+		const newCursorPos = textBeforeWord.length + completion.length;
+		return {
+			textToInsert: newText,
+			newCursorPos
+		};
+	}
 
-			if (suggestions.length === 0) {
-				return {
-					textToInsert: null,
-					newCursorPos: cursorPos
-				};
-			} else if (suggestions.length === 1) {
-				const completedSegment = suggestions[0];
-				const textToInsert = textBeforeCursor.substring(0, startOfWordIndex) + completedSegment + fullInput.substring(cursorPos);
-				const newCursorPos = startOfWordIndex + completedSegment.length;
-				return {
-					textToInsert,
-					newCursorPos
-				};
-			} else {
-				const lcp = findLongestCommonPrefix(suggestions);
-				if (lcp.length > currentWordPrefix.length) {
-					const textToInsert = textBeforeCursor.substring(0, startOfWordIndex) + lcp + fullInput.substring(cursorPos);
-					const newCursorPos = startOfWordIndex + lcp.length;
-					OutputManager.appendToOutput(suggestions.join("    "), {
-						typeClass: Config.CSS_CLASSES.CONSOLE_LOG_MSG,
-						isCompletionSuggestion: true
-					});
-					const promptText = `${DOM.promptUserSpan.textContent}${Config.TERMINAL.PROMPT_AT}${DOM.promptHostSpan.textContent}${Config.TERMINAL.PROMPT_SEPARATOR}${DOM.promptPathSpan.textContent}${Config.TERMINAL.PROMPT_CHAR} `;
-					OutputManager.appendToOutput(`${promptText}${textBeforeCursor.substring(0, startOfWordIndex) + lcp}${fullInput.substring(cursorPos)}`, {
-						isCompletionSuggestion: true
-					});
-					if (DOM.outputDiv) DOM.outputDiv.scrollTop = DOM.outputDiv.scrollHeight;
-					return {
-						textToInsert,
-						newCursorPos
-					};
-				} else {
-					OutputManager.appendToOutput(suggestions.join("    "), {
-						typeClass: Config.CSS_CLASSES.CONSOLE_LOG_MSG,
-						isCompletionSuggestion: true
-					});
-					const promptText = `${DOM.promptUserSpan.textContent}${Config.TERMINAL.PROMPT_AT}${DOM.promptHostSpan.textContent}${Config.TERMINAL.PROMPT_SEPARATOR}${DOM.promptPathSpan.textContent}${Config.TERMINAL.PROMPT_CHAR} `;
-					OutputManager.appendToOutput(`${promptText}${fullInput}`, {
-						isCompletionSuggestion: true
-					});
-					if (DOM.outputDiv) DOM.outputDiv.scrollTop = DOM.outputDiv.scrollHeight;
-					return {
-						textToInsert: null,
-						newCursorPos: cursorPos
-					};
-				}
-			}
-		} else if (PATH_COMMANDS.includes(baseCommandForPath)) {
-			if (baseCommandForPath === "grep" && tokensInitial.length < ((tokensInitial[1] && tokensInitial[1].startsWith("-")) ? 3 : 2) && !lastCharIsSpace && (startOfWordIndex <= (textBeforeCursor.indexOf(tokensInitial[1] || "") + (tokensInitial[1] || "").length))) return {
-				textToInsert: null,
-				newCursorPos: cursorPos
-			};
-			if (baseCommandForPath === "gemini") {
-				if (lastCharIsSpace && tokensInitial.length === 2) return {
-					textToInsert: null,
-					newCursorPos: cursorPos
-				};
-				if (tokensInitial.length > 2) {
-					const endOfFirstArgInText = textBeforeCursor.indexOf(tokensInitial[1]) + tokensInitial[1].length;
-					if (startOfWordIndex > endOfFirstArgInText) return {
-						textToInsert: null,
-						newCursorPos: cursorPos
-					};
-				}
-			}
-			let isActivelyQuoted = false;
-			let originalQuoteChar = '';
-			let contentInsideQuotes = "";
-			if (currentWordPrefix.startsWith("'") && currentWordPrefix.endsWith("'") && currentWordPrefix.length >= 2) {
-				isActivelyQuoted = false;
-				originalQuoteChar = "'";
-				contentInsideQuotes = currentWordPrefix.substring(1, currentWordPrefix.length - 1);
-			} else if (currentWordPrefix.startsWith('"') && currentWordPrefix.endsWith('"') && currentWordPrefix.length >= 2) {
-				isActivelyQuoted = false;
-				originalQuoteChar = '"';
-				contentInsideQuotes = currentWordPrefix.substring(1, currentWordPrefix.length - 1);
-			} else if (currentWordPrefix.startsWith("'")) {
-				isActivelyQuoted = true;
-				originalQuoteChar = "'";
-				contentInsideQuotes = currentWordPrefix.substring(1);
-			} else if (currentWordPrefix.startsWith('"')) {
-				isActivelyQuoted = true;
-				originalQuoteChar = '"';
-				contentInsideQuotes = currentWordPrefix.substring(1);
-			} else {
-				isActivelyQuoted = false;
-				originalQuoteChar = '';
-				contentInsideQuotes = currentWordPrefix;
-			}
+	function _getCompletionContext(fullInput, cursorPos) {
+		const textBeforeCursor = fullInput.substring(0, cursorPos);
+		const lastSpaceIndex = textBeforeCursor.lastIndexOf(' ');
+		// Find the start of the word being completed
+		let startOfWordIndex = lastSpaceIndex === -1 ? 0 : lastSpaceIndex + 1;
+		// If there are multiple spaces, we might be at the start of a new word.
+		if(/\s$/.test(textBeforeCursor)) {
+			startOfWordIndex = cursorPos;
+		}
+		const currentWordPrefix = textBeforeCursor.substring(startOfWordIndex);
+		const tokens = fullInput.trimStart().split(/\s+/).filter(Boolean);
+		const isCompletingCommand = tokens.length === 0 || (tokens.length === 1 && !/\s$/.test(fullInput));
+		const commandName = isCompletingCommand ? "" : tokens[0].toLowerCase();
+		return {
+			currentWordPrefix, startOfWordIndex, isCompletingCommand, commandName
+		};
+	}
+
+	function _getSuggestionsFromProvider(context) {
+		const {
+			currentWordPrefix, isCompletingCommand, commandName
+		} = context;
+		const USER_COMMANDS = ['chown', 'su', 'login', 'removeuser'];
+		const PATH_COMMANDS = ["ls", "cd", "cat", "edit", "run", "mv", "cp", "rm", "mkdir", "touch", "export", "find", "tree", "chmod", "grep", "adventure", "printscreen"];
+		let suggestions = [];
+		if(isCompletingCommand) {
+			const allCommands = CommandExecutor.getCommands();
+			suggestions = Object.keys(allCommands).filter(cmd => cmd.toLowerCase().startsWith(currentWordPrefix.toLowerCase())).sort();
+		} else if(commandName === "help") {
+			const allCommands = CommandExecutor.getCommands();
+			suggestions = Object.keys(allCommands).filter(cmd => cmd.toLowerCase().startsWith(currentWordPrefix.toLowerCase())).sort();
+		} else if(USER_COMMANDS.includes(commandName)) {
+			const users = StorageManager.loadItem(Config.STORAGE_KEYS.USER_CREDENTIALS, "User list", {});
+			const userNames = Object.keys(users);
+			if(!userNames.includes(Config.USER.DEFAULT_NAME)) userNames.push(Config.USER.DEFAULT_NAME);
+			suggestions = userNames.filter(name => name.toLowerCase().startsWith(currentWordPrefix.toLowerCase())).sort();
+		} else if(PATH_COMMANDS.includes(commandName)) {
 			let pathPrefixForFS = "";
 			let segmentToMatchForFS = "";
-			const lastSlashIndexInContent = contentInsideQuotes.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR);
-			if (lastSlashIndexInContent !== -1) {
-				pathPrefixForFS = contentInsideQuotes.substring(0, lastSlashIndexInContent + 1);
-				segmentToMatchForFS = contentInsideQuotes.substring(lastSlashIndexInContent + 1);
+			const lastSlashIndex = currentWordPrefix.lastIndexOf(Config.FILESYSTEM.PATH_SEPARATOR);
+			if(lastSlashIndex !== -1) {
+				pathPrefixForFS = currentWordPrefix.substring(0, lastSlashIndex + 1);
+				segmentToMatchForFS = currentWordPrefix.substring(lastSlashIndex + 1);
 			} else {
-				pathPrefixForFS = "";
-				segmentToMatchForFS = contentInsideQuotes;
+				segmentToMatchForFS = currentWordPrefix;
 			}
 			const effectiveBasePathForFS = FileSystemManager.getAbsolutePath(pathPrefixForFS, FileSystemManager.getCurrentPath());
 			const baseNode = FileSystemManager.getNodeByPath(effectiveBasePathForFS);
 			const currentUser = UserManager.getCurrentUser().name;
-			if (baseNode && baseNode.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE && FileSystemManager.hasPermission(baseNode, currentUser, "read")) {
-				suggestions = Object.keys(baseNode.children).filter((name) => name.startsWith(segmentToMatchForFS)).map((name) => {
+			if(baseNode && baseNode.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE && FileSystemManager.hasPermission(baseNode, currentUser, "read")) {
+				suggestions = Object.keys(baseNode.children).filter(name => name.toLowerCase().startsWith(segmentToMatchForFS.toLowerCase())).map(name => {
 					const childNode = baseNode.children[name];
-					return childNode.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE ? name + Config.FILESYSTEM.PATH_SEPARATOR : name;
+					const completion = pathPrefixForFS + name;
+					return childNode.type === Config.FILESYSTEM.DEFAULT_DIRECTORY_TYPE ? completion + Config.FILESYSTEM.PATH_SEPARATOR : completion;
 				}).sort();
 			}
-			if (suggestions.length === 0) return {
-				textToInsert: null,
-				newCursorPos: cursorPos
-			};
-			const textBeforeArg = textBeforeCursor.substring(0, startOfWordIndex);
-			const textAfterCursor = fullInput.substring(cursorPos);
-			if (suggestions.length === 1) {
-				const completedNamePart = suggestions[0];
-				const isDirSuggestion = completedNamePart.endsWith(Config.FILESYSTEM.PATH_SEPARATOR);
-				let finalCompletedFullArg;
-				if (originalQuoteChar) {
-					finalCompletedFullArg = originalQuoteChar + pathPrefixForFS + completedNamePart;
-					if (!isDirSuggestion) finalCompletedFullArg += originalQuoteChar;
-				} else {
-					const fullSuggestedPathSegment = pathPrefixForFS + completedNamePart;
-					if (fullSuggestedPathSegment.includes(" ")) {
-						finalCompletedFullArg = "'" + fullSuggestedPathSegment;
-						if (!isDirSuggestion) finalCompletedFullArg += "'";
-					} else finalCompletedFullArg = fullSuggestedPathSegment;
-				}
-				const spaceAfter = !isDirSuggestion;
-				const textToInsert = textBeforeArg + finalCompletedFullArg + (spaceAfter ? " " : "") + textAfterCursor;
-				const newCursorPos = textBeforeArg.length + finalCompletedFullArg.length + (spaceAfter ? 1 : 0);
-				return {
-					textToInsert,
-					newCursorPos
-				};
-			} else {
-				const lcpOfSuggestions = findLongestCommonPrefix(suggestions);
-				if (lcpOfSuggestions.length > segmentToMatchForFS.length) {
-					let completedArgPart;
-					if (originalQuoteChar) completedArgPart = originalQuoteChar + pathPrefixForFS + lcpOfSuggestions;
-					else completedArgPart = pathPrefixForFS + lcpOfSuggestions;
-					const textToInsert = textBeforeArg + completedArgPart + textAfterCursor;
-					const newCursorPos = textBeforeArg.length + completedArgPart.length;
-					OutputManager.appendToOutput(suggestions.join("    "), {
-						typeClass: Config.CSS_CLASSES.CONSOLE_LOG_MSG,
-						isCompletionSuggestion: true
-					});
-					const promptText = `${DOM.promptUserSpan.textContent}${Config.TERMINAL.PROMPT_AT}${DOM.promptHostSpan.textContent}${Config.TERMINAL.PROMPT_SEPARATOR}${DOM.promptPathSpan.textContent}${Config.TERMINAL.PROMPT_CHAR} `;
-					OutputManager.appendToOutput(`${promptText}${textBeforeArg + completedArgPart}${textAfterCursor}`, {
-						isCompletionSuggestion: true
-					});
-					if (DOM.outputDiv) DOM.outputDiv.scrollTop = DOM.outputDiv.scrollHeight;
-					return {
-						textToInsert,
-						newCursorPos
-					};
-				} else {
-					OutputManager.appendToOutput(suggestions.join("    "), {
-						typeClass: Config.CSS_CLASSES.CONSOLE_LOG_MSG,
-						isCompletionSuggestion: true
-					});
-					const promptText = `${DOM.promptUserSpan.textContent}${Config.TERMINAL.PROMPT_AT}${DOM.promptHostSpan.textContent}${Config.TERMINAL.PROMPT_SEPARATOR}${DOM.promptPathSpan.textContent}${Config.TERMINAL.PROMPT_CHAR} `;
-					OutputManager.appendToOutput(`${promptText}${fullInput}`, {
-						isCompletionSuggestion: true
-					});
-					if (DOM.outputDiv) DOM.outputDiv.scrollTop = DOM.outputDiv.scrollHeight;
-					return {
-						textToInsert: null,
-						newCursorPos: cursorPos
-					};
-				}
-			}
 		}
-		return {
-			textToInsert: null,
-			newCursorPos: cursorPos
-		};
+		return suggestions;
+	}
+
+	function handleTab(fullInput, cursorPos) {
+		if(fullInput !== lastCompletionInput) {
+			resetCycle();
+		}
+		const context = _getCompletionContext(fullInput, cursorPos);
+		if(suggestionsCache.length === 0) { // New completion
+			const suggestions = _getSuggestionsFromProvider(context);
+			if(suggestions.length === 0) {
+				resetCycle();
+				return {
+					textToInsert: null
+				};
+			}
+			if(suggestions.length === 1) {
+				const isDir = suggestions[0].endsWith(Config.FILESYSTEM.PATH_SEPARATOR);
+				const completion = suggestions[0] + (isDir ? "" : " ");
+				const result = _applyCompletion(fullInput, context.startOfWordIndex, context.currentWordPrefix.length, completion);
+				resetCycle();
+				return result;
+			}
+			// Multiple suggestions
+			const lcp = findLongestCommonPrefix(suggestions);
+			if(lcp && lcp.length > context.currentWordPrefix.length) {
+				const result = _applyCompletion(fullInput, context.startOfWordIndex, context.currentWordPrefix.length, lcp);
+				lastCompletionInput = result.textToInsert;
+				return result;
+			} else {
+				suggestionsCache = suggestions;
+				cycleIndex = -1;
+				lastCompletionInput = fullInput;
+				// Print the prompt and current input before showing suggestions
+				const promptText = `${DOM.promptUserSpan.textContent}${Config.TERMINAL.PROMPT_AT}${DOM.promptHostSpan.textContent}${Config.TERMINAL.PROMPT_SEPARATOR}${DOM.promptPathSpan.textContent}${Config.TERMINAL.PROMPT_CHAR} `;
+				OutputManager.appendToOutput(`${promptText}${fullInput}`, {
+					isCompletionSuggestion: true
+				});
+				// Now show the suggestions on the next line
+				OutputManager.appendToOutput(suggestionsCache.join("    "), {
+					typeClass: Config.CSS_CLASSES.CONSOLE_LOG_MSG,
+					isCompletionSuggestion: true
+				});
+				if(DOM.outputDiv) DOM.outputDiv.scrollTop = DOM.outputDiv.scrollHeight;
+				return {
+					textToInsert: null
+				};
+			}
+		} else { // We are cycling
+			cycleIndex = (cycleIndex + 1) % suggestionsCache.length;
+			const nextSuggestion = suggestionsCache[cycleIndex];
+			const result = _applyCompletion(fullInput, context.startOfWordIndex, context.currentWordPrefix.length, nextSuggestion);
+			lastCompletionInput = result.textToInsert;
+			return result;
+		}
 	}
 	return {
-		getSuggestions
+		handleTab,
+		resetCycle,
 	};
 })();
 
 function initializeTerminalEventListeners() {
-	if (!DOM.terminalDiv || !DOM.editableInputDiv) {
+	if(!DOM.terminalDiv || !DOM.editableInputDiv) {
 		console.error("Terminal event listeners cannot be initialized: Core DOM elements not found.");
 		return;
 	}
-
 	// This listener helps focus the input when the user clicks on the terminal area.
 	DOM.terminalDiv.addEventListener("click", (e) => {
-		if (EditorManager.isActive()) return;
+		if(EditorManager.isActive()) return;
 		const selection = window.getSelection();
-		if (selection && selection.toString().length > 0) {
+		if(selection && selection.toString().length > 0) {
 			return;
 		}
-		if (!e.target.closest("button, a") && (!DOM.editableInputDiv || !DOM.editableInputDiv.contains(e.target))) {
-			if (DOM.editableInputDiv.contentEditable === "true") TerminalUI.focusInput();
+		if(!e.target.closest("button, a") && (!DOM.editableInputDiv || !DOM.editableInputDiv.contains(e.target))) {
+			if(DOM.editableInputDiv.contentEditable === "true") TerminalUI.focusInput();
 		}
 	});
-
 	// This is the main keyboard event handler for the entire application.
-	document.addEventListener("keydown", async (e) => {
+	document.addEventListener("keydown", async(e) => {
 		// If the editor is active, it has its own key handler, so we do nothing here.
-		if (EditorManager.isActive()) {
+		if(EditorManager.isActive()) {
 			return;
 		}
-
 		// If a modal prompt (like a password input) is active, let the modal manager handle the key.
-		if (ModalInputManager.isAwaiting()) {
-			if (ModalInputManager.isObscured()) {
+		if(ModalInputManager.isAwaiting()) {
+			if(ModalInputManager.isObscured()) {
 				e.preventDefault();
-				if (e.key === "Enter") {
+				if(e.key === "Enter") {
 					await ModalInputManager.handleInput();
 				} else {
 					ModalInputManager.updateInput(e.key, e.key.length === 1 ? e.key : null);
 				}
 			} else {
-				if (e.key === "Enter") {
+				if(e.key === "Enter") {
 					e.preventDefault();
 					await ModalInputManager.handleInput();
 				}
 			}
 			return;
 		}
-
-		// === START OF THE FIX ===
-		// If the key press did not originate from our editable input div, ignore it.
-		// This is a more reliable way to check for focus than the previous method.
-		if (e.target !== DOM.editableInputDiv) {
+		if(e.target !== DOM.editableInputDiv) {
 			return;
 		}
-		// === END OF THE FIX ===
-
-		// If a script is running, we also ignore user input.
-		if (CommandExecutor.isScriptRunning()) {
+		if(CommandExecutor.isScriptRunning()) {
 			e.preventDefault();
 			return;
 		}
-
 		// Process the key press for the terminal
-		switch (e.key) {
+		switch(e.key) {
 			case "Enter":
 				e.preventDefault();
+				TabCompletionManager.resetCycle(); // Reset on command execution
 				await CommandExecutor.processSingleCommand(TerminalUI.getCurrentInputValue(), true);
 				break;
 			case "ArrowUp":
 				e.preventDefault();
 				const prevCmd = HistoryManager.getPrevious();
-				if (prevCmd !== null) {
+				if(prevCmd !== null) {
 					TerminalUI.setIsNavigatingHistory(true);
 					TerminalUI.setCurrentInputValue(prevCmd, true);
 				}
@@ -2836,7 +2520,7 @@ function initializeTerminalEventListeners() {
 			case "ArrowDown":
 				e.preventDefault();
 				const nextCmd = HistoryManager.getNext();
-				if (nextCmd !== null) {
+				if(nextCmd !== null) {
 					TerminalUI.setIsNavigatingHistory(true);
 					TerminalUI.setCurrentInputValue(nextCmd, true);
 				}
@@ -2846,9 +2530,9 @@ function initializeTerminalEventListeners() {
 				const currentInput = TerminalUI.getCurrentInputValue();
 				const sel = window.getSelection();
 				let cursorPos = 0;
-				if (sel && sel.rangeCount > 0) {
+				if(sel && sel.rangeCount > 0) {
 					const range = sel.getRangeAt(0);
-					if (DOM.editableInputDiv && DOM.editableInputDiv.contains(range.commonAncestorContainer)) {
+					if(DOM.editableInputDiv && DOM.editableInputDiv.contains(range.commonAncestorContainer)) {
 						const preCaretRange = range.cloneRange();
 						preCaretRange.selectNodeContents(DOM.editableInputDiv);
 						preCaretRange.setEnd(range.endContainer, range.endOffset);
@@ -2859,27 +2543,30 @@ function initializeTerminalEventListeners() {
 				} else {
 					cursorPos = currentInput.length;
 				}
-				const result = TabCompletionManager.getSuggestions(currentInput, cursorPos);
-				if (result?.textToInsert !== null && result.textToInsert !== undefined) {
+				const result = TabCompletionManager.handleTab(currentInput, cursorPos);
+				if(result ?.textToInsert !== null && result.textToInsert !== undefined) {
 					TerminalUI.setCurrentInputValue(result.textToInsert, false);
 					TerminalUI.setCaretPosition(DOM.editableInputDiv, result.newCursorPos);
 				}
 				break;
 		}
 	});
-
 	// This listener handles pasting text into the terminal.
-	if (DOM.editableInputDiv) {
+	if(DOM.editableInputDiv) {
 		DOM.editableInputDiv.addEventListener("paste", (e) => {
 			e.preventDefault();
-			if (DOM.editableInputDiv.contentEditable !== "true") return;
+			if(DOM.editableInputDiv.contentEditable !== "true") return;
 			const text = (e.clipboardData || window.clipboardData).getData("text/plain");
 			document.execCommand("insertText", false, text.replace(/\r?\n|\r/g, " "));
 		});
+		DOM.editableInputDiv.addEventListener("input", (e) => {
+			if(e.isTrusted) {
+				TabCompletionManager.resetCycle();
+			}
+		});
 	}
 }
-
-window.onload = async () => {
+window.onload = async() => {
 	DOM = {
 		terminalBezel: document.getElementById("terminal-bezel"),
 		terminalDiv: document.getElementById("terminal"),
@@ -2894,39 +2581,29 @@ window.onload = async () => {
 		adventureModal: document.getElementById('adventure-modal'),
 		adventureInput: document.getElementById('adventure-input'),
 	};
-
 	OutputManager.initializeConsoleOverrides();
-
 	try {
 		await IndexedDBManager.init();
 		await FileSystemManager.load();
-
 		await UserManager.initializeDefaultUsers();
-
 		await Config.loadFromFile();
-
 		AliasManager.initialize();
-
 		SessionManager.loadAutomaticState(Config.USER.DEFAULT_NAME);
-
 		const guestHome = `/home/${Config.USER.DEFAULT_NAME}`;
-		if (!FileSystemManager.getNodeByPath(FileSystemManager.getCurrentPath())) {
-			if (FileSystemManager.getNodeByPath(guestHome)) {
+		if(!FileSystemManager.getNodeByPath(FileSystemManager.getCurrentPath())) {
+			if(FileSystemManager.getNodeByPath(guestHome)) {
 				FileSystemManager.setCurrentPath(guestHome);
 			} else {
 				FileSystemManager.setCurrentPath(Config.FILESYSTEM.ROOT_PATH);
 			}
 		}
-
 		initializeTerminalEventListeners();
 		TerminalUI.updatePrompt();
 		TerminalUI.focusInput();
-
 		console.log(`${Config.OS.NAME} v.${Config.OS.VERSION} loaded successfully!`);
-
-	} catch (error) {
+	} catch(error) {
 		console.error("Failed to initialize OopisOs on window.onload:", error, error.stack);
-		if (DOM.outputDiv) {
+		if(DOM.outputDiv) {
 			DOM.outputDiv.innerHTML += `<div class="text-red-500">FATAL ERROR: ${error.message}. Check console for details.</div>`;
 		}
 	}

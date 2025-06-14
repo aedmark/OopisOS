@@ -1,8 +1,6 @@
 // adventure.js - OopisOS Adventure Engine and Editor v2.3
-
 const TextAdventureModal = (() => {
   "use strict";
-
   let adventureModal, adventureContainer, adventureTitle, adventureOutput, adventureInput, adventureCloseBtn;
   let isActive = false;
   let currentAdventureData = null;
@@ -15,11 +13,9 @@ const TextAdventureModal = (() => {
     adventureOutput = document.getElementById('adventure-output');
     adventureInput = document.getElementById('adventure-input');
     adventureCloseBtn = document.getElementById('adventure-close-btn');
-
-    if (!adventureModal || !adventureInput || !adventureCloseBtn || !adventureOutput) {
+    if(!adventureModal || !adventureInput || !adventureCloseBtn || !adventureOutput) {
       console.error("TextAdventureModal: Critical UI elements not found in DOM!");
-
-      if (adventureModal && !adventureContainer) {
+      if(adventureModal && !adventureContainer) {
         adventureModal.innerHTML = `
                     <div id="adventure-container" style="width: 700px; height: 500px; background: #0A0A0A; border: 1px solid #0F0; display: flex; flex-direction: column; padding: 10px; font-family: 'VT323', monospace; color: #0F0;">
                         <div id="adventure-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
@@ -29,7 +25,6 @@ const TextAdventureModal = (() => {
                         <div id="adventure-output" style="flex-grow: 1; overflow-y: auto; margin-bottom: 10px; white-space: pre-wrap;"></div>
                         <div id="adventure-input-container" style="display: flex;"><span style="margin-right: 5px;">&gt;</span><input type="text" id="adventure-input" style="flex-grow: 1; background: transparent; border: none; color: #0F0; font-family: 'VT323', monospace; outline: none;"></div>
                     </div>`;
-
         _initDOM();
       }
       return false;
@@ -38,9 +33,8 @@ const TextAdventureModal = (() => {
   }
 
   function show(adventureData, engineInstance) {
-    if (!_initDOM()) {
-
-      if (typeof OutputManager !== 'undefined' && typeof OutputManager.appendToOutput === 'function' && typeof Config !== 'undefined' && Config.CSS_CLASSES) {
+    if(!_initDOM()) {
+      if(typeof OutputManager !== 'undefined' && typeof OutputManager.appendToOutput === 'function' && typeof Config !== 'undefined' && Config.CSS_CLASSES) {
         OutputManager.appendToOutput("Error: Text Adventure UI could not be initialized.", {
           typeClass: Config.CSS_CLASSES.ERROR_MSG
         });
@@ -49,57 +43,47 @@ const TextAdventureModal = (() => {
       }
       return;
     }
-
     currentAdventureData = adventureData;
     currentEngineInstance = engineInstance;
     isActive = true;
-
-    if (adventureTitle && currentAdventureData && currentAdventureData.title) {
+    if(adventureTitle && currentAdventureData && currentAdventureData.title) {
       adventureTitle.textContent = currentAdventureData.title;
     }
     adventureOutput.innerHTML = '';
     adventureInput.value = '';
     adventureInput.disabled = false;
-
     adventureModal.classList.remove('hidden');
-
-    if (typeof OutputManager !== 'undefined' && typeof OutputManager.setEditorActive === 'function') {
+    if(typeof OutputManager !== 'undefined' && typeof OutputManager.setEditorActive === 'function') {
       OutputManager.setEditorActive(true);
     } else {
       console.warn("TextAdventureModal: OutputManager not available to set editor active state.");
     }
-    if (typeof TerminalUI !== 'undefined' && typeof TerminalUI.setInputState === 'function') {
+    if(typeof TerminalUI !== 'undefined' && typeof TerminalUI.setInputState === 'function') {
       TerminalUI.setInputState(false);
     } else {
       console.warn("TextAdventureModal: TerminalUI not available to set input state.");
     }
-
     adventureInput.focus();
     adventureInput.addEventListener('keydown', _handleInputKeydown);
     adventureCloseBtn.addEventListener('click', hide);
   }
 
   function hide() {
-    if (!_initDOM() || !isActive) return;
-
+    if(!_initDOM() || !isActive) return;
     isActive = false;
     currentAdventureData = null;
     currentEngineInstance = null;
-
     adventureModal.classList.add('hidden');
-
-    if (typeof OutputManager !== 'undefined' && typeof OutputManager.setEditorActive === 'function') {
+    if(typeof OutputManager !== 'undefined' && typeof OutputManager.setEditorActive === 'function') {
       OutputManager.setEditorActive(false);
     }
-    if (typeof TerminalUI !== 'undefined' && typeof TerminalUI.setInputState === 'function') {
+    if(typeof TerminalUI !== 'undefined' && typeof TerminalUI.setInputState === 'function') {
       TerminalUI.setInputState(true);
       TerminalUI.focusInput();
     }
-
     adventureInput.removeEventListener('keydown', _handleInputKeydown);
     adventureCloseBtn.removeEventListener('click', hide);
-
-    if (typeof OutputManager !== 'undefined' && typeof OutputManager.appendToOutput === 'function' && typeof Config !== 'undefined' && Config.CSS_CLASSES) {
+    if(typeof OutputManager !== 'undefined' && typeof OutputManager.appendToOutput === 'function' && typeof Config !== 'undefined' && Config.CSS_CLASSES) {
       OutputManager.appendToOutput("Exited text adventure.", {
         typeClass: Config.CSS_CLASSES.CONSOLE_LOG_MSG
       });
@@ -107,29 +91,28 @@ const TextAdventureModal = (() => {
   }
 
   function _handleInputKeydown(event) {
-    if (event.key === 'Enter') {
+    if(event.key === 'Enter') {
       event.preventDefault();
       const command = adventureInput.value.trim();
       adventureInput.value = '';
-      if (command && currentEngineInstance) {
+      if(command && currentEngineInstance) {
         currentEngineInstance.processCommand(command);
       }
     }
   }
 
   function appendOutput(text, type = 'room-desc') {
-    if (!adventureOutput && !_initDOM()) return;
-    if (adventureOutput) {
+    if(!adventureOutput && !_initDOM()) return;
+    if(adventureOutput) {
       const p = document.createElement('p');
       p.textContent = text;
-      if (type) {
+      if(type) {
         p.className = type;
       }
       adventureOutput.appendChild(p);
       adventureOutput.scrollTop = adventureOutput.scrollHeight;
     }
   }
-
   return {
     show,
     hide,
@@ -137,10 +120,8 @@ const TextAdventureModal = (() => {
     isActive: () => isActive,
   };
 })();
-
 const TextAdventureEngine = (() => {
   "use strict";
-
   let adventure;
   let player;
   let adventureInputRef;
@@ -149,17 +130,15 @@ const TextAdventureEngine = (() => {
     adventure = JSON.parse(JSON.stringify(adventureData));
     player = {
       currentLocation: adventure.startingRoomId,
-      inventory: adventure.player?.inventory || [],
+      inventory: adventure.player ?.inventory || [],
     };
-
     const advInput = document.getElementById('adventure-input');
-    if (advInput) {
+    if(advInput) {
       adventureInputRef = advInput;
     } else {
       console.warn("TextAdventureEngine: Could not get reference to adventure input field.");
       adventureInputRef = null;
     }
-
     TextAdventureModal.show(adventure, {
       processCommand
     });
@@ -171,10 +150,8 @@ const TextAdventureEngine = (() => {
     const parts = command.toLowerCase().trim().split(/\s+/);
     const action = parts[0];
     const target = parts.slice(1).join(" ");
-
-    if (!action) return;
-
-    switch (action) {
+    if(!action) return;
+    switch(action) {
       case 'look':
         _handleLook(target);
         break;
@@ -203,27 +180,23 @@ const TextAdventureEngine = (() => {
       default:
         TextAdventureModal.appendOutput("I don't understand that command. Try 'help'.", 'error');
     }
-
     _checkWinConditions();
   }
 
   function _displayCurrentRoom() {
     const room = adventure.rooms[player.currentLocation];
-    if (!room) {
+    if(!room) {
       TextAdventureModal.appendOutput("Error: You are in an unknown void!", 'error');
       return;
     }
-
     TextAdventureModal.appendOutput(`\n--- ${room.name} ---`, 'room-name');
     TextAdventureModal.appendOutput(room.description, 'room-desc');
-
     const roomItems = _getItemsInRoom(player.currentLocation);
-    if (roomItems.length > 0) {
+    if(roomItems.length > 0) {
       TextAdventureModal.appendOutput("You see here: " + roomItems.map(item => adventure.items[item.id].name).join(", ") + ".", 'items');
     }
-
     const exitNames = Object.keys(room.exits || {});
-    if (exitNames.length > 0) {
+    if(exitNames.length > 0) {
       TextAdventureModal.appendOutput("Exits: " + exitNames.join(", ") + ".", 'exits');
     } else {
       TextAdventureModal.appendOutput("There are no obvious exits.", 'exits');
@@ -231,12 +204,11 @@ const TextAdventureEngine = (() => {
   }
 
   function _handleLook(target) {
-    if (!target || target === 'room' || target === 'around') {
+    if(!target || target === 'room' || target === 'around') {
       _displayCurrentRoom();
     } else {
-
       const item = _findItemByName(target, player.currentLocation) || _findItemInInventory(target);
-      if (item) {
+      if(item) {
         TextAdventureModal.appendOutput(item.description, 'info');
       } else {
         TextAdventureModal.appendOutput(`You don't see any "${target}" here.`, 'error');
@@ -246,9 +218,9 @@ const TextAdventureEngine = (() => {
 
   function _handleGo(direction) {
     const room = adventure.rooms[player.currentLocation];
-    if (room.exits && room.exits[direction]) {
+    if(room.exits && room.exits[direction]) {
       const nextRoomId = room.exits[direction];
-      if (adventure.rooms[nextRoomId]) {
+      if(adventure.rooms[nextRoomId]) {
         player.currentLocation = nextRoomId;
         _displayCurrentRoom();
       } else {
@@ -261,10 +233,9 @@ const TextAdventureEngine = (() => {
 
   function _handleTake(itemName) {
     const item = _findItemByName(itemName, player.currentLocation);
-    if (item) {
-      if (item.canTake !== false) {
+    if(item) {
+      if(item.canTake !== false) {
         player.inventory.push(item.id);
-
         item.location = 'player';
         TextAdventureModal.appendOutput(`You take the ${item.name}.`, 'info');
       } else {
@@ -277,9 +248,8 @@ const TextAdventureEngine = (() => {
 
   function _handleDrop(itemName) {
     const item = _findItemInInventory(itemName);
-    if (item) {
+    if(item) {
       player.inventory = player.inventory.filter(id => id !== item.id);
-
       item.location = player.currentLocation;
       TextAdventureModal.appendOutput(`You drop the ${item.name}.`, 'info');
     } else {
@@ -288,7 +258,7 @@ const TextAdventureEngine = (() => {
   }
 
   function _handleInventory() {
-    if (player.inventory.length === 0) {
+    if(player.inventory.length === 0) {
       TextAdventureModal.appendOutput("You are not carrying anything.", 'info');
     } else {
       const itemNames = player.inventory.map(id => adventure.items[id].name);
@@ -308,10 +278,10 @@ const TextAdventureEngine = (() => {
   }
 
   function _findItemByName(name, locationId = null) {
-    for (const id in adventure.items) {
+    for(const id in adventure.items) {
       const item = adventure.items[id];
-      if (item.name.toLowerCase() === name.toLowerCase()) {
-        if (locationId === null || item.location === locationId) {
+      if(item.name.toLowerCase() === name.toLowerCase()) {
+        if(locationId === null || item.location === locationId) {
           return item;
         }
       }
@@ -326,8 +296,8 @@ const TextAdventureEngine = (() => {
 
   function _getItemsInRoom(roomId) {
     const itemsInRoom = [];
-    for (const id in adventure.items) {
-      if (adventure.items[id].location === roomId) {
+    for(const id in adventure.items) {
+      if(adventure.items[id].location === roomId) {
         itemsInRoom.push(adventure.items[id]);
       }
     }
@@ -336,32 +306,25 @@ const TextAdventureEngine = (() => {
 
   function _checkWinConditions() {
     const winCondition = adventure.winCondition;
-    if (!winCondition) return;
-
+    if(!winCondition) return;
     let won = false;
-    if (winCondition.type === "itemInRoom" &&
-      adventure.items[winCondition.itemId]?.location === winCondition.roomId) {
+    if(winCondition.type === "itemInRoom" && adventure.items[winCondition.itemId] ?.location === winCondition.roomId) {
       won = true;
-    } else if (winCondition.type === "playerHasItem" &&
-      player.inventory.includes(winCondition.itemId)) {
+    } else if(winCondition.type === "playerHasItem" && player.inventory.includes(winCondition.itemId)) {
       won = true;
     }
-
-    if (won) {
+    if(won) {
       TextAdventureModal.appendOutput(adventure.winMessage || "\n*** Congratulations! You have won! ***", 'system');
-      if (adventureInputRef) {
+      if(adventureInputRef) {
         adventureInputRef.disabled = true;
       }
-
     }
   }
-
   return {
     startAdventure,
     processCommand,
   };
 })();
-
 const sampleAdventure = {
   title: "The Lost Key of Oopis",
   startingRoomId: "forest_entrance",
@@ -453,82 +416,70 @@ const sampleAdventure = {
   },
   winMessage: "\n*** You found the Oopis Gem! Your quest is complete! ***"
 };
-
-if (typeof CommandExecutor !== 'undefined' && CommandExecutor.getCommands) {
+if(typeof CommandExecutor !== 'undefined' && CommandExecutor.getCommands) {
   const oopisCommands = CommandExecutor.getCommands();
-  if (!oopisCommands.adventure) {
+  if(!oopisCommands.adventure) {
     oopisCommands.adventure = {
-      handler: async (args, options) => {
-
-        if (typeof TextAdventureModal === 'undefined' || typeof TextAdventureModal.isActive !== 'function') {
+      handler: async(args, options) => {
+        if(typeof TextAdventureModal === 'undefined' || typeof TextAdventureModal.isActive !== 'function') {
           console.error("Command 'adventure': TextAdventureModal is not defined or not initialized correctly.");
           return {
             success: false,
             error: "Adventure UI (TextAdventureModal) is not available. Check console for JS errors."
           };
         }
-        if (typeof TextAdventureEngine === 'undefined' || typeof TextAdventureEngine.startAdventure !== 'function') {
+        if(typeof TextAdventureEngine === 'undefined' || typeof TextAdventureEngine.startAdventure !== 'function') {
           console.error("Command 'adventure': TextAdventureEngine is not defined or not initialized correctly.");
           return {
             success: false,
             error: "Adventure Engine (TextAdventureEngine) is not available. Check console for JS errors."
           };
         }
-
-        if (TextAdventureModal.isActive()) {
+        if(TextAdventureModal.isActive()) {
           return {
             success: false,
             error: "An adventure is already in progress. Type 'quit' in the adventure window to exit."
           };
         }
-
         let adventureToLoad = sampleAdventure;
-
-        if (args.length > 0) {
+        if(args.length > 0) {
           const filePath = args[0];
-
-          if (typeof FileSystemManager === 'undefined' || typeof UserManager === 'undefined' || typeof Config === 'undefined') {
+          if(typeof FileSystemManager === 'undefined' || typeof UserManager === 'undefined' || typeof Config === 'undefined') {
             return {
               success: false,
               error: "FileSystemManager or UserManager or Config not available for loading adventure file."
             };
           }
-
           const pathValidation = FileSystemManager.validatePath("adventure", filePath, {
             expectedType: Config.FILESYSTEM.DEFAULT_FILE_TYPE
           });
-
-          if (pathValidation.error) {
+          if(pathValidation.error) {
             return {
               success: false,
               error: pathValidation.error
             };
           }
-
           const fileNode = pathValidation.node;
           const currentUser = UserManager.getCurrentUser().name;
-
-          if (!FileSystemManager.hasPermission(fileNode, currentUser, "read")) {
+          if(!FileSystemManager.hasPermission(fileNode, currentUser, "read")) {
             return {
               success: false,
               error: `adventure: Cannot read file '${filePath}'${Config.MESSAGES.PERMISSION_DENIED_SUFFIX}`
             };
           }
-
           try {
             adventureToLoad = JSON.parse(fileNode.content);
-            if (!adventureToLoad.rooms || !adventureToLoad.startingRoomId || !adventureToLoad.items) {
+            if(!adventureToLoad.rooms || !adventureToLoad.startingRoomId || !adventureToLoad.items) {
               throw new Error("Invalid adventure file format. Missing essential parts like rooms, items, or startingRoomId.");
             }
-            if (!adventureToLoad.title) adventureToLoad.title = filePath;
-          } catch (e) {
+            if(!adventureToLoad.title) adventureToLoad.title = filePath;
+          } catch(e) {
             return {
               success: false,
               error: `adventure: Error parsing adventure file '${filePath}': ${e.message}`
             };
           }
         }
-
         TextAdventureEngine.startAdventure(adventureToLoad);
         return {
           success: true,
@@ -545,8 +496,8 @@ if (typeof CommandExecutor !== 'undefined' && CommandExecutor.getCommands) {
 }
 
 function adventure_start() {
-  if (typeof TextAdventureModal !== 'undefined' && typeof TextAdventureEngine !== 'undefined' && typeof sampleAdventure !== 'undefined') {
-    if (TextAdventureModal.isActive()) {
+  if(typeof TextAdventureModal !== 'undefined' && typeof TextAdventureEngine !== 'undefined' && typeof sampleAdventure !== 'undefined') {
+    if(TextAdventureModal.isActive()) {
       console.log("Adventure already active. Close it first.");
       return;
     }
